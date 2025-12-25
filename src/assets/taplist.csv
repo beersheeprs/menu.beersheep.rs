@@ -1,0 +1,6 @@
+tap_num,name,abv,image_url,description,price_big,price_small
+1,Amber Ale,2,"https://assets.untappd.com/site/beer_logos_hd/beer-5786009_18de3_hd.jpeg","A well-balanced amber ale with caramel malt sweetness and a subtle hop bitterness. Medium-bodied with a clean, crisp finish.",10,5
+2,Hazy IPA,5,,"Juicy, tropical, and hazy with intense aromas of mango, passionfruit, and citrus. Unfiltered for maximum flavor and aroma.",12,6
+3,Pilsner Gold,8,,"Crisp, clean, and refreshing traditional pilsner with a bright golden color and subtle floral hop aroma. Perfectly balanced.",14,7
+4,Wheat Hefeweizen,2,,"Unfiltered German-style wheat beer with distinctive banana and clove aromas. Cloudy appearance with a thick, creamy head.",1300,800
+5,Double Chocolate Porter,2,,"A decadent porter brewed with dark chocolate and cocoa nibs. Rich, smooth, and indulgent with a warming finish.",8000,840
