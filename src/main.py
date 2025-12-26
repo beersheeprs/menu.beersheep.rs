@@ -50,10 +50,9 @@ def gen_snippet(beer):
 
 
 def get_snippets(csv_reader):
-    snippets_list = []
-    for row in csv_reader:
-        snippets_list.append(gen_snippet(row))
-    return "\n".join(snippets_list)
+    snippets_list = list(csv_reader)
+    snippets_list.sort(key=lambda x: int(x["tap_num"]))
+    return "\n".join([gen_snippet(beer) for beer in snippets_list])
 
 
 if __name__ == "__main__":
