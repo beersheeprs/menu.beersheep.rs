@@ -238,6 +238,10 @@ h1 {
 .footer i {
   color: #4caf50;
 }
+.footer a {
+  color: #4caf50;
+  text-decoration: none;
+}
 
 /* Tablet and Desktop - Override mobile styles */
 @media (min-width: 769px) {
