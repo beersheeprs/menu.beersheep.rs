@@ -1,16 +1,22 @@
-# html taplist generator
+# menu.beersheep.rs
 
-## howto
+## deployment
 
-- Review and update `src/assets/taplist.csv`. Note: text values (e.g. link and description) should be "surrounded with quotation marks". Link field could be empty.
-- `python src/main.py`
-- The brand new web-page is ready, check it for mistakes (checkout the debug section below).
-- Push updated taplist and `docs/index.html` to repo to deploy them
-- Wait for few minutes
-- You're awesome
+- update supabase tables (mostly it'll be `taps` or `prices`)
+- trigger github actions via Actions — Deploy to GitHub pages — Run workflow
+- wait for a few seconds
+- check the website for changes
 
-## debug
+## development
 
-- `python src/main.py`
-- `python3 -m http.server`
-- Visit `http://bs-local.com:8000`
+### prerequisites
+
+- install [nvm](https://www.nvmnode.com/guide/installation.html)
+- `nvm install && nvm use`
+- `npm install`
+
+### build and debug
+
+- Add keys for db to `.env`
+- `npm run serve`
+- visit `http://bs-local.com:8000/`

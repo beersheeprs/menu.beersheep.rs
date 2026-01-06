@@ -86,7 +86,8 @@ h1 {
   align-items: flex-start;
   margin-bottom: 8px;
   position: relative;
-  padding-right: 75px; /* Space for ABV badge */
+  padding-right: 75px;
+  /* Space for ABV badge */
 }
 
 .beer-name {
@@ -238,6 +239,7 @@ h1 {
 .footer i {
   color: #4caf50;
 }
+
 .footer a {
   color: #4caf50;
   text-decoration: none;
