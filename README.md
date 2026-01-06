@@ -18,4 +18,5 @@
 ### build and debug
 
 - Add keys for db to `.env`
-- `npm run build`
+- `npm run serve`
+- visit `http://bs-local.com:8000/`
