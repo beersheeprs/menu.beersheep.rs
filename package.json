@@ -1,0 +1,20 @@
+{
+  "name": "bsh-builder",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js",
+    "clean": "rm -rf dist && echo '✅ Cleaned dist folder'"
+  },
+  "author": "k-pf",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.89.0",
+    "ejs": "^3.1.10",
+    "html-minifier-terser": "^7.2.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
