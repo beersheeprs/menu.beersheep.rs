@@ -5,7 +5,7 @@
   "main": "build.js",
   "scripts": {
     "build": "node build.js",
-    "clean": "rm -rf dist && echo '✅ Cleaned dist folder'",
+    "clean": "rm -rf dist && echo 'Cleaned dist folder'",
     "preserve": "npm run build",
     "serve": "npx serve -p 8000 dist/"
   },

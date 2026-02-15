@@ -13,7 +13,7 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-    console.error('❌ Supabase credentials not found in environment variables');
+    console.error('Supabase credentials not found in environment variables');
     if (process.env.NODE_ENV !== 'production') {
         console.error('   Make sure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env file');
     } else {
@@ -40,7 +40,7 @@ const minifyOptions = {
 
 // Function to fetch data from Supabase
 async function fetchDataFromSupabase() {
-    console.log('📡 Fetching data from Supabase...');
+    console.log('Fetching data from Supabase');
 
     try {
         const { data, error } = await supabase.rpc('get_taplist')
@@ -48,7 +48,7 @@ async function fetchDataFromSupabase() {
             data
         };
     } catch (error) {
-        console.error('❌ Error fetching data from Supabase:', error.message);
+        console.error('Error fetching data from Supabase:', error.message);
         return {
             data: []
         };
@@ -114,13 +114,13 @@ async function build() {
             buildDate: new Date().toISOString(),
             environment: process.env.NODE_ENV || 'development'
         };
-        console.log('🚀 Building HTML with EJS...');
+        console.log('Building HTML with EJS...');
         const distDir = './dist';
         if (fs.existsSync(distDir)) {
             fs.rmSync(distDir, { recursive: true, force: true });
         }
         ensureDir(distDir);
-        console.log('📁 Copying static assets...');
+        console.log('Copying static assets');
         const assetDirs = [
             { src: './src/assets', dest: './dist' },
             { src: './src/styles', dest: './dist' },
@@ -141,17 +141,17 @@ async function build() {
         });
 
         if (process.env.MINIFY !== 'false') {
-            console.log('🔧 Minifying HTML...');
+            console.log('Minifying HTML');
             html = await htmlMinifier.minify(html, minifyOptions);
         }
 
         // Write to output file
         const outputPath = path.join(distDir, 'index.html');
         fs.writeFileSync(outputPath, html);
-        console.log(`✅ Successfully built: ${outputPath}`);
+        console.log(`Successfully built: ${outputPath}`);
 
     } catch (error) {
-        console.error('❌ Build failed:', error.message);
+        console.error('Build failed:', error.message);
         process.exit(1);
     }
 }
