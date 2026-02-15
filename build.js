@@ -39,7 +39,7 @@ const minifyOptions = {
 };
 
 // Function to fetch data from Supabase
-async function fetchDataFromSupabase() {
+async function fetchBeerData() {
     console.log('Fetching data from Supabase');
 
     try {
@@ -101,7 +101,7 @@ const partials = {
 
 async function build() {
     try {
-        const beers = await fetchDataFromSupabase();
+        const beers = await fetchBeerData();
         const templateData = {
             // Asset paths (relative to dist/)
             assets: {
@@ -145,10 +145,11 @@ async function build() {
             html = await htmlMinifier.minify(html, minifyOptions);
         }
 
-        // Write to output file
-        const outputPath = path.join(distDir, 'index.html');
-        fs.writeFileSync(outputPath, html);
-        console.log(`Successfully built: ${outputPath}`);
+        // atm index is the only page
+        fs.writeFileSync(path.join(distDir, 'index.html'), html);
+        // at some point index should be the entry point, and taps should be the taplist page
+        fs.writeFileSync(path.join(distDir, 'taps.html'), html);
+        console.log(`Successfully built`);
 
     } catch (error) {
         console.error('Build failed:', error.message);
