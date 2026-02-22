@@ -16,10 +16,10 @@
     <div class="container">
         <%- partials.header %>
         <%- include('partials/ld-json', {beers: beers}) %>
-        <div class="beer-grid">
+        <div class="grid">
             <% if (beers.data && beers.data.length> 0) { %>
                 <% beers.data.forEach(beer=> { %>
-                    <%- include('partials/snippet', {beer: beer}); %>
+                    <%- include('partials/snippet', {item: beer}); %>
                 <% }) %>
             <% } else { %>
                 <p>No beers available at the moment. Please check back later!</p>
