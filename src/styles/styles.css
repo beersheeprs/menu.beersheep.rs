@@ -33,21 +33,6 @@ h1 {
   letter-spacing: 1px;
 }
 
-.tagline {
-  color: #aaa;
-  font-size: clamp(0.9rem, 3vw, 1.2rem);
-  font-style: italic;
-}
-
-.intro {
-  text-align: center;
-  max-width: 800px;
-  margin: 0 auto 25px;
-  color: #ccc;
-  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-  padding: 0 8px;
-}
-
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -215,12 +200,6 @@ h1 {
   font-weight: 700;
 }
 
-.divider {
-  color: #555;
-  font-weight: 300;
-  padding: 0 5px;
-}
-
 .footer {
   text-align: center;
   margin-top: 35px;
@@ -373,10 +352,6 @@ h1 {
     flex-direction: column;
     align-items: center;
     gap: 3px;
-  }
-
-  .divider {
-    display: none;
   }
 
   .producer,

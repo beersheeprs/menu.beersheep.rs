@@ -106,8 +106,7 @@ async function build() {
             // Asset paths (relative to dist/)
             assets: {
                 images: './assets/images',
-                styles: './styles',
-                scripts: './scripts',
+                styles: './styles'
             },
             beers,
 
