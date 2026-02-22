@@ -1,0 +1,76 @@
+<script type='application/ld+json'>
+            {
+                "@context": "http://www.schema.org",
+                "@type": "BarOrPub",
+                "name": "Beersheep Garden",
+                "logo": "https://menu.beersheep.rs/mstile-310x310.png",
+                "image": "https://menu.beersheep.rs/mstile-310x310.png",
+                "telephone": "+38163301415",
+                "priceRange": "$",
+                "address": {
+                    "@type": "PostalAddress",
+                    "streetAddress": "Kneginje Zorke 3",
+                    "addressLocality": "Belgrade",
+                    "postalCode": "11000",
+                    "addressCountry": "RS"
+                },
+                "hasMap": "https://maps.app.goo.gl/z2qo5YZfdFaiDu4n7",
+                "openingHours": "Mo 16:00-01:00 Tu 16:00-01:00 We 16:00-01:00 Th 16:00-01:00 Fr 16:00-01:00 Sa 16:00-01:00 Su 15:00-23:00",
+                "geo": {
+                    "@type": "GeoCoordinates",
+                    "latitude": "44.8002398",
+                    "longitude": "20.4665677"
+                }
+                <% if (beers.data && beers.data.length> 0) { %>,
+                    "servesCuisine": ["Beer"],
+                    "hasMenu": {
+                        "@type": "Menu",
+                        "name": "Taplist",
+                        "description": "Beers on tap",
+                        "hasMenuSection": [
+                            {
+                                "@type": "MenuSection",
+                                "name": "Draft Beers",
+                                "description": "Current beers on tap",
+                                "hasMenuItem": [
+                                        <% beers.data.forEach(beer=> { %>
+                                            {
+                                                "@type": "MenuItem",
+                                                "name": "<%= beer.name %>",
+                                                "description": "<%= beer.description %>",
+                                                "offers": {
+                                                    "@type": "Offer",
+                                                    "priceCurrency": "RSD",
+                                                    "priceSpecification": [
+                                                        {
+                                                            "@type": "UnitPriceSpecification",
+                                                            "price": "<%= beer.price_small %>",
+                                                            "unitCode": "LTR",
+                                                            "referenceQuantity": {
+                                                                "@type": "QuantitativeValue",
+                                                                "value": 0.33,
+                                                                "unitCode": "LTR"
+                                                            }
+                                                        },
+                                                        {
+                                                            "@type": "UnitPriceSpecification",
+                                                            "price": "<%= beer.price_big %>",
+                                                            "unitCode": "LTR",
+                                                            "referenceQuantity": {
+                                                                "@type": "QuantitativeValue",
+                                                                "value": 0.5,
+                                                                "unitCode": "LTR"
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                            <% if (beers.data.indexOf(beer) !== beers.data.length - 1) { %>,<% } %>
+                                            <% }) %>
+                                ]
+                            }
+                        ]
+                    }
+                    <% } %>
+            }
+        </script>
