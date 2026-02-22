@@ -140,7 +140,7 @@ async function build() {
             filename: 'src/index.ejs'
         });
 
-        if (process.env.MINIFY !== 'false') {
+        if (process.env.NODE_ENV === 'production') {
             console.log('Minifying HTML');
             html = await htmlMinifier.minify(html, minifyOptions);
         }
