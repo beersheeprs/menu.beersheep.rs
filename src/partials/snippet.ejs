@@ -42,14 +42,21 @@
                     <div class="snippet-prices">
                         <div class="price-option">
                             <div class="size-price">
-                                <span class="size">0.33 l:</span>
-                                <span class="price">
-                                    <%= item.price_small %> RSD
-                                </span>
-                                <span class="size">0.5 l:</span>
-                                <span class="price">
-                                    <%= item.price_big %> RSD
-                                </span>
+                                <% if(item.price_small) { %>
+                                    <span class="size">0.33 l:</span>
+                                    <span class="price">
+                                        <%= item.price_small %> RSD
+                                    </span>
+                                    <% } %>
+                                        <% if(item.price_big) { %>
+                                            <span class="size">0.5 l:</span>
+                                            <span class="price">
+                                                <%= item.price_big %> RSD
+                                            </span>
+                                            <% } %>
+                                                <% if(!item.price_small && !item.price_big) { %>
+                                                    <span class="size">Please ask the bartender for price details</span>
+                                                    <% } %>
                             </div>
                         </div>
                     </div>
