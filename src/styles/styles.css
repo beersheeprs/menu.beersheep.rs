@@ -408,12 +408,73 @@ h1 {
     border-left: 4px solid #4dac68;
   }
 }
+
 .overlay {
   display: none;
 }
+
 .soc-link {
   display: flex;
   gap: 15px;
   justify-content: center;
   margin-top: 20px;
+}
+
+.rating-system {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* Base circle rating style */
+.circle-rating {
+  --rating: 0;
+  --size: 15px;
+  --gap: 1px;
+  --empty: #e2e8f0;
+  --filled: #f59e0b;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+}
+
+.circles {
+  position: relative;
+  display: inline-block;
+  font-size: var(--size);
+  letter-spacing: var(--gap);
+  color: var(--empty);
+}
+
+.circles::before {
+  content: "● ● ● ● ●";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(var(--rating) * 20%);
+  color: var(--filled);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.circles.hollow::before {
+  content: "○ ○ ○ ○ ○";
+}
+
+.rating-value {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.rating-label {
+  font-size: 14px;
+  color: #6b7280;
+  margin-left: 4px;
 }

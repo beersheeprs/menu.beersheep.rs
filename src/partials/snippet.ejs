@@ -31,20 +31,28 @@
             <p class="snippet-description">
                 <%= item.description %>
             </p>
-            <div class="snippet-prices">
-                <div class="price-option">
-                    <div class="size-price">
-                        <span class="size">0.33 l:</span>
-                        <span class="price">
-                            <%= item.price_small %> RSD
-                        </span>
-                        <span class="size">0.5 l:</span>
-                        <span class="price">
-                            <%= item.price_big %> RSD
-                        </span>
-                    </div>
+            <% if(item.rating) { %>
+                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>">
+                    <div class="circles">● ● ● ● ●</div>
+                    <div><span class="value">
+                            <%= item.rating.toFixed(1) %>
+                        </span><span class="rating-label">/5</span></div>
                 </div>
-            </div>
+                <% } %>
+                    <div class="snippet-prices">
+                        <div class="price-option">
+                            <div class="size-price">
+                                <span class="size">0.33 l:</span>
+                                <span class="price">
+                                    <%= item.price_small %> RSD
+                                </span>
+                                <span class="size">0.5 l:</span>
+                                <span class="price">
+                                    <%= item.price_big %> RSD
+                                </span>
+                            </div>
+                        </div>
+                    </div>
         </div>
     </div>
 </div>
