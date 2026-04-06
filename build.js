@@ -38,12 +38,29 @@ const minifyOptions = {
     ignoreCustomComments: [/^!/],
 };
 
-// Function to fetch data from Supabase
+// Function to fetch data from Supabase for manual taps
 async function fetchBeerData() {
     console.log('Fetching data from Supabase');
 
     try {
         const { data, error } = await supabase.rpc('get_taplist')
+        return {
+            data
+        };
+    } catch (error) {
+        console.error('Error fetching data from Supabase:', error.message);
+        return {
+            data: []
+        };
+    }
+}
+
+// Function to fetch data from Supabase for untappd taps
+async function fetchUntappdData() {
+    console.log('Fetching data from Supabase');
+
+    try {
+        const { data, error } = await supabase.rpc('get_untappd_taplist')
         return {
             data
         };
@@ -102,6 +119,8 @@ const partials = {
 async function build() {
     try {
         const beers = await fetchBeerData();
+        const untappdBeers = await fetchUntappdData();
+        console.log(untappdBeers)
         const templateData = {
             // Asset paths (relative to dist/)
             assets: {
@@ -109,7 +128,16 @@ async function build() {
                 styles: './styles'
             },
             beers,
-
+            buildDate: new Date().toISOString(),
+            environment: process.env.NODE_ENV || 'development'
+        };
+        const tapsTemplate = {
+            // Asset paths (relative to dist/)
+            assets: {
+                images: './assets/images',
+                styles: './styles'
+            },
+            beers: untappdBeers,
             buildDate: new Date().toISOString(),
             environment: process.env.NODE_ENV || 'development'
         };
@@ -131,23 +159,28 @@ async function build() {
             }
         });
         const mainTemplate = readTemplate('./src/index.ejs');
-        let html = ejs.render(mainTemplate, {
+        let indexHtml = ejs.render(mainTemplate, {
             ...templateData,
             partials,
-            // EJS options
             cache: templateData.environment === 'production',
+            filename: 'src/index.ejs'
+        });
+
+        let tapsHtml = ejs.render(mainTemplate, {
+            ...tapsTemplate,
+            partials,
+            cache: tapsTemplate.environment === 'production',
             filename: 'src/index.ejs'
         });
 
         if (process.env.NODE_ENV === 'production') {
             console.log('Minifying HTML');
-            html = await htmlMinifier.minify(html, minifyOptions);
+            indexHtml = await htmlMinifier.minify(indexHtml, minifyOptions);
+            tapsHtml = await htmlMinifier.minify(tapsHtml, minifyOptions);
         }
 
-        // atm index is the only page
-        fs.writeFileSync(path.join(distDir, 'index.html'), html);
-        // at some point index should be the entry point, and taps should be the taplist page
-        fs.writeFileSync(path.join(distDir, 'taps.html'), html);
+        fs.writeFileSync(path.join(distDir, 'index.html'), indexHtml);
+        fs.writeFileSync(path.join(distDir, 'taps.html'), tapsHtml);
         console.log(`Successfully built`);
 
     } catch (error) {
