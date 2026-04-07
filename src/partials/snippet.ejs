@@ -10,6 +10,7 @@
             </h2>
             <span class="abv-badge">
                 <%= item.abv.toFixed(1) %>% ABV
+                    <% if(item.ibu) { %>| <%= item.ibu %> IBU<% } %>
             </span>
         </div>
         <div class="snippet-subtitle">
