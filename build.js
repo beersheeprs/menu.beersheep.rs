@@ -120,7 +120,6 @@ async function build() {
     try {
         const beers = await fetchBeerData();
         const untappdBeers = await fetchUntappdData();
-        console.log(untappdBeers)
         const templateData = {
             // Asset paths (relative to dist/)
             assets: {
