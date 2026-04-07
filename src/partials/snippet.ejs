@@ -2,7 +2,11 @@
     <div class="snippet-header">
         <div class="title-row">
             <h2 class="snippet-name">
-                <%= item.tap_num %>. <%= item.name %>
+                <% if(item.tap_num) { %>
+                    <%= item.tap_num %>. <%= item.name %>
+                            <% } else { %>
+                                <%= item.name %>
+                                    <% } %>
             </h2>
             <span class="abv-badge">
                 <%= item.abv.toFixed(1) %>% ABV
