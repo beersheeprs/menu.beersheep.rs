@@ -161,6 +161,7 @@ async function build() {
         let indexHtml = ejs.render(mainTemplate, {
             ...templateData,
             partials,
+            pageType: 'index',
             cache: templateData.environment === 'production',
             filename: 'src/index.ejs'
         });
@@ -168,6 +169,7 @@ async function build() {
         let tapsHtml = ejs.render(mainTemplate, {
             ...tapsTemplate,
             partials,
+            pageType: 'taps',
             cache: tapsTemplate.environment === 'production',
             filename: 'src/index.ejs'
         });
