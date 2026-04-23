@@ -2,8 +2,8 @@
 
 ## deployment
 
-- update supabase tables (mostly it'll be `taps` or `prices`)
-- trigger github actions via Actions — Deploy to GitHub pages — Run workflow
+- update taps via bot
+- trigger deployment
 - wait for a few seconds
 - check the website for changes
 
