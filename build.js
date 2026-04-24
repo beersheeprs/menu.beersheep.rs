@@ -180,8 +180,8 @@ async function build() {
             tapsHtml = await htmlMinifier.minify(tapsHtml, minifyOptions);
         }
 
-        fs.writeFileSync(path.join(distDir, 'index.html'), indexHtml);
-        fs.writeFileSync(path.join(distDir, 'taps.html'), tapsHtml);
+        fs.writeFileSync(path.join(distDir, 'index.html'), tapsHtml);
+        fs.writeFileSync(path.join(distDir, 'taps.html'), indexHtml); // old version of taps page, will be removed eventually
         console.log(`Successfully built`);
 
     } catch (error) {
