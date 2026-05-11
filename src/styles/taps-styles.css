@@ -89,7 +89,7 @@ h1 {
   font-size: 0.85rem;
   white-space: nowrap;
   position: absolute;
-  top: 0;
+  top: 3.6em;
   right: 0;
   z-index: 2;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -242,7 +242,7 @@ h1 {
 
   .abv-badge {
     position: static;
-    margin-left: 10px;
+    margin-left: -45px;
     box-shadow: none;
     flex-shrink: 0;
   }
