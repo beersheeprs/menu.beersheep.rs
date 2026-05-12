@@ -59,11 +59,14 @@ async function fetchBeerData() {
 
 // Function to fetch data from Supabase for untappd taps
 async function fetchUntappdData() {
-    console.log('Fetching data from Supabase');
+    if (beerData && beerData.length > 0) {
+        console.debug('Using beer data from input environment variable');
+        return beerData;
+    }
+    console.log('Fetching untappd data from Supabase');
 
     try {
         const { data, error } = await supabase.rpc('get_untappd_taplist')
-        console.debug('Fetched env:', beerData);
         return {
             data
         };
