@@ -60,7 +60,7 @@ async function fetchBeerData() {
 // Function to fetch data from Supabase for untappd taps
 async function fetchUntappdData() {
     if (beerData && beerData.length > 0) {
-        console.debug('Using beer data from input environment variable');
+        console.debug('Using beer data from input environment variable', beerData);
         return beerData;
     }
     console.log('Fetching untappd data from Supabase');
