@@ -2,7 +2,6 @@ const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 const htmlMinifier = require('html-minifier-terser');
-const { createClient } = require('@supabase/supabase-js');
 
 if (process.env.NODE_ENV !== 'production') {
     console.debug('not production, loading .env file');
@@ -10,21 +9,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 // parse input json
 const beerData = process.env.BEER_DATA ? JSON.parse(process.env.BEER_DATA) : [];
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Supabase credentials not found in environment variables');
-    if (process.env.NODE_ENV !== 'production') {
-        console.error('   Make sure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in .env file');
-    } else {
-        console.error('   Make sure SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in environment variables');
-    }
-    process.exit(1);
-}
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 
 const minifyOptions = {
     collapseWhitespace: true,
@@ -40,42 +24,6 @@ const minifyOptions = {
     ignoreCustomComments: [/^!/],
 };
 
-// Function to fetch data from Supabase for manual taps
-async function fetchBeerData() {
-    console.log('Fetching data from Supabase');
-
-    try {
-        const { data, error } = await supabase.rpc('get_taplist')
-        return {
-            data
-        };
-    } catch (error) {
-        console.error('Error fetching data from Supabase:', error.message);
-        return {
-            data: []
-        };
-    }
-}
-
-// Function to fetch data from Supabase for untappd taps
-async function fetchUntappdData() {
-    if (beerData && beerData.length > 0) {
-        return { data: beerData };
-    }
-    console.log('Fetching untappd data from Supabase');
-
-    try {
-        const { data, error } = await supabase.rpc('get_untappd_taplist')
-        return {
-            data
-        };
-    } catch (error) {
-        console.error('Error fetching data from Supabase:', error.message);
-        return {
-            data: []
-        };
-    }
-}
 const ensureDir = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
@@ -97,16 +45,6 @@ const copyDir = (src, dest) => {
         }
     }
 };
-const copyFile = (src, dest, transform = null) => {
-    ensureDir(path.dirname(dest));
-
-    if (transform) {
-        const content = fs.readFileSync(src, 'utf8');
-        fs.writeFileSync(dest, transform(content));
-    } else {
-        fs.copyFileSync(src, dest);
-    }
-};
 
 // Helper function to read EJS files
 function readTemplate(filePath) {
@@ -123,28 +61,18 @@ const partials = {
 
 async function build() {
     try {
-        const beers = await fetchBeerData();
-        const untappdBeers = await fetchUntappdData();
-        const templateData = {
-            // Asset paths (relative to dist/)
+        if (!beerData || !Array.isArray(beerData) || beerData.length === 0) {
+            throw new Error('Invalid BEER_DATA environment variable:', beerData);
+        }
+        const beerDataTemplate = {
             assets: {
                 images: './assets/images',
                 styles: './styles'
             },
-            beers,
+            beers: { data: beerData },
             buildDate: new Date().toISOString(),
             environment: process.env.NODE_ENV || 'development'
-        };
-        const tapsTemplate = {
-            // Asset paths (relative to dist/)
-            assets: {
-                images: './assets/images',
-                styles: './styles'
-            },
-            beers: untappdBeers,
-            buildDate: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development'
-        };
+        }
         console.log('Building HTML with EJS...');
         const distDir = './dist';
         if (fs.existsSync(distDir)) {
@@ -163,30 +91,20 @@ async function build() {
             }
         });
         const mainTemplate = readTemplate('./src/index.ejs');
-        let indexHtml = ejs.render(mainTemplate, {
-            ...templateData,
+        let taplistHtml = ejs.render(mainTemplate, {
+            ...beerDataTemplate,
             partials,
             pageType: 'index',
-            cache: templateData.environment === 'production',
-            filename: 'src/index.ejs'
-        });
-
-        let tapsHtml = ejs.render(mainTemplate, {
-            ...tapsTemplate,
-            partials,
-            pageType: 'taps',
-            cache: tapsTemplate.environment === 'production',
+            cache: beerDataTemplate.environment === 'production',
             filename: 'src/index.ejs'
         });
 
         if (process.env.NODE_ENV === 'production') {
             console.log('Minifying HTML');
-            indexHtml = await htmlMinifier.minify(indexHtml, minifyOptions);
-            tapsHtml = await htmlMinifier.minify(tapsHtml, minifyOptions);
+            taplistHtml = await htmlMinifier.minify(taplistHtml, minifyOptions);
         }
 
-        fs.writeFileSync(path.join(distDir, 'index.html'), tapsHtml);
-        fs.writeFileSync(path.join(distDir, 'taps.html'), indexHtml); // old version of taps page, will be removed eventually
+        fs.writeFileSync(path.join(distDir, 'index.html'), taplistHtml);
         console.log(`Successfully built`);
 
     } catch (error) {
