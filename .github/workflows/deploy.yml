@@ -1,9 +1,13 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
+    inputs:
+      BEER_DATA:
+        description: "Beers json"
+        required: true
+        type: string
+        default: "[]"
 
 permissions:
   contents: read
@@ -30,6 +34,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          BEER_DATA: ${{ inputs.BEER_DATA }}
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           NODE_ENV: production

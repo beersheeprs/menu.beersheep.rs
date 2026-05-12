@@ -8,6 +8,8 @@ if (process.env.NODE_ENV !== 'production') {
     console.debug('not production, loading .env file');
     require('dotenv').config();
 }
+// parse input json
+const beerData = process.env.BEER_DATA ? JSON.parse(process.env.BEER_DATA) : [];
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -61,6 +63,7 @@ async function fetchUntappdData() {
 
     try {
         const { data, error } = await supabase.rpc('get_untappd_taplist')
+        console.debug('Fetched env:', beerData);
         return {
             data
         };
