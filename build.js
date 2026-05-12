@@ -94,7 +94,7 @@ async function build() {
         let taplistHtml = ejs.render(mainTemplate, {
             ...beerDataTemplate,
             partials,
-            pageType: 'index',
+            pageType: 'taps',
             cache: beerDataTemplate.environment === 'production',
             filename: 'src/index.ejs'
         });
