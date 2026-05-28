@@ -21,7 +21,7 @@ BEER_DATA (env var / workflow input)
 
 - **Build script** (`build.js`): Parses `BEER_DATA` JSON, renders EJS templates, copies static assets, minifies HTML in production.
 - **Templates** (`src/`): `index.ejs` is the main page; partials live in `src/partials/` (head metadata, header, footer, beer snippet card, JSON-LD structured data, Google Analytics).
-- **Styles** (`src/styles/`): `taps-styles.css` is the active stylesheet. `styles.css` exists as a fallback.
+- **Styles** (`src/styles/`): `styles.css` is the single stylesheet.
 - **Assets** (`src/assets/`): Favicons, app icons, and beer label images (`img/*.webp`).
 
 ## Tech stack
