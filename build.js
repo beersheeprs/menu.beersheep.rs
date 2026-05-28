@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
     console.debug('not production, loading .env file');
     require('dotenv').config();
 }
-// parse input json
+
 const beerData = process.env.BEER_DATA ? JSON.parse(process.env.BEER_DATA) : [];
 
 const minifyOptions = {
@@ -19,7 +19,6 @@ const minifyOptions = {
     useShortDoctype: true,
     minifyJS: true,
     minifyCSS: true,
-    minifyURLs: true,
     removeAttributeQuotes: true,
     ignoreCustomComments: [/^!/],
 };
@@ -29,6 +28,7 @@ const ensureDir = (dirPath) => {
         fs.mkdirSync(dirPath, { recursive: true });
     }
 };
+
 const copyDir = (src, dest) => {
     ensureDir(dest);
 
@@ -46,39 +46,40 @@ const copyDir = (src, dest) => {
     }
 };
 
-// Helper function to read EJS files
-function readTemplate(filePath) {
-    return fs.readFileSync(path.join(__dirname, filePath), 'utf8');
+function validateBeers(beers) {
+    if (!beers || !Array.isArray(beers) || beers.length === 0) {
+        throw new Error(
+            `Invalid BEER_DATA: expected non-empty array, got ${JSON.stringify(beers)}`
+        );
+    }
+    for (let i = 0; i < beers.length; i++) {
+        const beer = beers[i];
+        if (!beer.name || typeof beer.abv !== 'number') {
+            throw new Error(
+                `Invalid beer at index ${i}: missing name or abv. Got: ${JSON.stringify(beer)}`
+            );
+        }
+    }
 }
-
-// Read partials
-const partials = {
-    head: readTemplate('./src/partials/head.ejs'),
-    header: readTemplate('./src/partials/header.ejs'),
-    footer: readTemplate('./src/partials/footer.ejs'),
-    gtag: readTemplate('./src/partials/gtag.ejs'),
-};
 
 async function build() {
     try {
-        if (!beerData || !Array.isArray(beerData) || beerData.length === 0) {
-            throw new Error('Invalid BEER_DATA environment variable:', beerData);
-        }
-        const beerDataTemplate = {
-            assets: {
-                images: './assets/images',
-                styles: './styles'
-            },
+        validateBeers(beerData);
+
+        const templateData = {
             beers: { data: beerData },
             buildDate: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development'
-        }
+            environment: process.env.NODE_ENV || 'development',
+        };
+
         console.log('Building HTML with EJS...');
+
         const distDir = './dist';
         if (fs.existsSync(distDir)) {
             fs.rmSync(distDir, { recursive: true, force: true });
         }
         ensureDir(distDir);
+
         console.log('Copying static assets');
         const assetDirs = [
             { src: './src/assets', dest: './dist' },
@@ -90,13 +91,20 @@ async function build() {
                 console.debug(`   ✓ ${src} → ${dest}`);
             }
         });
-        const mainTemplate = readTemplate('./src/index.ejs');
+
+        const partials = {
+            head: fs.readFileSync(path.join(__dirname, 'src/partials/head.ejs'), 'utf8'),
+            header: fs.readFileSync(path.join(__dirname, 'src/partials/header.ejs'), 'utf8'),
+            footer: fs.readFileSync(path.join(__dirname, 'src/partials/footer.ejs'), 'utf8'),
+            gtag: fs.readFileSync(path.join(__dirname, 'src/partials/gtag.ejs'), 'utf8'),
+        };
+        const mainTemplate = fs.readFileSync(path.join(__dirname, 'src/index.ejs'), 'utf8');
+
         let taplistHtml = ejs.render(mainTemplate, {
-            ...beerDataTemplate,
+            ...templateData,
             partials,
             pageType: 'taps',
-            cache: beerDataTemplate.environment === 'production',
-            filename: 'src/index.ejs'
+            filename: 'src/index.ejs',
         });
 
         if (process.env.NODE_ENV === 'production') {
@@ -105,8 +113,7 @@ async function build() {
         }
 
         fs.writeFileSync(path.join(distDir, 'index.html'), taplistHtml);
-        console.log(`Successfully built`);
-
+        console.log('Successfully built');
     } catch (error) {
         console.error('Build failed:', error.message);
         process.exit(1);
