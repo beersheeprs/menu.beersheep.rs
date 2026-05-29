@@ -30,7 +30,7 @@
             <% } else if (item.image_url) { %>
                 <img src="<%= item.image_url %>" alt="<%= item.name %>" itemprop="image" />
             <% } else { %>
-                <div class="placeholder"><i class="fas fa-beer"></i></div>
+                <div class="placeholder"><i class="fas fa-beer" aria-hidden="true"></i></div>
             <% } %>
         </div>
         <div class="snippet-details">
@@ -38,7 +38,7 @@
                 <%= item.description %>
             </p>
             <% if(item.rating) { %>
-                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>" aria-label="Rating: <%= item.rating.toFixed(2) %> out of 5" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
                     <meta itemprop="ratingValue" content="<%= item.rating.toFixed(2) %>">
                     <meta itemprop="bestRating" content="5">
                     <div class="circles">● ● ● ● ●</div>
@@ -56,14 +56,14 @@
                     <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                         <meta itemprop="priceCurrency" content="RSD">
                         <span class="size">0.33 l:</span>
-                        <span class="price"><span itemprop="price"><%= item.price_small %></span> RSD</span>
+                        <span class="price"><data itemprop="price" value="<%= item.price_small %>"><%= item.price_small %> RSD</data></span>
                     </span>
                 <% } %>
                 <% if(item.price_big) { %>
                     <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                         <meta itemprop="priceCurrency" content="RSD">
                         <span class="size">0.5 l:</span>
-                        <span class="price"><span itemprop="price"><%= item.price_big %></span> RSD</span>
+                        <span class="price"><data itemprop="price" value="<%= item.price_big %>"><%= item.price_big %> RSD</data></span>
                     </span>
                 <% } %>
                 <% if(!item.price_small && !item.price_big) { %>
