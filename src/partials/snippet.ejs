@@ -38,7 +38,7 @@
                 <%= item.description %>
             </p>
             <% if(item.rating) { %>
-                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>" aria-label="Rating: <%= item.rating.toFixed(2) %> out of 5" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>" aria-label="Rating: <%= item.rating.toFixed(2) %> out of 5" itemscope itemtype="https://schema.org/AggregateRating">
                     <meta itemprop="ratingValue" content="<%= item.rating.toFixed(2) %>">
                     <meta itemprop="bestRating" content="5">
                     <div class="circles">● ● ● ● ●</div>
