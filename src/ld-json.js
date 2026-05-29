@@ -1,14 +1,16 @@
 module.exports = function (beers) {
-    const ld = {
+    const bar = {
         "@context": "https://schema.org",
         "@type": "BarOrPub",
         "@id": "#beersheep",
         "name": "Beersheep Garden",
         "url": "https://menu.beersheep.rs/",
+        "description": "Craft beer bar in Vračar, Belgrade with a rotating tap list of local and imported beers.",
         "logo": "https://menu.beersheep.rs/mstile-310x310.png",
         "image": "https://menu.beersheep.rs/mstile-310x310.png",
         "telephone": "+38163301415",
         "priceRange": "$",
+        "areaServed": { "@type": "City", "name": "Belgrade" },
         "address": {
             "@type": "PostalAddress",
             "streetAddress": "Kneginje Zorke 3",
@@ -35,8 +37,8 @@ module.exports = function (beers) {
     };
 
     if (beers.length > 0) {
-        ld.servesCuisine = ["Beer"];
-        ld.hasMenu = {
+        bar.servesCuisine = ["Beer"];
+        bar.hasMenu = {
             "@type": "Menu",
             "@id": "#menu",
             "name": "Taplist",
@@ -83,5 +85,13 @@ module.exports = function (beers) {
         };
     }
 
-    return ld;
+    const webSite = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "#website",
+        "url": "https://menu.beersheep.rs/",
+        "name": "Beersheep Garden Taplist"
+    };
+
+    return [bar, webSite];
 };
