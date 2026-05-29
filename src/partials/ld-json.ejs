@@ -1,7 +1,8 @@
 <script type='application/ld+json'>
             {
-                "@context": "http://www.schema.org",
+                "@context": "https://schema.org",
                 "@type": "BarOrPub",
+                "@id": "#beersheep",
                 "name": "Beersheep Garden",
                 "logo": "https://menu.beersheep.rs/mstile-310x310.png",
                 "image": "https://menu.beersheep.rs/mstile-310x310.png",
@@ -25,17 +26,20 @@
                     "servesCuisine": ["Beer"],
                     "hasMenu": {
                         "@type": "Menu",
+                        "@id": "#menu",
                         "name": "Taplist",
                         "description": "Beers on tap",
                         "hasMenuSection": [
                             {
                                 "@type": "MenuSection",
+                                "@id": "#draft-beers",
                                 "name": "Draft Beers",
                                 "description": "Current beers on tap",
                                 "hasMenuItem": [
-                                        <% beers.data.forEach(beer=> { %>
+                                        <% beers.data.forEach((beer, i)=> { %>
                                             {
                                                 "@type": "MenuItem",
+                                                "@id": "#tap<%= i + 1 %>",
                                                 "name": "<%= beer.name %>",
                                                 "description": "<%= beer.description %>",
                                                 "offers": {
