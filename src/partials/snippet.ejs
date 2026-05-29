@@ -1,7 +1,8 @@
-<div class="snippet">
+<div class="snippet" itemscope itemtype="https://schema.org/MenuItem">
+    <% if (item.tap_num) { %><meta itemprop="identifier" content="#tap<%= item.tap_num %>"><% } %>
     <div class="snippet-header">
         <div class="title-row">
-            <h2 class="snippet-name">
+            <h2 class="snippet-name" itemprop="name">
                 <% if(item.tap_num) { %>
                     <%= item.tap_num %>. <%= item.name %>
                 <% } else { %>
@@ -25,19 +26,21 @@
     <div class="snippet-content">
         <div class="snippet-image">
             <% if(item.image_name){ %>
-                <img src="/img/<%= item.image_name %>.webp" alt="<%= item.name %>" />
+                <img src="/img/<%= item.image_name %>.webp" alt="<%= item.name %>" itemprop="image" />
             <% } else if (item.image_url) { %>
-                <img src="<%= item.image_url %>" alt="<%= item.name %>" />
+                <img src="<%= item.image_url %>" alt="<%= item.name %>" itemprop="image" />
             <% } else { %>
                 <div class="placeholder"><i class="fas fa-beer"></i></div>
             <% } %>
         </div>
         <div class="snippet-details">
-            <p class="snippet-description">
+            <p class="snippet-description" itemprop="description">
                 <%= item.description %>
             </p>
             <% if(item.rating) { %>
-                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>">
+                <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                    <meta itemprop="ratingValue" content="<%= item.rating.toFixed(2) %>">
+                    <meta itemprop="bestRating" content="5">
                     <div class="circles">● ● ● ● ●</div>
                     <div><span class="value">
                             <%= item.rating.toFixed(2) %>
@@ -50,15 +53,17 @@
         <div class="price-option">
             <div class="size-price">
                 <% if(item.price_small) { %>
-                    <span class="size">0.33 l:</span>
-                    <span class="price">
-                        <%= item.price_small %> RSD
+                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <meta itemprop="priceCurrency" content="RSD">
+                        <span class="size">0.33 l:</span>
+                        <span class="price"><span itemprop="price"><%= item.price_small %></span> RSD</span>
                     </span>
                 <% } %>
                 <% if(item.price_big) { %>
-                    <span class="size">0.5 l:</span>
-                    <span class="price">
-                        <%= item.price_big %> RSD
+                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                        <meta itemprop="priceCurrency" content="RSD">
+                        <span class="size">0.5 l:</span>
+                        <span class="price"><span itemprop="price"><%= item.price_big %></span> RSD</span>
                     </span>
                 <% } %>
                 <% if(!item.price_small && !item.price_big) { %>

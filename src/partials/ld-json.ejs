@@ -4,6 +4,7 @@
                 "@type": "BarOrPub",
                 "@id": "#beersheep",
                 "name": "Beersheep Garden",
+                "url": "https://menu.beersheep.rs/",
                 "logo": "https://menu.beersheep.rs/mstile-310x310.png",
                 "image": "https://menu.beersheep.rs/mstile-310x310.png",
                 "telephone": "+38163301415",
@@ -16,6 +17,11 @@
                     "addressCountry": "RS"
                 },
                 "hasMap": "https://maps.app.goo.gl/z2qo5YZfdFaiDu4n7",
+                "sameAs": [
+                    "https://t.me/Beersheep",
+                    "https://www.instagram.com/beersheep_/",
+                    "https://www.facebook.com/BeerSheep1/"
+                ],
                 "openingHours": "Mo 16:00-01:00 Tu 16:00-01:00 We 16:00-01:00 Th 16:00-01:00 Fr 16:00-01:00 Sa 16:00-01:00 Su 15:00-23:00",
                 "geo": {
                     "@type": "GeoCoordinates",
@@ -36,19 +42,23 @@
                                 "name": "Draft Beers",
                                 "description": "Current beers on tap",
                                 "hasMenuItem": [
-                                        <% beers.data.forEach((beer, i)=> { %>
+                                        <% beers.data.forEach(beer=> { %>
                                             {
                                                 "@type": "MenuItem",
-                                                "@id": "#tap<%= i + 1 %>",
+                                                "@id": "#tap<%= beer.tap_num %>",
                                                 "name": "<%= beer.name %>",
                                                 "description": "<%= beer.description %>",
+                                                "additionalProperty": [
+                                                    { "@type": "PropertyValue", "name": "ABV", "value": "<%= beer.abv %>%" }<% if (beer.ibu != null) { %>,
+                                                    { "@type": "PropertyValue", "name": "IBU", "value": "<%= beer.ibu %>" }<% } %>
+                                                ],
                                                 "offers": {
                                                     "@type": "Offer",
                                                     "priceCurrency": "RSD",
                                                     "priceSpecification": [
                                                         {
                                                             "@type": "UnitPriceSpecification",
-                                                            "price": "<%= beer.price_small %>",
+                                                            "price": <%= beer.price_small %>,
                                                             "unitCode": "LTR",
                                                             "referenceQuantity": {
                                                                 "@type": "QuantitativeValue",
@@ -58,7 +68,7 @@
                                                         },
                                                         {
                                                             "@type": "UnitPriceSpecification",
-                                                            "price": "<%= beer.price_big %>",
+                                                            "price": <%= beer.price_big %>,
                                                             "unitCode": "LTR",
                                                             "referenceQuantity": {
                                                                 "@type": "QuantitativeValue",
