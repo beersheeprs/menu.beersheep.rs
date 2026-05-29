@@ -97,6 +97,7 @@ async function build() {
             header: fs.readFileSync(path.join(__dirname, 'src/partials/header.ejs'), 'utf8'),
             footer: fs.readFileSync(path.join(__dirname, 'src/partials/footer.ejs'), 'utf8'),
             gtag: fs.readFileSync(path.join(__dirname, 'src/partials/gtag.ejs'), 'utf8'),
+            cftag: fs.readFileSync(path.join(__dirname, 'src/partials/cftag.ejs'), 'utf8'),
         };
         const mainTemplate = fs.readFileSync(path.join(__dirname, 'src/index.ejs'), 'utf8');
 
