@@ -17,7 +17,7 @@
     </div>
     <div class="container">
         <%- partials.header %>
-        <%- include('partials/ld-json', {beers: beers}) %>
+        <%- include('partials/ld-json', {ldJson}) %>
         <div class="grid">
             <% if (beers.data && beers.data.length> 0) { %>
                 <% beers.data.forEach(beer=> { %>

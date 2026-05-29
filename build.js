@@ -66,8 +66,11 @@ async function build() {
     try {
         validateBeers(beerData);
 
+        const ldJson = require('./src/ld-json')(beerData);
+
         const templateData = {
             beers: { data: beerData },
+            ldJson,
             buildDate: new Date().toISOString(),
             environment: process.env.NODE_ENV || 'development',
         };
