@@ -10,7 +10,7 @@
 BEER_DATA (env var, optional)
         │
         ▼
-    build.js ─── API fetch (fallback, $API_ORIGIN/list)
+    build.js ─── API fetch (fallback, $API_ORIGIN/list → extracts "Draft Beers")
         │
         ▼
     build.js ─── EJS templates (src/index.ejs + src/partials/*)
@@ -22,7 +22,7 @@ BEER_DATA (env var, optional)
     GitHub Pages (via workflow_dispatch)
 ```
 
-- **Build script** (`build.js`): Uses `BEER_DATA` JSON if provided, otherwise fetches from `$API_ORIGIN/list`. Maps API field names, renders EJS templates, copies static assets, minifies HTML in production.
+- **Build script** (`build.js`): Uses `BEER_DATA` JSON if provided, otherwise fetches from `$API_ORIGIN/list`. The API returns a sectioned object (e.g., `{"Draft Beers": [...]}`); only the `"Draft Beers"` section is extracted and mapped. Renders EJS templates, copies static assets, minifies HTML in production.
 - **Templates** (`src/`): `index.ejs` is the main page; partials live in `src/partials/` (head metadata, header, footer, beer snippet card, JSON-LD structured data, Google Analytics).
 - **Styles** (`src/styles/`): `styles.css` is the single stylesheet.
 - **Assets** (`src/assets/`): Favicons, app icons, and beer label images (`img/*.webp`).
@@ -87,7 +87,7 @@ Each beer object in the `BEER_DATA` JSON array (or from the API after mapping):
 
 Deployments are manual via GitHub Actions **workflow_dispatch**. The workflow:
 1. Optionally takes `BEER_DATA` as a JSON string input (falls back to API fetch)
-2. Fetches beer data from the API if `BEER_DATA` is not provided
+2. Fetches beer data from the API if `BEER_DATA` is not provided (extracts only `"Draft Beers"` section)
 3. Builds the site with `NODE_ENV=production`
 4. Uploads `dist/` as a Pages artifact
 5. Deploys to GitHub Pages

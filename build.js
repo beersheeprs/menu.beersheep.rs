@@ -82,7 +82,12 @@ async function build() {
 
         if (process.env.BEER_DATA) {
             console.log('Using BEER_DATA env var');
-            beerData = JSON.parse(process.env.BEER_DATA);
+            const raw = JSON.parse(process.env.BEER_DATA);
+            const draftBeers = raw['Draft Beers'];
+            if (!draftBeers || !Array.isArray(draftBeers)) {
+                throw new Error('BEER_DATA missing "Draft Beers" array');
+            }
+            beerData = draftBeers.map(mapApiBeer);
         } else {
             const apiOrigin = process.env.API_ORIGIN;
             if (!apiOrigin) {
@@ -94,7 +99,11 @@ async function build() {
                 throw new Error(`API returned ${res.status}: ${res.statusText}`);
             }
             const apiData = await res.json();
-            beerData = apiData.map(mapApiBeer);
+            const draftBeers = apiData['Draft Beers'];
+            if (!draftBeers || !Array.isArray(draftBeers)) {
+                throw new Error('API response missing "Draft Beers" array');
+            }
+            beerData = draftBeers.map(mapApiBeer);
         }
 
         validateBeers(beerData);
