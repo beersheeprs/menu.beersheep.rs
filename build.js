@@ -76,9 +76,23 @@ function validateBeers(beers) {
     }
 }
 
+function extractSections(apiData) {
+    const sections = [];
+    for (const [key, value] of Object.entries(apiData)) {
+        if (key !== 'Draft Beers' && Array.isArray(value) && value.length > 0) {
+            sections.push({
+                name: key,
+                beers: value.map(mapApiBeer),
+            });
+        }
+    }
+    return sections;
+}
+
 async function build() {
     try {
         let beerData;
+        let bottleSections = [];
 
         if (process.env.BEER_DATA) {
             console.log('Using BEER_DATA env var');
@@ -88,6 +102,7 @@ async function build() {
                 throw new Error('BEER_DATA missing "Draft Beers" array');
             }
             beerData = draftBeers.map(mapApiBeer);
+            bottleSections = extractSections(raw);
         } else {
             const apiOrigin = process.env.API_ORIGIN;
             if (!apiOrigin) {
@@ -104,15 +119,26 @@ async function build() {
                 throw new Error('API response missing "Draft Beers" array');
             }
             beerData = draftBeers.map(mapApiBeer);
+            bottleSections = extractSections(apiData);
         }
 
         validateBeers(beerData);
+        for (const section of bottleSections) {
+            validateBeers(section.beers);
+        }
 
-        const ldJson = require('./src/ld-json')(beerData);
+        const ldJson = require('./src/ld-json');
 
-        const templateData = {
+        const tapTemplateData = {
             beers: { data: beerData },
-            ldJson,
+            ldJson: ldJson(beerData, 'taps'),
+            buildDate: new Date().toISOString(),
+            environment: process.env.NODE_ENV || 'development',
+        };
+
+        const bottleTemplateData = {
+            sections: bottleSections,
+            ldJson: ldJson(bottleSections, 'bottles'),
             buildDate: new Date().toISOString(),
             environment: process.env.NODE_ENV || 'development',
         };
@@ -138,27 +164,36 @@ async function build() {
         });
 
         const partials = {
-            head: fs.readFileSync(path.join(__dirname, 'src/partials/head.ejs'), 'utf8'),
             header: fs.readFileSync(path.join(__dirname, 'src/partials/header.ejs'), 'utf8'),
             footer: fs.readFileSync(path.join(__dirname, 'src/partials/footer.ejs'), 'utf8'),
             gtag: fs.readFileSync(path.join(__dirname, 'src/partials/gtag.ejs'), 'utf8'),
             cftag: fs.readFileSync(path.join(__dirname, 'src/partials/cftag.ejs'), 'utf8'),
         };
         const mainTemplate = fs.readFileSync(path.join(__dirname, 'src/index.ejs'), 'utf8');
+        const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
 
         let taplistHtml = ejs.render(mainTemplate, {
-            ...templateData,
+            ...tapTemplateData,
             partials,
             pageType: 'taps',
             filename: 'src/index.ejs',
         });
 
+        let bottlesHtml = ejs.render(bottlesTemplate, {
+            ...bottleTemplateData,
+            partials,
+            pageType: 'bottles',
+            filename: 'src/bottles.ejs',
+        });
+
         if (process.env.NODE_ENV === 'production') {
             console.log('Minifying HTML');
             taplistHtml = await htmlMinifier.minify(taplistHtml, minifyOptions);
+            bottlesHtml = await htmlMinifier.minify(bottlesHtml, minifyOptions);
         }
 
         fs.writeFileSync(path.join(distDir, 'index.html'), taplistHtml);
+        fs.writeFileSync(path.join(distDir, 'bottles.html'), bottlesHtml);
         console.log('Successfully built');
     } catch (error) {
         console.error('Build failed:', error.message);

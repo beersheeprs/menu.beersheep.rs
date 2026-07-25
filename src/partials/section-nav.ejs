@@ -1,0 +1,15 @@
+<nav class="section-nav" aria-label="Jump to section">
+    <div class="section-nav-links">
+        <% sections.forEach(section => { %>
+            <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
+            <a href="#<%= slug %>" class="section-nav-link"><%= section.name %></a>
+        <% }) %>
+    </div>
+    <select class="section-nav-select" aria-label="Jump to section" onchange="if(this.value) window.location.href=this.value">
+        <option value="">Jump to section...</option>
+        <% sections.forEach(section => { %>
+            <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
+            <option value="#<%= slug %>"><%= section.name %></option>
+        <% }) %>
+    </select>
+</nav>
