@@ -20,6 +20,9 @@
             </div>
             <div class="snippet-style">
                 <%= item.style %>
+                <% if (item.serving_style === 'draft') { %> <i class="fas fa-faucet-drip" aria-hidden="true"></i><% } %>
+                <% if (item.serving_style === 'can') { %> <i class="fas fa-jar" aria-hidden="true"></i><% } %>
+                <% if (item.serving_style === 'bottle') { %> <i class="fas fa-wine-bottle" aria-hidden="true"></i><% } %>
             </div>
         </div>
     </div>

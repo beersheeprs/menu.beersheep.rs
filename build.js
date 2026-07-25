@@ -21,6 +21,7 @@ function mapApiBeer(apiBeer) {
         ibu: apiBeer.ibu,
         description: apiBeer.description,
         prices: apiBeer.prices,
+        serving_style: apiBeer.serving_style,
     };
 }
 
