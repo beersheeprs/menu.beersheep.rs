@@ -2,7 +2,7 @@
 
 ## deployment
 
-- For manual deploy trigger the workflow passing valid json with taps
+- For manual deploy trigger the workflow. Optionally pass `BEER_DATA` as a JSON override, otherwise beer data is fetched from the API (`$API_ORIGIN/list`).
 
 ## development
 
@@ -13,5 +13,6 @@
 
 ### build and debug
 
-- `BEER_DATA='[{"tap_num":1,"name":"Hazy Sheep","style":"NE IPA","abv":5.5,"ibu":161,"rating":3.61391997337341,"description":"Super cool beer","image_url":"https://labels.untappd.com/4847776","price_big":600,"price_small":540,"brewery":"Beersheep Brew","country":"Serbia"},...]' npm run serve`
+- `BEER_DATA='[...]' npm run serve` (optional, overrides API)
+- `API_ORIGIN=<host> npm run serve` (uses API)
 - visit `http://bs-local.com:8000/`

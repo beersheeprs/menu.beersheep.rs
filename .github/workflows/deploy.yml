@@ -4,10 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       BEER_DATA:
-        description: "Beers json"
-        required: true
+        description: "Beers json (optional, falls back to API)"
+        required: false
         type: string
-        default: "[]"
 
 permissions:
   contents: read
@@ -35,6 +34,7 @@ jobs:
         run: npm run build
         env:
           BEER_DATA: ${{ inputs.BEER_DATA }}
+          API_ORIGIN: ${{ vars.API_ORIGIN }}
           NODE_ENV: production
 
       - name: Upload artifact
