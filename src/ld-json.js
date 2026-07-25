@@ -55,30 +55,25 @@ module.exports = function (beers) {
                     if (beer.ibu != null) {
                         props.push({ "@type": "PropertyValue", "name": "IBU", "value": String(beer.ibu) });
                     }
+                    const offers = {
+                        "@type": "Offer",
+                        "priceCurrency": "RSD"
+                    };
+                    if (beer.prices) {
+                        offers.priceSpecification = Object.entries(beer.prices).map(([volume, price]) => ({
+                            "@type": "UnitPriceSpecification",
+                            "price": price,
+                            "unitCode": "LTR",
+                            "referenceQuantity": { "@type": "QuantitativeValue", "value": parseFloat(volume), "unitCode": "LTR" }
+                        }));
+                    }
                     return {
                         "@type": "MenuItem",
                         "@id": `#tap${beer.tap_num}`,
                         "name": beer.name,
                         "description": beer.description,
                         "additionalProperty": props,
-                        "offers": {
-                            "@type": "Offer",
-                            "priceCurrency": "RSD",
-                            "priceSpecification": [
-                                {
-                                    "@type": "UnitPriceSpecification",
-                                    "price": beer.price_small,
-                                    "unitCode": "LTR",
-                                    "referenceQuantity": { "@type": "QuantitativeValue", "value": 0.33, "unitCode": "LTR" }
-                                },
-                                {
-                                    "@type": "UnitPriceSpecification",
-                                    "price": beer.price_big,
-                                    "unitCode": "LTR",
-                                    "referenceQuantity": { "@type": "QuantitativeValue", "value": 0.5, "unitCode": "LTR" }
-                                }
-                            ]
-                        }
+                        "offers": offers
                     };
                 })
             }]

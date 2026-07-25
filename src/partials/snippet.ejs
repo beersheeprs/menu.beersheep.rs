@@ -52,21 +52,30 @@
     <div class="snippet-prices">
         <div class="price-option">
             <div class="size-price">
-                <% if(item.price_small) { %>
-                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                        <meta itemprop="priceCurrency" content="RSD">
-                        <span class="size">0.33 l:</span>
-                        <span class="price"><data itemprop="price" value="<%= item.price_small %>"><%= item.price_small %> RSD</data></span>
-                    </span>
-                <% } %>
-                <% if(item.price_big) { %>
-                    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
-                        <meta itemprop="priceCurrency" content="RSD">
-                        <span class="size">0.5 l:</span>
-                        <span class="price"><data itemprop="price" value="<%= item.price_big %>"><%= item.price_big %> RSD</data></span>
-                    </span>
-                <% } %>
-                <% if(!item.price_small && !item.price_big) { %>
+                <% if (item.prices) { %>
+                    <% Object.entries(item.prices).forEach(([volume, price]) => { %>
+                        <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="RSD">
+                            <span class="size"><%= volume %> l:</span>
+                            <span class="price"><data itemprop="price" value="<%= price %>"><%= price %> RSD</data></span>
+                        </span>
+                    <% }) %>
+                <% } else if (item.price_small || item.price_big) { %>
+                    <% if(item.price_small) { %>
+                        <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="RSD">
+                            <span class="size">0.33 l:</span>
+                            <span class="price"><data itemprop="price" value="<%= item.price_small %>"><%= item.price_small %> RSD</data></span>
+                        </span>
+                    <% } %>
+                    <% if(item.price_big) { %>
+                        <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                            <meta itemprop="priceCurrency" content="RSD">
+                            <span class="size">0.5 l:</span>
+                            <span class="price"><data itemprop="price" value="<%= item.price_big %>"><%= item.price_big %> RSD</data></span>
+                        </span>
+                    <% } %>
+                <% } else { %>
                     <span class="size">Please ask the bartender for price details</span>
                 <% } %>
             </div>

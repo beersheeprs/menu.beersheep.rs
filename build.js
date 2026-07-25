@@ -8,7 +8,21 @@ if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
 }
 
-const beerData = process.env.BEER_DATA ? JSON.parse(process.env.BEER_DATA) : [];
+function mapApiBeer(apiBeer) {
+    return {
+        tap_num: apiBeer.tap_number,
+        name: apiBeer.beer_name,
+        style: apiBeer.beer_style,
+        rating: apiBeer.beer_rating,
+        image_url: apiBeer.beer_image,
+        brewery: apiBeer.brewery,
+        country: apiBeer.country,
+        abv: apiBeer.abv,
+        ibu: apiBeer.ibu,
+        description: apiBeer.description,
+        prices: apiBeer.prices,
+    };
+}
 
 const minifyOptions = {
     collapseWhitespace: true,
@@ -64,6 +78,25 @@ function validateBeers(beers) {
 
 async function build() {
     try {
+        let beerData;
+
+        if (process.env.BEER_DATA) {
+            console.log('Using BEER_DATA env var');
+            beerData = JSON.parse(process.env.BEER_DATA);
+        } else {
+            const apiOrigin = process.env.API_ORIGIN;
+            if (!apiOrigin) {
+                throw new Error('API_ORIGIN env var is required when BEER_DATA is not set');
+            }
+            console.log(`Fetching from ${apiOrigin}/list`);
+            const res = await fetch(`${apiOrigin}/list`);
+            if (!res.ok) {
+                throw new Error(`API returned ${res.status}: ${res.statusText}`);
+            }
+            const apiData = await res.json();
+            beerData = apiData.map(mapApiBeer);
+        }
+
         validateBeers(beerData);
 
         const ldJson = require('./src/ld-json')(beerData);
