@@ -16,7 +16,7 @@
         </div>
         <div class="snippet-subtitle">
             <div class="producer">
-                <%= item.brewery %>, <%= item.country %>
+                <%= item.brewery %><% if (item.country) { %>, <%= item.country %><% } %>
             </div>
             <div class="snippet-style">
                 <%= item.style %>
@@ -34,9 +34,11 @@
             <% } %>
         </div>
         <div class="snippet-details">
-            <p class="snippet-description" itemprop="description">
-                <%= item.description %>
-            </p>
+            <% if (item.description) { %>
+                <p class="snippet-description" itemprop="description">
+                    <%= item.description %>
+                </p>
+            <% } %>
             <% if(item.rating) { %>
                 <div class="circle-rating" style="--rating: <%= item.rating.toFixed(1) %>" aria-label="Rating: <%= item.rating.toFixed(2) %> out of 5" itemscope itemtype="https://schema.org/AggregateRating">
                     <meta itemprop="ratingValue" content="<%= item.rating.toFixed(2) %>">
@@ -56,7 +58,8 @@
                     <% Object.entries(item.prices).forEach(([volume, price]) => { %>
                         <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                             <meta itemprop="priceCurrency" content="RSD">
-                            <span class="size"><%= volume %> l:</span>
+                            <% var v = parseFloat(volume); var label = v >= 1 ? (v / 1000) + ' l' : volume + ' l'; %>
+                            <span class="size"><%= label %>:</span>
                             <span class="price"><data itemprop="price" value="<%= price %>"><%= price %> RSD</data></span>
                         </span>
                     <% }) %>

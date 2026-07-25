@@ -1,4 +1,4 @@
-module.exports = function (beers) {
+module.exports = function (data, pageType) {
     const bar = {
         "@context": "https://schema.org",
         "@type": "BarOrPub",
@@ -36,48 +36,72 @@ module.exports = function (beers) {
         }
     };
 
-    if (beers.length > 0) {
-        bar.servesCuisine = ["Beer"];
-        bar.hasMenu = {
-            "@type": "Menu",
-            "@id": "#menu",
-            "name": "Taplist",
-            "description": "Beers on tap",
-            "hasMenuSection": [{
-                "@type": "MenuSection",
-                "@id": "#draft-beers",
-                "name": "Draft Beers",
-                "description": "Current beers on tap",
-                "hasMenuItem": beers.map(beer => {
-                    const props = [
-                        { "@type": "PropertyValue", "name": "ABV", "value": `${beer.abv}%` }
-                    ];
-                    if (beer.ibu != null) {
-                        props.push({ "@type": "PropertyValue", "name": "IBU", "value": String(beer.ibu) });
-                    }
-                    const offers = {
-                        "@type": "Offer",
-                        "priceCurrency": "RSD"
-                    };
-                    if (beer.prices) {
-                        offers.priceSpecification = Object.entries(beer.prices).map(([volume, price]) => ({
-                            "@type": "UnitPriceSpecification",
-                            "price": price,
-                            "unitCode": "LTR",
-                            "referenceQuantity": { "@type": "QuantitativeValue", "value": parseFloat(volume), "unitCode": "LTR" }
-                        }));
-                    }
-                    return {
-                        "@type": "MenuItem",
-                        "@id": `#tap${beer.tap_num}`,
-                        "name": beer.name,
-                        "description": beer.description,
-                        "additionalProperty": props,
-                        "offers": offers
-                    };
-                })
-            }]
+    function makeMenuItem(beer, idPrefix) {
+        const props = [
+            { "@type": "PropertyValue", "name": "ABV", "value": `${beer.abv}%` }
+        ];
+        if (beer.ibu != null) {
+            props.push({ "@type": "PropertyValue", "name": "IBU", "value": String(beer.ibu) });
+        }
+        const offers = {
+            "@type": "Offer",
+            "priceCurrency": "RSD"
         };
+        if (beer.prices) {
+            offers.priceSpecification = Object.entries(beer.prices).map(([volume, price]) => {
+                const v = parseFloat(volume);
+                const liters = v >= 1 ? v / 1000 : v;
+                return {
+                    "@type": "UnitPriceSpecification",
+                    "price": price,
+                    "unitCode": "LTR",
+                    "referenceQuantity": { "@type": "QuantitativeValue", "value": liters, "unitCode": "LTR" }
+                };
+            });
+        }
+        return {
+            "@type": "MenuItem",
+            "@id": `#${idPrefix}${beer.tap_num || beer.name.replace(/[^a-zA-Z0-9]/g, '')}`,
+            "name": beer.name,
+            "description": beer.description,
+            "additionalProperty": props,
+            "offers": offers
+        };
+    }
+
+    if (pageType === 'bottles') {
+        if (data.length > 0) {
+            bar.servesCuisine = ["Beer"];
+            bar.hasMenu = {
+                "@type": "Menu",
+                "@id": "#menu",
+                "name": "Bottles & Cans",
+                "description": "Bottled and canned beers",
+                "hasMenuSection": data.map(section => ({
+                    "@type": "MenuSection",
+                    "@id": `#section-${section.name.replace(/[^a-zA-Z0-9]/g, '')}`,
+                    "name": section.name,
+                    "hasMenuItem": section.beers.map(beer => makeMenuItem(beer, 'bottle-'))
+                }))
+            };
+        }
+    } else {
+        if (data.length > 0) {
+            bar.servesCuisine = ["Beer"];
+            bar.hasMenu = {
+                "@type": "Menu",
+                "@id": "#menu",
+                "name": "Taplist",
+                "description": "Beers on tap",
+                "hasMenuSection": [{
+                    "@type": "MenuSection",
+                    "@id": "#draft-beers",
+                    "name": "Draft Beers",
+                    "description": "Current beers on tap",
+                    "hasMenuItem": data.map(beer => makeMenuItem(beer, 'tap'))
+                }]
+            };
+        }
     }
 
     const webSite = {

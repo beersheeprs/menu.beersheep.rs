@@ -1,19 +1,25 @@
+<%
+var isBottles = pageType === 'bottles';
+var pageTitle = isBottles ? 'Beersheep Garden - Bottles & Cans Menu' : 'Beersheep Garden - Tap Beer Menu';
+var pageDesc = isBottles ? 'Bottled and canned beer menu for Beersheep Garden, featuring a curated selection of craft beers from around the world.' : 'Tap menu for Beersheep Garden, featuring a curated selection of craft beers.';
+var pageUrl = isBottles ? 'https://menu.beersheep.rs/bottles.html' : 'https://menu.beersheep.rs/';
+%>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="keywords" content="beersheep, beer garden, tap beer, craft beer, Belgrade" />
+<meta name="keywords" content="beersheep, beer garden, craft beer, Belgrade" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Beersheep Garden - Tap Beer Menu</title>
+<title><%= pageTitle %></title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-<meta property="og:title" content="Beersheep Garden - Tap Beer Menu">
-<meta property="og:description" content="Tap menu for Beersheep Garden, featuring a curated selection of craft beers.">
-<meta name="description" content="Tap menu for Beersheep Garden, featuring a curated selection of craft beers.">
-<meta property="og:url" content="https://menu.beersheep.rs/">
-<link rel="canonical" href="https://menu.beersheep.rs/" />
+<meta property="og:title" content="<%= pageTitle %>">
+<meta property="og:description" content="<%= pageDesc %>">
+<meta name="description" content="<%= pageDesc %>">
+<meta property="og:url" content="<%= pageUrl %>">
+<link rel="canonical" href="<%= pageUrl %>" />
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Beersheep Garden Taplist">
 <meta property="og:image" content="https://menu.beersheep.rs/mstile-310x310.png" />
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Beersheep Garden - Tap Beer Menu">
-<meta name="twitter:description" content="Tap menu for Beersheep Garden, featuring a curated selection of craft beers.">
+<meta name="twitter:title" content="<%= pageTitle %>">
+<meta name="twitter:description" content="<%= pageDesc %>">
 <meta name="twitter:image" content="https://menu.beersheep.rs/mstile-310x310.png">
 <meta name="robots" content="index, follow">
 <link rel="apple-touch-icon-precomposed" sizes="57x57" href="apple-touch-icon-57x57.png" />
