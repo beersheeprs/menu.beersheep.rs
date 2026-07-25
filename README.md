@@ -13,6 +13,6 @@
 
 ### build and debug
 
-- `BEER_DATA='[...]' npm run serve` (optional, overrides API)
+- `BEER_DATA='{"Draft Beers":[{"tap_number":1,"beer_name":"Albino","abv":6.5,...}]}' npm run serve` (optional, overrides API)
 - `API_ORIGIN=<host> npm run serve` (uses API)
 - visit `http://bs-local.com:8000/`
