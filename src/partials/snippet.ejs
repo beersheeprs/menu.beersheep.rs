@@ -61,7 +61,7 @@
                     <% Object.entries(item.prices).forEach(([volume, price]) => { %>
                         <span itemprop="offers" itemscope itemtype="https://schema.org/Offer">
                             <meta itemprop="priceCurrency" content="RSD">
-                            <% var v = parseFloat(volume); var label = v >= 1 ? (v / 1000) + ' l' : volume + ' l'; %>
+                            <% var v = parseFloat(volume); var label = volume.match(/[lm]/i) ? volume : (v >= 1 ? (v / 1000) + ' l' : volume + ' l'); %>
                             <span class="size"><%= label %>:</span>
                             <span class="price"><data itemprop="price" value="<%= price %>"><%= price %> RSD</data></span>
                         </span>
