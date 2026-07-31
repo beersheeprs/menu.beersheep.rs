@@ -195,6 +195,17 @@ async function build() {
 
         fs.writeFileSync(path.join(distDir, 'index.html'), taplistHtml);
         fs.writeFileSync(path.join(distDir, 'bottles.html'), bottlesHtml);
+
+        // API endpoints
+        ensureDir(path.join(distDir, 'api/v1'));
+        fs.writeFileSync(
+          path.join(distDir, 'api/v1/taps.json'),
+          JSON.stringify(beerData)
+        );
+        fs.writeFileSync(
+          path.join(distDir, 'api/v1/fridge.json'),
+          JSON.stringify(bottleSections)
+        );
         console.log('Successfully built');
     } catch (error) {
         console.error('Build failed:', error.message);
