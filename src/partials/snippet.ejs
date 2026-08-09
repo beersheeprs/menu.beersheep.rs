@@ -28,6 +28,7 @@
     </div>
     <div class="snippet-content">
         <div class="snippet-image">
+            <% if (item.untappd_url) { %><a href="<%= item.untappd_url %>" target="_blank" rel="noopener"><% } %>
             <% if(item.image_name){ %>
                 <img src="/img/<%= item.image_name %>.webp" alt="<%= item.name %>" itemprop="image" />
             <% } else if (item.image_url) { %>
@@ -35,6 +36,7 @@
             <% } else { %>
                 <div class="placeholder"><i class="fas fa-beer" aria-hidden="true"></i></div>
             <% } %>
+            <% if (item.untappd_url) { %></a><% } %>
         </div>
         <div class="snippet-details">
             <% if (item.description) { %>
