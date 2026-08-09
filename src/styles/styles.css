@@ -244,8 +244,8 @@ h1 {
 
 /* HD labels get a larger container to show the extra detail */
 .snippet-image.has-hd {
-  width: 140px;
-  height: 140px;
+  width: 200px;
+  height: 200px;
   border-color: #555;
 }
 
@@ -378,8 +378,8 @@ h1 {
     height: 120px;
   }
   .snippet-image.has-hd {
-    width: 160px;
-    height: 160px;
+    width: 200px;
+    height: 200px;
   }
 
   .snippet-prices {
@@ -421,8 +421,8 @@ h1 {
     align-self: center;
   }
   .snippet-image.has-hd {
-    width: 130px;
-    height: 130px;
+    width: 170px;
+    height: 170px;
     align-self: center;
   }
 
@@ -471,7 +471,7 @@ h1 {
     height: 100px;
   }
   .snippet-image.has-hd {
-    height: 130px;
+    height: 170px;
   }
 
   .size-price {
@@ -505,7 +505,7 @@ h1 {
     height: 100px;
   }
   .snippet-image.has-hd {
-    height: 130px;
+    height: 170px;
   }
 
   .snippet-description {
@@ -678,8 +678,8 @@ h1 {
     border-radius: 2px;
   }
   .snippet-image.has-hd {
-    width: 18mm;
-    height: 18mm;
+    width: 22mm;
+    height: 22mm;
     border-radius: 2px;
   }
 
