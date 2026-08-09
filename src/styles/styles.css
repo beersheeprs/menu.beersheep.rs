@@ -242,6 +242,18 @@ h1 {
   font-size: 2rem;
 }
 
+/* HD labels get a larger container to show the extra detail */
+.snippet-image.has-hd {
+  width: 140px;
+  height: 140px;
+  border-color: #555;
+}
+
+.snippet-image.has-hd img {
+  object-fit: contain;
+  background-color: #1a1a1a;
+}
+
 .snippet-details {
   flex: 1;
   display: flex;
@@ -365,6 +377,10 @@ h1 {
     width: 120px;
     height: 120px;
   }
+  .snippet-image.has-hd {
+    width: 160px;
+    height: 160px;
+  }
 
   .snippet-prices {
     padding: 14px 24px;
@@ -402,6 +418,11 @@ h1 {
   .snippet-image {
     width: 100px;
     height: 100px;
+    align-self: center;
+  }
+  .snippet-image.has-hd {
+    width: 130px;
+    height: 130px;
     align-self: center;
   }
 
@@ -449,6 +470,9 @@ h1 {
   .snippet-image {
     height: 100px;
   }
+  .snippet-image.has-hd {
+    height: 130px;
+  }
 
   .size-price {
     flex-direction: column;
@@ -479,6 +503,9 @@ h1 {
 
   .snippet-image {
     height: 100px;
+  }
+  .snippet-image.has-hd {
+    height: 130px;
   }
 
   .snippet-description {
@@ -648,6 +675,11 @@ h1 {
   .snippet-image {
     width: 14mm;
     height: 14mm;
+    border-radius: 2px;
+  }
+  .snippet-image.has-hd {
+    width: 18mm;
+    height: 18mm;
     border-radius: 2px;
   }
 

@@ -27,12 +27,17 @@
         </div>
     </div>
     <div class="snippet-content">
-        <div class="snippet-image">
+        <%
+           var labelSrc = item.image_hd_url || item.image_url;
+           var isHd = !!item.image_hd_url;
+        %>
+        <div class="snippet-image<%= isHd ? ' has-hd' : '' %>">
             <% if (item.untappd_url) { %><a href="<%= item.untappd_url %>" target="_blank" rel="noopener"><% } %>
             <% if(item.image_name){ %>
                 <img src="/img/<%= item.image_name %>.webp" alt="<%= item.name %>" itemprop="image" />
-            <% } else if (item.image_url) { %>
-                <img src="<%= item.image_url %>" alt="<%= item.name %>" itemprop="image" />
+            <% } else if (labelSrc) { %>
+                <img src="<%= labelSrc %>" alt="<%= item.name %>" itemprop="image"
+                     loading="lazy" />
             <% } else { %>
                 <div class="placeholder"><i class="fas fa-beer" aria-hidden="true"></i></div>
             <% } %>
