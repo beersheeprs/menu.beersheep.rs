@@ -23,6 +23,7 @@ function mapApiBeer(apiBeer) {
         description: apiBeer.description,
         prices: apiBeer.prices,
         serving_style: apiBeer.serving_style,
+        on_tap: apiBeer.on_tap,
         untappd_url: apiBeer.untappd_url,
     };
 }

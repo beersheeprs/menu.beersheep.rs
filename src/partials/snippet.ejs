@@ -24,6 +24,9 @@
                 <% if (item.serving_style === 'can') { %> <i class="fas fa-jar" aria-hidden="true"></i><% } %>
                 <% if (item.serving_style === 'bottle') { %> <i class="fas fa-wine-bottle" aria-hidden="true"></i><% } %>
             </div>
+            <% if (item.on_tap) { %>
+                <div class="on-tap-badge"><i class="fas fa-faucet-drip" aria-hidden="true"></i> i na točioniku</div>
+            <% } %>
         </div>
     </div>
     <div class="snippet-content">
