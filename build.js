@@ -15,6 +15,7 @@ function mapApiBeer(apiBeer) {
         style: apiBeer.beer_style,
         rating: apiBeer.beer_rating,
         image_url: apiBeer.beer_image,
+        image_hd_url: apiBeer.image_hd_url,
         brewery: apiBeer.brewery,
         country: apiBeer.country,
         abv: apiBeer.abv,
