@@ -7,6 +7,10 @@ on:
         description: "Beers json (optional, falls back to API)"
         required: false
         type: string
+      notify:
+        description: 'Send Telegram notification'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -54,7 +58,7 @@ jobs:
         uses: actions/deploy-pages@v5
 
       - name: Notify group
-        if: ${{ vars.TELEGRAM_BOT_TOKEN && vars.TELEGRAM_GROUP_CHAT_ID }}
+        if: ${{ vars.TELEGRAM_BOT_TOKEN && vars.TELEGRAM_GROUP_CHAT_ID && inputs.notify != false }}
         run: |
           curl -s -X POST "https://api.telegram.org/bot${{ vars.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
