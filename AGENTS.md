@@ -1,16 +1,16 @@
-# AGENT.md
+# AGENTS.md — menu.beersheep.rs
 
 ## Project overview
 
-`menu.beersheep.rs` is a static site builder that generates a beer tap list for **Beersheep Garden**, a craft beer bar in Belgrade, Serbia. It renders beer data into a responsive HTML page and deploys to GitHub Pages.
+Static site builder for **Beersheep Garden** beer menu. Fetches beer data from the Cloudflare Worker API, renders it into a responsive HTML page via EJS templates, and deploys to GitHub Pages.
 
 ## Architecture
 
 ```
-BEER_DATA (env var, optional)
+API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
         │
         ▼
-    build.js ─── API fetch (fallback, $API_ORIGIN/list → extracts "Draft Beers")
+    build.js ─── mapApiBeer() → flat beer objects for templates
         │
         ▼
     build.js ─── EJS templates (src/index.ejs + src/partials/*)
@@ -19,47 +19,19 @@ BEER_DATA (env var, optional)
     dist/index.html  ─── static assets (CSS, images, favicons)
         │
         ▼
-    GitHub Pages (via workflow_dispatch)
+    GitHub Pages (via workflow_dispatch in deploy.yml)
 ```
-
-- **Build script** (`build.js`): Uses `BEER_DATA` JSON if provided, otherwise fetches from `$API_ORIGIN/list`. The API returns a sectioned object (e.g., `{"Draft Beers": [...]}`); only the `"Draft Beers"` section is extracted and mapped. Renders EJS templates, copies static assets, minifies HTML in production.
-- **Templates** (`src/`): `index.ejs` is the main page; partials live in `src/partials/` (head metadata, header, footer, beer snippet card, JSON-LD structured data, Google Analytics).
-- **Styles** (`src/styles/`): `styles.css` is the single stylesheet.
-- **Assets** (`src/assets/`): Favicons, app icons, and beer label images (`img/*.webp`).
 
 ## Tech stack
 
 - **Node.js 24** (`.nvmrc`)
 - **EJS** templating
 - **html-minifier-terser** for production HTML minification
-- **GitHub Actions** deploys to GitHub Pages on manual `workflow_dispatch`
-- **Google Analytics** (gtag, production only)
+- **GitHub Actions** deploys to GitHub Pages on `workflow_dispatch`
+- **Google Analytics** (production only)
 - **Font Awesome 7** for icons
 
-## Commands
-
-```bash
-# Install dependencies (first time)
-nvm install && nvm use && npm ci
-
-# Build and serve locally (BEER_DATA is optional, falls back to API)
-BEER_DATA='[{...}]' npm run serve
-
-# Or rely on API fetch (requires API_ORIGIN)
-API_ORIGIN=<host> npm run serve
-
-# Build only
-npm run build
-
-# Clean dist
-npm run clean
-```
-
-Local dev expects `http://bs-local.com:8000/` (add to `/etc/hosts` if needed).
-
-## Beer data schema
-
-Each beer object in the `BEER_DATA` JSON array (or from the API after mapping):
+## Beer data schema (mapped from API)
 
 ```json
 {
@@ -71,32 +43,62 @@ Each beer object in the `BEER_DATA` JSON array (or from the API after mapping):
   "rating": 3.61,
   "description": "Tasting notes...",
   "image_url": "https://labels.untappd.com/...",
+  "image_hd_url": "https://assets.untappd.com/site/beer_logos_hd/...",
   "image_name": "beer-slug",
-  "prices": { "0.5": 600, "0.33": 540 },
+  "prices": { "0.33L": 540, "0.5L": 600 },
   "brewery": "Brewery Name",
-  "country": "Serbia"
+  "country": "Serbia",
+  "serving_style": "draft",
+  "untappd_url": "https://untappd.com/b/beer/123456"
 }
 ```
 
-- `prices` is an object mapping volume strings (in liters) to price in RSD. This is the preferred format.
-- `price_small` and `price_big` are still supported for backward compatibility with older `BEER_DATA`.
-- `image_name` takes precedence over `image_url` (resolved to `/img/<image_name>.webp`).
-- `tap_num` and `ibu` are optional.
+## Image handling
+
+- **HD labels** (`image_hd_url`): Displayed at 200px with `object-fit: contain` on a dark background. Container gets `.has-hd` class with larger dimensions at each responsive breakpoint. Border on the `<img>` element itself (hugs the label shape).
+- **Preview fallback** (`image_url`): 100px container with `object-fit: cover`. Used when no HD label is available.
+- **Placeholder**: Beer icon (`.placeholder`) when neither image source exists.
+- **Untappd link**: Beer image wrapped in `<a href="untappd_url">` — clicking the label opens Untappd.
+
+## Price rendering
+
+- Prices sorted **small-to-large** by volume (`parseFloat` sort on keys).
+- Entries with `price > 0` only — zero or null prices are filtered out.
+- If no valid prices remain, shows "Please ask the bartender for price details".
+- Old `price_small`/`price_big` fallback removed — all beers use the `prices` object.
 
 ## Deployment
 
-Deployments are manual via GitHub Actions **workflow_dispatch**. The workflow:
-1. Optionally takes `BEER_DATA` as a JSON string input (falls back to API fetch)
-2. Fetches beer data from the API if `BEER_DATA` is not provided (extracts only `"Draft Beers"` section)
-3. Builds the site with `NODE_ENV=production`
-4. Uploads `dist/` as a Pages artifact
-5. Deploys to GitHub Pages
+Triggered by `workflow_dispatch` (usually from the scraper after `/feed`).
 
-`API_ORIGIN` is set via GitHub Actions variables (`${{ vars.API_ORIGIN }}`).
+The deploy workflow (`deploy.yml`):
+1. Fetches beer data from `API_ORIGIN/list`
+2. Builds with `NODE_ENV=production`
+3. Deploys to GitHub Pages
+4. Sends Telegram notification (suppressed when `inputs.notify: false` — silent deploys from silent scrapes)
 
-## Code conventions
+## Commands
 
-- Templates use EJS `<% ... %>` syntax. Partials are passed as pre-read strings in `build.js` for the main template, and included via `<%- include(...) %>` for nested templates.
-- CSS is responsive with breakpoints at 769px, 768px, 480px, and 360px, plus print styles.
-- The production build injects Google Analytics and minifies output; dev builds skip both.
-- `dotenv` is loaded in non-production for local `.env` support.
+```bash
+npm run build    # Build dist/
+npm run serve    # Build + serve at localhost:8000
+npm run clean    # Remove dist/
+```
+
+Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
+
+## CSS breakpoints
+
+- Desktop: default
+- 769px: larger images (120px), HD gets 200px
+- 768px: 100px images, HD gets 170px
+- 480px: compact layout
+- 360px: minimum width
+- Print: small images, no backgrounds
+
+## Conventions
+
+- Templates use EJS `<% ... %>` syntax
+- CSS is a single `styles.css` file with responsive breakpoints
+- Production build injects Google Analytics and minifies output
+- `dotenv` loaded in non-production for local `.env` support
