@@ -67,6 +67,7 @@
                 <%
                    var validPrices = item.prices && typeof item.prices === 'object'
                      ? Object.entries(item.prices).filter(function(e) { return e[1] > 0; })
+                         .sort(function(a, b) { return parseFloat(a[0]) - parseFloat(b[0]); })
                      : [];
                 %>
                 <% if (validPrices.length > 0) { %>
