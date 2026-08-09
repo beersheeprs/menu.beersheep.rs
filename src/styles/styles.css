@@ -242,16 +242,19 @@ h1 {
   font-size: 2rem;
 }
 
-/* HD labels get a larger container to show the extra detail */
+/* HD labels get a larger container — border moves to the image itself */
 .snippet-image.has-hd {
   width: 200px;
   height: 200px;
-  border-color: #555;
+  border: none;
+  background-color: transparent;
 }
 
 .snippet-image.has-hd img {
   object-fit: contain;
   background-color: #1a1a1a;
+  border: 1px solid #555;
+  border-radius: 3px;
 }
 
 .snippet-details {
