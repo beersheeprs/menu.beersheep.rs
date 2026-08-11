@@ -175,6 +175,7 @@ async function build() {
         };
         const mainTemplate = fs.readFileSync(path.join(__dirname, 'src/index.ejs'), 'utf8');
         const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
+        const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
 
         let taplistHtml = ejs.render(mainTemplate, {
             ...tapTemplateData,
@@ -198,6 +199,20 @@ async function build() {
 
         fs.writeFileSync(path.join(distDir, 'index.html'), taplistHtml);
         fs.writeFileSync(path.join(distDir, 'bottles.html'), bottlesHtml);
+
+        let notFoundHtml = ejs.render(notFoundTemplate, {
+            partials,
+            pageType: '404',
+            filename: 'src/404.ejs',
+            environment: process.env.NODE_ENV || 'development',
+        });
+
+        if (process.env.NODE_ENV === 'production') {
+            console.log('Minifying 404');
+            notFoundHtml = await htmlMinifier.minify(notFoundHtml, minifyOptions);
+        }
+
+        fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml);
 
         // API endpoints
         ensureDir(path.join(distDir, 'api/v1'));

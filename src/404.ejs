@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- partials.gtag %>
+    <%- partials.cftag %>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="prefetch" href="/bottles.html">
+    <%- include('partials/head', {pageType: '404'}) %>
+</head>
+
+<body>
+    <div class="container">
+        <%- include('partials/header', {pageType: '404'}) %>
+        <main>
+            <div class="not-found">
+                <div class="not-found-icon">
+                    <i class="fas fa-beer"></i>
+                </div>
+                <h2>404 — Page Not Found</h2>
+                <p>Looks like this tap has run dry.</p>
+                <p>No beer here, but we've got plenty on the menu.</p>
+                <a href="/" class="not-found-link">Back to the menu</a>
+            </div>
+        </main>
+    </div>
+    <%- partials.footer %>
+</body>
+
+</html>
