@@ -569,6 +569,30 @@ h1 {
   display: none;
 }
 
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: #4dac68;
+  z-index: 9999;
+  width: 100%;
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    animation: scroll-grow linear;
+    animation-timeline: scroll();
+  }
+}
+
+@keyframes scroll-grow {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
 .soc-link {
   display: flex;
   gap: 20px;
