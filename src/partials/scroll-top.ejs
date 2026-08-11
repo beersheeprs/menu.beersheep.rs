@@ -1,0 +1,20 @@
+<a href="#" class="scroll-top" aria-label="Back to top">
+  <svg viewBox="0 0 48 48" class="scroll-top-ring">
+    <circle cx="24" cy="24" r="20"
+            fill="none" stroke="#4dac68" stroke-width="3"
+            stroke-linecap="round"
+            transform="rotate(-90 24 24)" />
+  </svg>
+  <i class="fas fa-chevron-up"></i>
+</a>
+<script>
+(function(){
+  var c = document.querySelector('.scroll-top-ring circle');
+  if (!c) return;
+  if (CSS.supports('animation-timeline: scroll(root)')) return;
+  window.addEventListener('scroll', function(){
+    var pct = document.documentElement.scrollTop / (document.documentElement.scrollHeight - document.documentElement.clientHeight);
+    c.style.strokeDashoffset = 125.66 * (1 - (isNaN(pct) ? 0 : pct));
+  });
+})();
+</script>
