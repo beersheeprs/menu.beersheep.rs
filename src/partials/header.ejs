@@ -1,4 +1,4 @@
 <header>
-    <h1><%= pageType === 'bottles' ? 'Beersheep Garden Bottles & Cans' : 'Beersheep Garden Taplist' %></h1>
+    <h1><%= t(pageType === 'bottles' ? 'bottles.h1' : pageType === '404' ? 'notFound.h1' : 'taps.h1') %></h1>
     <%- include('nav') %>
 </header>

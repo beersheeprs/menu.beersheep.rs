@@ -16,7 +16,8 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
     EJS templates:
         src/index.ejs      → dist/index.html     (draft taps)
         src/bottles.ejs    → dist/bottles.html   (bottles & cans)
-        src/404.ejs        → dist/404.html        (custom error page)
+        src/404.ejs        → dist/404.html        (custom error page, default locale only)
+        (index/bottles rendered once per locale: en → dist/, sr → dist/sr/)
         src/partials/*     (shared snippets, head, nav, footer…)
         │
         ├─ dist/           (static assets: CSS, images, favicons)
@@ -100,6 +101,15 @@ npm run clean    # Remove dist/
 
 Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
 
+## i18n
+
+- UI strings live in `src/i18n/<code>.json` (`en`, `sr` = Serbian Cyrillic). Locales are listed in `LOCALES` in `build.js`; the default (`en`) renders to `dist/`, others to `dist/<prefix>/`.
+- Templates get `t(key, vars)` (dot-path lookup, `{var}` interpolation, falls back to `en` then to the key), plus `lang`, `base` (`''` or `/sr`), `pagePath` and `locales`.
+- Internal links must use `<%= base %>/…`; asset links must be absolute (`/styles.css`) so they resolve under `/sr/`.
+- `head.ejs` emits `hreflang` alternates + `x-default`; `nav.ejs` renders the EN / СР switcher; `ld-json.js` takes `(data, pageType, t, base)`.
+- Beer data from the API (names, styles, descriptions, section names) is **not** translated.
+- Adding a language: create `src/i18n/<code>.json`, add it to `LOCALES`, add its URLs to `src/assets/sitemap.xml`.
+
 ## CSS breakpoints
 
 - Desktop: default
@@ -120,7 +130,7 @@ Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
 | `snippet.ejs` | Single beer card (image, name, style, ABV, prices, rating) |
 | `ld-json.ejs` | Inlines the `<script type="application/ld+json">` block |
 | `scroll-top.ejs` | Fixed scroll-to-top button + CSS scroll-progress ring |
-| `footer.ejs` | Address, social links |
+| `footer.ejs` | Address, social links (rendered via `include()`, so `t()` works) |
 | `gtag.ejs` | Google Analytics snippet (injected only in production) |
 | `cftag.ejs` | Cloudflare Web Analytics beacon (injected only in production) |
 
