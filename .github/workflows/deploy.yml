@@ -23,10 +23,10 @@ jobs:
     environment: github-pages
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version-file: ".nvmrc"
           cache: "npm"
@@ -58,8 +58,8 @@ jobs:
         uses: actions/deploy-pages@v5
 
       - name: Notify group
-        if: ${{ vars.TELEGRAM_BOT_TOKEN && vars.TELEGRAM_GROUP_CHAT_ID && inputs.notify != false }}
+        if: ${{ secrets.TELEGRAM_BOT_TOKEN && secrets.TELEGRAM_GROUP_CHAT_ID && inputs.notify != false }}
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ vars.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d '{"chat_id":"${{ vars.TELEGRAM_GROUP_CHAT_ID }}","text":"<b>🍺 Menu site deployed</b>\n${{ steps.deployment.outputs.page_url }}","parse_mode":"HTML","disable_web_page_preview":true}'
+            -d '{"chat_id":"${{ secrets.TELEGRAM_GROUP_CHAT_ID }}","text":"<b>🍺 Menu site deployed</b>\n${{ steps.deployment.outputs.page_url }}","parse_mode":"HTML","disable_web_page_preview":true}'
