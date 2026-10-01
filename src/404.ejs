@@ -2,8 +2,10 @@
 <html lang="en">
 
 <head>
-    <%- partials.gtag %>
-    <%- partials.cftag %>
+    <% if (process.env.NODE_ENV === 'production') { %>
+        <%- partials.gtag %>
+        <%- partials.cftag %>
+    <% } %>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="styles.css" fetchpriority="high">
     <link rel="prefetch" href="/bottles.html" as="document">
