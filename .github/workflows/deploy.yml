@@ -58,8 +58,12 @@ jobs:
         uses: actions/deploy-pages@v5
 
       - name: Notify group
-        if: ${{ secrets.TELEGRAM_BOT_TOKEN && secrets.TELEGRAM_GROUP_CHAT_ID && inputs.notify != false }}
+        if: ${{ inputs.notify != false }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_GROUP_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
+          [[ -z "$TELEGRAM_BOT_TOKEN" || -z "$TELEGRAM_GROUP_CHAT_ID" ]] && exit 0
+          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d '{"chat_id":"${{ secrets.TELEGRAM_GROUP_CHAT_ID }}","text":"<b>🍺 Menu site deployed</b>\n${{ steps.deployment.outputs.page_url }}","parse_mode":"HTML","disable_web_page_preview":true}'
+            -d "{\"chat_id\":\"${TELEGRAM_GROUP_CHAT_ID}\",\"text\":\"<b>🍺 Menu site deployed</b>\n${{ steps.deployment.outputs.page_url }}\",\"parse_mode\":\"HTML\",\"disable_web_page_preview\":true}"
