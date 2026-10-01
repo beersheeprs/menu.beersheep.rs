@@ -30,8 +30,9 @@ function mapApiBeer(apiBeer) {
 }
 
 const LOCALES = [
-    { code: 'en', prefix: '' },
-    { code: 'sr', prefix: 'sr' },
+    { code: 'en', prefix: '', public: true },
+    // Not public yet: /sr/ pages get noindex and are left out of hreflang alternates
+    { code: 'sr', prefix: 'sr', public: false },
 ];
 const DEFAULT_LOCALE = 'en';
 
@@ -169,9 +170,10 @@ async function build() {
         const ldJson = require('./src/ld-json');
         const buildDate = new Date().toISOString();
         const environment = process.env.NODE_ENV || 'development';
-        const locales = LOCALES.map(({ code, prefix }) => ({
+        const locales = LOCALES.map(({ code, prefix, public: isPublic }) => ({
             code,
             base: prefix ? `/${prefix}` : '',
+            public: isPublic,
             name: dictionaries[code].meta.langName,
         }));
 
@@ -218,7 +220,7 @@ async function build() {
             ensureDir(outDir);
             console.log(`Rendering locale "${code}" → ${outDir}`);
 
-            const common = { partials, t, localize, lang: code, base, locales, buildDate, environment };
+            const common = { partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment };
 
             const taplistHtml = await render(mainTemplate, {
                 ...common,

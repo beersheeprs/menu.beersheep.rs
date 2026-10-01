@@ -106,9 +106,11 @@ Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
 - UI strings live in `src/i18n/<code>.json` (`en`, `sr` = Serbian Cyrillic). Locales are listed in `LOCALES` in `build.js`; the default (`en`) renders to `dist/`, others to `dist/<prefix>/`.
 - Templates get `t(key, vars)` (dot-path lookup, `{var}` interpolation, falls back to `en` then to the key), plus `lang`, `base` (`''` or `/sr`), `pagePath` and `locales`.
 - Internal links must use `<%= base %>/…`; asset links must be absolute (`/styles.css`) so they resolve under `/sr/`.
-- `head.ejs` emits `hreflang` alternates + `x-default`; `nav.ejs` renders the EN / СР switcher; `ld-json.js` takes `(data, pageType, t, base)`.
-- Beer data from the API (names, styles, descriptions, section names) is **not** translated.
-- Adding a language: create `src/i18n/<code>.json`, add it to `LOCALES`, add its URLs to `src/assets/sitemap.xml`.
+- `head.ejs` emits `hreflang` alternates + `x-default` for public locales; `nav.ejs` renders the EN / СР switcher (hidden via `.lang-switch { display: none }`); `ld-json.js` takes `(data, pageType, t, base, localize)`.
+- `public: false` on a locale (currently `sr`) renders its pages with `noindex` and leaves them out of `hreflang`; they are also kept out of `sitemap.xml`. To launch: set `public: true`, add the URLs to the sitemap, and show the switcher.
+- Beer names, styles and section names from the API are **not** translated.
+- Beer descriptions use `description_<code>` from the API (e.g. `description_sr`, maintained manually in D1) via `localize.description()`, falling back to English; country names via the `countries` map in the locale file.
+- Adding a language: create `src/i18n/<code>.json` and add it to `LOCALES` (start with `public: false`).
 
 ## CSS breakpoints
 

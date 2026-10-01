@@ -16,7 +16,8 @@ var pageUrl = origin + base + pagePath;
 <meta name="description" content="<%= pageDesc %>">
 <meta property="og:url" content="<%= pageUrl %>">
 <link rel="canonical" href="<%= pageUrl %>" />
-<% if (pageType !== '404') { locales.forEach(function(l) { %>
+<% var publicLocales = locales.filter(function(l) { return l.public; }); %>
+<% if (pageType !== '404' && isPublic && publicLocales.length > 1) { publicLocales.forEach(function(l) { %>
 <link rel="alternate" hreflang="<%= l.code %>" href="<%= origin + l.base + pagePath %>" />
 <% }) %>
 <link rel="alternate" hreflang="x-default" href="<%= origin + pagePath %>" />
@@ -29,7 +30,7 @@ var pageUrl = origin + base + pagePath;
 <meta name="twitter:title" content="<%= pageTitle %>">
 <meta name="twitter:description" content="<%= pageDesc %>">
 <meta name="twitter:image" content="https://menu.beersheep.rs/mstile-310x310.png">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="<%= isPublic ? 'index, follow' : 'noindex, follow' %>">
 <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/apple-touch-icon-57x57.png" />
 <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/apple-touch-icon-114x114.png" />
 <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/apple-touch-icon-72x72.png" />
