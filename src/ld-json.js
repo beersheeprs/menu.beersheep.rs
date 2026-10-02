@@ -1,11 +1,13 @@
-module.exports = function (data, pageType) {
+module.exports = function (data, pageType, t, base, localize) {
+    const pageUrl = `https://menu.beersheep.rs${base}/`;
+
     const bar = {
         "@context": "https://schema.org",
         "@type": "BarOrPub",
         "@id": "#beersheep",
         "name": "Beersheep Garden",
-        "url": "https://menu.beersheep.rs/",
-        "description": "Craft beer bar in Vračar, Belgrade with a rotating tap list of local and imported beers.",
+        "url": pageUrl,
+        "description": t('ld.barDescription'),
         "logo": "https://menu.beersheep.rs/mstile-310x310.png",
         "image": "https://menu.beersheep.rs/mstile-310x310.png",
         "telephone": "+38163301415",
@@ -63,7 +65,7 @@ module.exports = function (data, pageType) {
             "@type": "MenuItem",
             "@id": `#${idPrefix}${beer.tap_num || beer.name.replace(/[^a-zA-Z0-9]/g, '')}`,
             "name": beer.name,
-            "description": beer.description,
+            "description": localize.description(beer),
             "additionalProperty": props,
             "offers": offers
         };
@@ -75,8 +77,8 @@ module.exports = function (data, pageType) {
             bar.hasMenu = {
                 "@type": "Menu",
                 "@id": "#menu",
-                "name": "Bottles & Cans",
-                "description": "Bottled and canned beers",
+                "name": t('ld.bottleMenuName'),
+                "description": t('ld.bottleMenuDesc'),
                 "hasMenuSection": data.map(section => ({
                     "@type": "MenuSection",
                     "@id": `#section-${section.name.replace(/[^a-zA-Z0-9]/g, '')}`,
@@ -91,13 +93,13 @@ module.exports = function (data, pageType) {
             bar.hasMenu = {
                 "@type": "Menu",
                 "@id": "#menu",
-                "name": "Taplist",
-                "description": "Beers on tap",
+                "name": t('ld.tapMenuName'),
+                "description": t('ld.tapMenuDesc'),
                 "hasMenuSection": [{
                     "@type": "MenuSection",
                     "@id": "#draft-beers",
-                    "name": "Draft Beers",
-                    "description": "Current beers on tap",
+                    "name": t('ld.draftSection'),
+                    "description": t('ld.draftSectionDesc'),
                     "hasMenuItem": data.map(beer => makeMenuItem(beer, 'tap'))
                 }]
             };
@@ -108,8 +110,9 @@ module.exports = function (data, pageType) {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "@id": "#website",
-        "url": "https://menu.beersheep.rs/",
-        "name": "Beersheep Garden Taplist"
+        "url": pageUrl,
+        "inLanguage": t('meta.lang'),
+        "name": t('meta.siteName')
     };
 
     return [bar, webSite];

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 
 <head>
     <% if (process.env.NODE_ENV==='production' ) { %>
@@ -8,8 +8,8 @@
     <% } %>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="preconnect" href="https://assets.untappd.com">
-    <link rel="stylesheet" href="styles.css" fetchpriority="high">
-    <link rel="prefetch" href="/bottles.html" as="document">
+    <link rel="stylesheet" href="/styles.css" fetchpriority="high">
+    <link rel="prefetch" href="<%= base %>/bottles.html" as="document">
     <%- include('partials/head', {pageType}) %>
     <meta property="og:updated_time" content="<%= new Date().toISOString() %>" />
 </head>
@@ -29,12 +29,12 @@
                         <%- include('partials/snippet', {item: beer}); %>
                     <% }) %>
                 <% } else { %>
-                    <p>No beers available at the moment. Please check back later!</p>
+                    <p><%= t('taps.empty') %></p>
                 <% } %>
             </div>
         </main>
     </div>
-    <%- partials.footer %>
+    <%- include('partials/footer') %>
     <div style="display: none;"><%= new Date().toUTCString() %></div>
 </body>
 

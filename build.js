@@ -21,10 +21,46 @@ function mapApiBeer(apiBeer) {
         abv: apiBeer.abv,
         ibu: apiBeer.ibu,
         description: apiBeer.description,
+        description_sr: apiBeer.description_sr,
         prices: apiBeer.prices,
         serving_style: apiBeer.serving_style,
         on_tap: apiBeer.on_tap,
         untappd_url: apiBeer.untappd_url,
+    };
+}
+
+const LOCALES = [
+    { code: 'en', prefix: '', public: true },
+    // Not public yet: /sr/ pages get noindex and are left out of hreflang alternates
+    { code: 'sr', prefix: 'sr', public: false },
+];
+const DEFAULT_LOCALE = 'en';
+
+const dictionaries = Object.fromEntries(
+    LOCALES.map(({ code }) => [code, require(`./src/i18n/${code}.json`)])
+);
+
+function lookup(dict, key) {
+    return key.split('.').reduce((obj, k) => (obj == null ? undefined : obj[k]), dict);
+}
+
+// Translation helper: dot-path lookup with {var} interpolation,
+// falling back to the default locale and then to the key itself.
+function makeT(code) {
+    return (key, vars = {}) => {
+        let value = lookup(dictionaries[code], key);
+        if (typeof value !== 'string') value = lookup(dictionaries[DEFAULT_LOCALE], key);
+        if (typeof value !== 'string') return key;
+        return value.replace(/\{(\w+)\}/g, (match, name) => (name in vars ? vars[name] : match));
+    };
+}
+
+// Locale-aware view of a beer's data fields: falls back to the original (English) values.
+function makeLocalize(code) {
+    const countries = dictionaries[code].countries || {};
+    return {
+        country: (name) => (name && countries[name]) || name,
+        description: (beer) => (code !== DEFAULT_LOCALE && beer[`description_${code}`]?.trim()) || beer.description,
     };
 }
 
@@ -132,20 +168,14 @@ async function build() {
         }
 
         const ldJson = require('./src/ld-json');
-
-        const tapTemplateData = {
-            beers: { data: beerData },
-            ldJson: ldJson(beerData, 'taps'),
-            buildDate: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development',
-        };
-
-        const bottleTemplateData = {
-            sections: bottleSections,
-            ldJson: ldJson(bottleSections, 'bottles'),
-            buildDate: new Date().toISOString(),
-            environment: process.env.NODE_ENV || 'development',
-        };
+        const buildDate = new Date().toISOString();
+        const environment = process.env.NODE_ENV || 'development';
+        const locales = LOCALES.map(({ code, prefix, public: isPublic }) => ({
+            code,
+            base: prefix ? `/${prefix}` : '',
+            public: isPublic,
+            name: dictionaries[code].meta.langName,
+        }));
 
         console.log('Building HTML with EJS...');
 
@@ -168,8 +198,6 @@ async function build() {
         });
 
         const partials = {
-            header: fs.readFileSync(path.join(__dirname, 'src/partials/header.ejs'), 'utf8'),
-            footer: fs.readFileSync(path.join(__dirname, 'src/partials/footer.ejs'), 'utf8'),
             gtag: fs.readFileSync(path.join(__dirname, 'src/partials/gtag.ejs'), 'utf8'),
             cftag: fs.readFileSync(path.join(__dirname, 'src/partials/cftag.ejs'), 'utf8'),
         };
@@ -177,42 +205,54 @@ async function build() {
         const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
         const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
 
-        let taplistHtml = ejs.render(mainTemplate, {
-            ...tapTemplateData,
-            partials,
-            pageType: 'taps',
-            filename: 'src/index.ejs',
-        });
+        const render = async (template, data) => {
+            const html = ejs.render(template, data);
+            return process.env.NODE_ENV === 'production'
+                ? htmlMinifier.minify(html, minifyOptions)
+                : html;
+        };
 
-        let bottlesHtml = ejs.render(bottlesTemplate, {
-            ...bottleTemplateData,
-            partials,
-            pageType: 'bottles',
-            filename: 'src/bottles.ejs',
-        });
+        for (const locale of locales) {
+            const { code, base } = locale;
+            const t = makeT(code);
+            const localize = makeLocalize(code);
+            const outDir = path.join(distDir, base);
+            ensureDir(outDir);
+            console.log(`Rendering locale "${code}" → ${outDir}`);
 
-        if (process.env.NODE_ENV === 'production') {
-            console.log('Minifying HTML');
-            taplistHtml = await htmlMinifier.minify(taplistHtml, minifyOptions);
-            bottlesHtml = await htmlMinifier.minify(bottlesHtml, minifyOptions);
+            const common = { partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment };
+
+            const taplistHtml = await render(mainTemplate, {
+                ...common,
+                beers: { data: beerData },
+                ldJson: ldJson(beerData, 'taps', t, base, localize),
+                pageType: 'taps',
+                pagePath: '/',
+                filename: 'src/index.ejs',
+            });
+            fs.writeFileSync(path.join(outDir, 'index.html'), taplistHtml);
+
+            const bottlesHtml = await render(bottlesTemplate, {
+                ...common,
+                sections: bottleSections,
+                ldJson: ldJson(bottleSections, 'bottles', t, base, localize),
+                pageType: 'bottles',
+                pagePath: '/bottles.html',
+                filename: 'src/bottles.ejs',
+            });
+            fs.writeFileSync(path.join(outDir, 'bottles.html'), bottlesHtml);
+
+            // GitHub Pages only serves the root 404.html, so render it for the default locale only
+            if (code === DEFAULT_LOCALE) {
+                const notFoundHtml = await render(notFoundTemplate, {
+                    ...common,
+                    pageType: '404',
+                    pagePath: '/',
+                    filename: 'src/404.ejs',
+                });
+                fs.writeFileSync(path.join(outDir, '404.html'), notFoundHtml);
+            }
         }
-
-        fs.writeFileSync(path.join(distDir, 'index.html'), taplistHtml);
-        fs.writeFileSync(path.join(distDir, 'bottles.html'), bottlesHtml);
-
-        let notFoundHtml = ejs.render(notFoundTemplate, {
-            partials,
-            pageType: '404',
-            filename: 'src/404.ejs',
-            environment: process.env.NODE_ENV || 'development',
-        });
-
-        if (process.env.NODE_ENV === 'production') {
-            console.log('Minifying 404');
-            notFoundHtml = await htmlMinifier.minify(notFoundHtml, minifyOptions);
-        }
-
-        fs.writeFileSync(path.join(distDir, '404.html'), notFoundHtml);
 
         // API endpoints
         ensureDir(path.join(distDir, 'api/v1'));

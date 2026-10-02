@@ -1,0 +1,60 @@
+{
+    "meta": {
+        "lang": "en",
+        "ogLocale": "en_US",
+        "langName": "EN",
+        "siteName": "Beersheep Garden Taplist",
+        "keywords": "beersheep, beer garden, craft beer, Belgrade"
+    },
+    "taps": {
+        "title": "Beersheep Garden - Tap Beer Menu",
+        "desc": "Tap menu for Beersheep Garden, featuring a curated selection of craft beers.",
+        "h1": "Beersheep Garden Taplist",
+        "empty": "No beers available at the moment. Please check back later!"
+    },
+    "bottles": {
+        "title": "Beersheep Garden - Bottles & Cans Menu",
+        "desc": "Bottled and canned beer menu for Beersheep Garden, featuring a curated selection of craft beers from around the world.",
+        "h1": "Beersheep Garden Bottles & Cans",
+        "empty": "No bottled beers available at the moment. Please check back later!",
+        "jumpTo": "Jump to section",
+        "jumpToPlaceholder": "Jump to section..."
+    },
+    "notFound": {
+        "title": "Beersheep Garden - Page Not Found",
+        "h1": "Beersheep Garden Taplist",
+        "heading": "404 — Page Not Found",
+        "line1": "Looks like this tap has run dry.",
+        "line2": "No beer here, but we've got plenty on the menu.",
+        "back": "Back to the menu"
+    },
+    "nav": {
+        "label": "Page navigation",
+        "taps": "On Tap",
+        "bottles": "Bottles & Cans",
+        "language": "Language"
+    },
+    "snippet": {
+        "alsoOnTap": "also on tap",
+        "askPrice": "Please ask the bartender for price details",
+        "rating": "Rating: {value} out of 5",
+        "currency": "RSD"
+    },
+    "footer": {
+        "address": "Kneginje Zorke 3. Vračar",
+        "responsibly": "Always drink responsibly",
+        "opensNewTab": "opens in new tab"
+    },
+    "scrollTop": {
+        "label": "Back to top"
+    },
+    "ld": {
+        "barDescription": "Craft beer bar in Vračar, Belgrade with a rotating tap list of local and imported beers.",
+        "tapMenuName": "Taplist",
+        "tapMenuDesc": "Beers on tap",
+        "draftSection": "Draft Beers",
+        "draftSectionDesc": "Current beers on tap",
+        "bottleMenuName": "Bottles & Cans",
+        "bottleMenuDesc": "Bottled and canned beers"
+    }
+}

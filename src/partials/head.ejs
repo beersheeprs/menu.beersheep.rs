@@ -1,11 +1,12 @@
 <%
-var isBottles = pageType === 'bottles';
-var pageTitle = isBottles ? 'Beersheep Garden - Bottles & Cans Menu' : 'Beersheep Garden - Tap Beer Menu';
-var pageDesc = isBottles ? 'Bottled and canned beer menu for Beersheep Garden, featuring a curated selection of craft beers from around the world.' : 'Tap menu for Beersheep Garden, featuring a curated selection of craft beers.';
-var pageUrl = isBottles ? 'https://menu.beersheep.rs/bottles.html' : 'https://menu.beersheep.rs/';
+var origin = 'https://menu.beersheep.rs';
+var pageKey = pageType === 'bottles' ? 'bottles' : pageType === '404' ? 'notFound' : 'taps';
+var pageTitle = t(pageKey + '.title');
+var pageDesc = t(pageKey === 'notFound' ? 'taps.desc' : pageKey + '.desc');
+var pageUrl = origin + base + pagePath;
 %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<meta name="keywords" content="beersheep, beer garden, craft beer, Belgrade" />
+<meta name="keywords" content="<%= t('meta.keywords') %>" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="view-transition" content="same-origin">
 <title><%= pageTitle %></title>
@@ -15,31 +16,38 @@ var pageUrl = isBottles ? 'https://menu.beersheep.rs/bottles.html' : 'https://me
 <meta name="description" content="<%= pageDesc %>">
 <meta property="og:url" content="<%= pageUrl %>">
 <link rel="canonical" href="<%= pageUrl %>" />
+<% var publicLocales = locales.filter(function(l) { return l.public; }); %>
+<% if (pageType !== '404' && isPublic && publicLocales.length > 1) { publicLocales.forEach(function(l) { %>
+<link rel="alternate" hreflang="<%= l.code %>" href="<%= origin + l.base + pagePath %>" />
+<% }) %>
+<link rel="alternate" hreflang="x-default" href="<%= origin + pagePath %>" />
+<% } %>
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="Beersheep Garden Taplist">
+<meta property="og:site_name" content="<%= t('meta.siteName') %>">
+<meta property="og:locale" content="<%= t('meta.ogLocale') %>">
 <meta property="og:image" content="https://menu.beersheep.rs/mstile-310x310.png" />
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<%= pageTitle %>">
 <meta name="twitter:description" content="<%= pageDesc %>">
 <meta name="twitter:image" content="https://menu.beersheep.rs/mstile-310x310.png">
-<meta name="robots" content="index, follow">
-<link rel="apple-touch-icon-precomposed" sizes="57x57" href="apple-touch-icon-57x57.png" />
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="apple-touch-icon-114x114.png" />
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="apple-touch-icon-72x72.png" />
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="apple-touch-icon-144x144.png" />
-<link rel="apple-touch-icon-precomposed" sizes="60x60" href="apple-touch-icon-60x60.png" />
-<link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120.png" />
-<link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76.png" />
-<link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152.png" />
-<link rel="icon" type="image/png" href="favicon-196x196.png" sizes="196x196" />
-<link rel="icon" type="image/png" href="favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32" />
-<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16" />
-<link rel="icon" type="image/png" href="favicon-128.png" sizes="128x128" />
+<meta name="robots" content="<%= isPublic ? 'index, follow' : 'noindex, follow' %>">
+<link rel="apple-touch-icon-precomposed" sizes="57x57" href="/apple-touch-icon-57x57.png" />
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="/apple-touch-icon-114x114.png" />
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="/apple-touch-icon-72x72.png" />
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144x144.png" />
+<link rel="apple-touch-icon-precomposed" sizes="60x60" href="/apple-touch-icon-60x60.png" />
+<link rel="apple-touch-icon-precomposed" sizes="120x120" href="/apple-touch-icon-120x120.png" />
+<link rel="apple-touch-icon-precomposed" sizes="76x76" href="/apple-touch-icon-76x76.png" />
+<link rel="apple-touch-icon-precomposed" sizes="152x152" href="/apple-touch-icon-152x152.png" />
+<link rel="icon" type="image/png" href="/favicon-196x196.png" sizes="196x196" />
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+<link rel="icon" type="image/png" href="/favicon-128.png" sizes="128x128" />
 <meta name="application-name" content="Beersheep Garden" />
 <meta name="msapplication-TileColor" content="#231f20" />
-<meta name="msapplication-TileImage" content="mstile-144x144.png" />
-<meta name="msapplication-square70x70logo" content="mstile-70x70.png" />
-<meta name="msapplication-square150x150logo" content="mstile-150x150.png" />
-<meta name="msapplication-wide310x150logo" content="mstile-310x150.png" />
-<meta name="msapplication-square310x310logo" content="mstile-310x310.png" />
+<meta name="msapplication-TileImage" content="/mstile-144x144.png" />
+<meta name="msapplication-square70x70logo" content="/mstile-70x70.png" />
+<meta name="msapplication-square150x150logo" content="/mstile-150x150.png" />
+<meta name="msapplication-wide310x150logo" content="/mstile-310x150.png" />
+<meta name="msapplication-square310x310logo" content="/mstile-310x310.png" />

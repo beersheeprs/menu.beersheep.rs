@@ -1,0 +1,104 @@
+{
+    "meta": {
+        "lang": "sr",
+        "ogLocale": "sr_RS",
+        "langName": "СР",
+        "siteName": "Beersheep Garden – точење",
+        "keywords": "beersheep, пивска башта, крафт пиво, Београд"
+    },
+    "taps": {
+        "title": "Beersheep Garden – Пиво на точењу",
+        "desc": "Мени точеног пива у Beersheep Garden-у, пажљиво одабрана крафт пива.",
+        "h1": "Beersheep Garden – На точилицама",
+        "empty": "Тренутно нема пива на точењу. Свратите ускоро!"
+    },
+    "bottles": {
+        "title": "Beersheep Garden – Флаше и лименке",
+        "desc": "Мени пива у флашама и лименкама у Beersheep Garden-у, пажљиво одабрана крафт пива из целог света.",
+        "h1": "Beersheep Garden – Флаше и лименке",
+        "empty": "Тренутно нема пива у флашама. Свратите ускоро!",
+        "jumpTo": "Пређи на одељак",
+        "jumpToPlaceholder": "Пређи на одељак..."
+    },
+    "notFound": {
+        "title": "Beersheep Garden – Страница није пронађена",
+        "h1": "Beersheep Garden – На точилицама",
+        "heading": "404 — Страница није пронађена",
+        "line1": "Изгледа да је ова славина пресушила.",
+        "line2": "Овде нема пива, али у менију има пуно.",
+        "back": "Назад на мени"
+    },
+    "nav": {
+        "label": "Навигација",
+        "taps": "Точилице",
+        "bottles": "Флаше и лименке",
+        "language": "Језик"
+    },
+    "snippet": {
+        "alsoOnTap": "има и на точилици",
+        "askPrice": "За цену питајте на шанку",
+        "rating": "Оцена: {value} од 5",
+        "currency": "дин."
+    },
+    "footer": {
+        "address": "Кнегиње Зорке 3, Врачар",
+        "responsibly": "Пијте одговорно",
+        "opensNewTab": "отвара се у новој картици"
+    },
+    "scrollTop": {
+        "label": "Назад на врх"
+    },
+    "ld": {
+        "barDescription": "Крафт пивница на Врачару, Београд, са сменском понудом домаћих и увозних пива на точењу.",
+        "tapMenuName": "Пиво на точењу",
+        "tapMenuDesc": "Пива на точењу",
+        "draftSection": "Точено пиво",
+        "draftSectionDesc": "Тренутна понуда на точењу",
+        "bottleMenuName": "Флаше и лименке",
+        "bottleMenuDesc": "Пива у флашама и лименкама"
+    },
+    "countries": {
+        "Australia": "Аустралија",
+        "Austria": "Аустрија",
+        "Belgium": "Белгија",
+        "Bosnia and Herzegovina": "Босна и Херцеговина",
+        "Bulgaria": "Бугарска",
+        "Canada": "Канада",
+        "Croatia": "Хрватска",
+        "Czech Republic": "Чешка",
+        "Czechia": "Чешка",
+        "Denmark": "Данска",
+        "England": "Енглеска",
+        "Estonia": "Естонија",
+        "Finland": "Финска",
+        "France": "Француска",
+        "Germany": "Немачка",
+        "Greece": "Грчка",
+        "Hungary": "Мађарска",
+        "Ireland": "Ирска",
+        "Italy": "Италија",
+        "Japan": "Јапан",
+        "Latvia": "Летонија",
+        "Lithuania": "Литванија",
+        "Montenegro": "Црна Гора",
+        "Netherlands": "Холандија",
+        "New Zealand": "Нови Зеланд",
+        "North Macedonia": "Северна Македонија",
+        "Northern Ireland": "Северна Ирска",
+        "Norway": "Норвешка",
+        "Poland": "Пољска",
+        "Portugal": "Португалија",
+        "Romania": "Румунија",
+        "Scotland": "Шкотска",
+        "Serbia": "Србија",
+        "Slovakia": "Словачка",
+        "Slovenia": "Словенија",
+        "Spain": "Шпанија",
+        "Sweden": "Шведска",
+        "Switzerland": "Швајцарска",
+        "Ukraine": "Украјина",
+        "United Kingdom": "Уједињено Краљевство",
+        "USA": "САД",
+        "Wales": "Велс"
+    }
+}
