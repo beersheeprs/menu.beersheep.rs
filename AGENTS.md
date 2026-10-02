@@ -2,7 +2,7 @@
 
 ## Project overview
 
-Static site builder for **Beersheep Garden** beer menu. Fetches beer data from the Cloudflare Worker API, renders it into responsive HTML pages via EJS templates, and deploys to GitHub Pages.
+Static site builder for the **Beersheep Garden** beer menu and the (unreleased) **Beersheep Beer Store** menu. Fetches beer data from the Cloudflare Worker API, renders it into responsive HTML pages via EJS templates, and deploys to GitHub Pages.
 
 ## Architecture
 
@@ -16,12 +16,13 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
     EJS templates:
         src/index.ejs      → dist/index.html     (draft taps)
         src/bottles.ejs    → dist/bottles.html   (bottles & cans)
+        src/store.ejs      → dist/store.html     (Beer Store, from API_ORIGIN/store/list; hidden until STORE_PUBLIC)
         src/404.ejs        → dist/404.html        (custom error page, default locale only)
         (index/bottles rendered once per locale: en → dist/, sr → dist/sr/)
         src/partials/*     (shared snippets, head, nav, footer…)
         │
         ├─ dist/           (static assets: CSS, images, favicons)
-        └─ dist/api/v1/    (taps.json, fridge.json — JSON mirror of beer data)
+        └─ dist/api/v1/    (taps.json, fridge.json, store.json — JSON mirror of beer data)
         │
         ▼
     GitHub Pages (via workflow_dispatch in deploy.yml)
@@ -35,7 +36,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 - **GitHub Actions** deploys to GitHub Pages on `workflow_dispatch`
 - **Google Analytics + Cloudflare Web Analytics** (production only, `src/partials/gtag.ejs` and `cftag.ejs`)
 - **Font Awesome 7** for icons
-- **`src/ld-json.js`** generates Schema.org `BarOrPub` + `Menu` structured data for both pages
+- **`src/ld-json.js`** generates Schema.org `BarOrPub` + `Menu` structured data for the garden pages, and `LiquorStore` + `OfferCatalog` (no opening hours) for the store page
 
 ## Beer data schema (mapped from API)
 
@@ -61,7 +62,10 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 ```
 
 `serving_style`: `"draft"` | `"can"` | `"bottle"` — drives the icon in `snippet.ejs`.  
-`on_tap`: when `true` on a bottles/cans entry, renders an "also on tap" badge.  
+`on_tap`: when `true` on a bottles/cans entry, renders an "also on tap" badge ("also on tap in Garden" on the store page).  
+`sizes` (store only): `[{ size, style }]` — the store lists volumes, not prices; each volume keeps its own container icon.  
+`style_group` (store only): filter-chip group from the style prefix (`STYLE_GROUPS` in `build.js`).  
+`abv`: may be null — Untappd menus print "N/A ABV" for both 0% and unknown ABV, so the two can't be told apart. A missing ABV on a `Non-Alcoholic` style shows a "Non-alcoholic" badge (never a made-up 0.0%); any other style shows no ABV badge.  
 `image_name`: slug for a locally hosted `.webp` in `dist/img/`. **Note:** `mapApiBeer()` in `build.js` does not currently map this field from the API response, so local images are only served if the beer data is injected via `BEER_DATA` with `image_name` already set.
 
 ## Image handling
@@ -78,8 +82,16 @@ Priority order in `src/partials/snippet.ejs`:
 
 - Prices sorted **small-to-large** by volume (`parseFloat` sort on keys).
 - Entries with `price > 0` only — zero or null prices are filtered out.
-- If no valid prices remain, shows "Please ask the bartender for price details".
+- If no valid prices remain, shows "Please ask the bartender for price details" — except on the store page, which shows the volumes (`sizes`) instead.
 - Old `price_small`/`price_big` fallback removed — all beers use the `prices` object.
+
+## Beer Store page (`store.ejs`)
+
+- **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's always fetched from the API, even when `BEER_DATA` is given.
+- **Isolated:** any store fetch or render failure logs a warning and skips `store.html`; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
+- **Hidden until release:** `STORE_PUBLIC` (repo variable, passed by `deploy.yml`) defaults to false. While false, `store.html` is built and deployed but gets `noindex`, no `hreflang` alternates, no nav link on other pages, and no sitemap entry. `STORE_PUBLIC=true` adds the nav tab and the sitemap URL (written into `dist/sitemap.xml` at build) and allows indexing.
+- **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
+- "Beer Store" is a name — never translated in any locale.
 
 ## Deployment
 
@@ -127,12 +139,12 @@ Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
 |---|---|
 | `head.ejs` | `<meta>` tags, OG/Twitter cards, favicons, canonical URL |
 | `header.ejs` | `<h1>` + page nav |
-| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links |
-| `section-nav.ejs` | Jump-to-section links (bottles page only) |
+| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links (+ "Beer Store" when `STORE_PUBLIC`, or on the store page itself) |
+| `section-nav.ejs` | Jump-to-section links (bottles and store pages) |
 | `snippet.ejs` | Single beer card (image, name, style, ABV, prices, rating) |
 | `ld-json.ejs` | Inlines the `<script type="application/ld+json">` block |
 | `scroll-top.ejs` | Fixed scroll-to-top button + CSS scroll-progress ring |
-| `footer.ejs` | Address, social links (rendered via `include()`, so `t()` works) |
+| `footer.ejs` | Venue name + address from `venue` (garden or store), social links (rendered via `include()`, so `t()` works) |
 | `gtag.ejs` | Google Analytics snippet (injected only in production) |
 | `cftag.ejs` | Cloudflare Web Analytics beacon (injected only in production) |
 

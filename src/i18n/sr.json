@@ -20,6 +20,27 @@
         "jumpTo": "Пређи на одељак",
         "jumpToPlaceholder": "Пређи на одељак..."
     },
+    "store": {
+        "title": "Beersheep Beer Store – Флаше и лименке",
+        "desc": "Крафт пиво у флашама и лименкама у Beersheep Beer Store-у, Београд — домаће и увозно, по земљама.",
+        "h1": "Beersheep Beer Store",
+        "empty": "Тренутно нема пива на листи. Свратите ускоро!",
+        "search": "Тражи пиво, пивару или стил",
+        "filterLabel": "Филтер по стилу",
+        "noResults": "Ниједно пиво не одговара претрази.",
+        "groups": {
+            "all": "Сва",
+            "ipa": "IPA",
+            "paleAle": "Пејл ејл",
+            "sour": "Кисела и ламбик",
+            "stout": "Стаут и портер",
+            "lager": "Лагер и пилснер",
+            "belgian": "Белгијска",
+            "cider": "Сајдер",
+            "nonAlcoholic": "Безалкохолна",
+            "other": "Остало"
+        }
+    },
     "notFound": {
         "title": "Beersheep Garden – Страница није пронађена",
         "h1": "Beersheep Garden – На точилицама",
@@ -32,16 +53,20 @@
         "label": "Навигација",
         "taps": "Точилице",
         "bottles": "Флаше и лименке",
-        "language": "Језик"
+        "language": "Језик",
+        "store": "Beer Store"
     },
     "snippet": {
         "alsoOnTap": "има и на точилици",
+        "alsoOnTapInGarden": "има и на точилици у Garden-у",
+        "nonAlcoholic": "Безалкохолно",
         "askPrice": "За цену питајте на шанку",
         "rating": "Оцена: {value} од 5",
         "currency": "дин."
     },
     "footer": {
         "address": "Кнегиње Зорке 3, Врачар",
+        "storeAddress": "Балканска 21, Београд",
         "responsibly": "Пијте одговорно",
         "opensNewTab": "отвара се у новој картици"
     },
@@ -55,7 +80,9 @@
         "draftSection": "Точено пиво",
         "draftSectionDesc": "Тренутна понуда на точењу",
         "bottleMenuName": "Флаше и лименке",
-        "bottleMenuDesc": "Пива у флашама и лименкама"
+        "bottleMenuDesc": "Пива у флашама и лименкама",
+        "storeDescription": "Продавница крафт пива у Београду — пива у флашама и лименкама домаћих и страних пивара.",
+        "storeCatalogName": "Флаше и лименке"
     },
     "countries": {
         "Australia": "Аустралија",

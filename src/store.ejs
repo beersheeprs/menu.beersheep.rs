@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+
+<head>
+    <% if (process.env.NODE_ENV==='production' ) { %>
+        <%- partials.gtag %>
+        <%- partials.cftag %>
+    <% } %>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://assets.untappd.com">
+    <link rel="stylesheet" href="/styles.css" fetchpriority="high">
+    <%- include('partials/head', {pageType}) %>
+    <meta property="og:updated_time" content="<%= new Date().toISOString() %>" />
+</head>
+
+<body>
+    <%- include('partials/scroll-top') %>
+    <div class="overlay" aria-hidden="true"
+        style="background-color:#333; position:absolute; top:0px; left:0px; width:100%; height:100%; z-index:2000;">
+    </div>
+    <div class="container">
+        <%- include('partials/header', {pageType}) %>
+        <%- include('partials/ld-json', {ldJson}) %>
+        <main>
+            <% if (sections && sections.length > 0) { %>
+                <%
+                   // Filter chips: only style groups present on the menu, in a fixed order
+                   var groupOrder = ['ipa', 'paleAle', 'sour', 'stout', 'lager', 'belgian', 'cider', 'nonAlcoholic', 'other'];
+                   var groupCounts = {};
+                   sections.forEach(function(s) { s.beers.forEach(function(b) { groupCounts[b.style_group] = (groupCounts[b.style_group] || 0) + 1; }); });
+                %>
+                <%# Shown by the script below; without JS every beer is listed %>
+                <div class="store-filter" hidden>
+                    <input type="search" class="store-search" placeholder="<%= t('store.search') %>" aria-label="<%= t('store.search') %>" autocomplete="off">
+                    <div class="store-chips" role="group" aria-label="<%= t('store.filterLabel') %>">
+                        <button type="button" class="store-chip active" data-group="" aria-pressed="true"><%= t('store.groups.all') %></button>
+                        <% groupOrder.filter(function(g) { return groupCounts[g]; }).forEach(function(g) { %>
+                            <button type="button" class="store-chip" data-group="<%= g %>" aria-pressed="false"><%= t('store.groups.' + g) %> <span class="store-chip-count"><%= groupCounts[g] %></span></button>
+                        <% }) %>
+                    </div>
+                </div>
+                <%- include('partials/section-nav') %>
+                <p class="store-no-results" hidden><%= t('store.noResults') %></p>
+                <% sections.forEach(section => { %>
+                    <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
+                    <section class="beer-section" id="<%= slug %>">
+                        <h2 class="section-header"><%= localize.country(section.name) %></h2>
+                        <div class="grid">
+                            <% section.beers.forEach(beer => { %>
+                                <%- include('partials/snippet', {item: beer}); %>
+                            <% }) %>
+                        </div>
+                    </section>
+                <% }) %>
+            <% } else { %>
+                <p><%= t('store.empty') %></p>
+            <% } %>
+        </main>
+    </div>
+    <%- include('partials/footer') %>
+    <script>
+        (function () {
+            var filter = document.querySelector('.store-filter');
+            if (!filter) return;
+            filter.hidden = false;
+
+            // Accent-insensitive: "culo" finds "ČULO"
+            function norm(text) {
+                return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+            }
+
+            var input = filter.querySelector('.store-search');
+            var chips = [].slice.call(filter.querySelectorAll('.store-chip'));
+            var cards = [].slice.call(document.querySelectorAll('.snippet[data-search]'));
+            var sections = [].slice.call(document.querySelectorAll('.beer-section'));
+            var noResults = document.querySelector('.store-no-results');
+            var texts = cards.map(function (card) { return norm(card.getAttribute('data-search')); });
+            var group = '';
+
+            function apply() {
+                var query = norm(input.value.trim());
+                cards.forEach(function (card, i) {
+                    var groupOk = !group || card.getAttribute('data-group') === group;
+                    card.hidden = !(groupOk && (!query || texts[i].indexOf(query) !== -1));
+                });
+                var anyVisible = false;
+                sections.forEach(function (section) {
+                    var visible = !!section.querySelector('.snippet[data-search]:not([hidden])');
+                    section.hidden = !visible;
+                    if (visible) anyVisible = true;
+                });
+                noResults.hidden = anyVisible;
+            }
+
+            input.addEventListener('input', apply);
+            chips.forEach(function (chip) {
+                chip.addEventListener('click', function () {
+                    group = chip.getAttribute('data-group');
+                    chips.forEach(function (other) {
+                        other.classList.toggle('active', other === chip);
+                        other.setAttribute('aria-pressed', other === chip ? 'true' : 'false');
+                    });
+                    apply();
+                });
+            });
+        })();
+    </script>
+    <div style="display: none;"><%= new Date().toUTCString() %></div>
+</body>
+
+</html>

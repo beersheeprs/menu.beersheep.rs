@@ -20,6 +20,27 @@
         "jumpTo": "Jump to section",
         "jumpToPlaceholder": "Jump to section..."
     },
+    "store": {
+        "title": "Beersheep Beer Store - Bottles & Cans",
+        "desc": "Bottled and canned craft beer at Beersheep Beer Store, Belgrade — local and imported, grouped by country.",
+        "h1": "Beersheep Beer Store",
+        "empty": "No beers listed at the moment. Please check back later!",
+        "search": "Search beer, brewery or style",
+        "filterLabel": "Filter by style",
+        "noResults": "No beers match your search.",
+        "groups": {
+            "all": "All",
+            "ipa": "IPA",
+            "paleAle": "Pale Ale",
+            "sour": "Sour & Lambic",
+            "stout": "Stout & Porter",
+            "lager": "Lager & Pilsner",
+            "belgian": "Belgian",
+            "cider": "Cider",
+            "nonAlcoholic": "Non-alcoholic",
+            "other": "Other"
+        }
+    },
     "notFound": {
         "title": "Beersheep Garden - Page Not Found",
         "h1": "Beersheep Garden Taplist",
@@ -32,16 +53,20 @@
         "label": "Page navigation",
         "taps": "On Tap",
         "bottles": "Bottles & Cans",
-        "language": "Language"
+        "language": "Language",
+        "store": "Beer Store"
     },
     "snippet": {
         "alsoOnTap": "also on tap",
+        "alsoOnTapInGarden": "also on tap in Garden",
+        "nonAlcoholic": "Non-alcoholic",
         "askPrice": "Please ask the bartender for price details",
         "rating": "Rating: {value} out of 5",
         "currency": "RSD"
     },
     "footer": {
         "address": "Kneginje Zorke 3. Vračar",
+        "storeAddress": "Balkanska 21, Belgrade",
         "responsibly": "Always drink responsibly",
         "opensNewTab": "opens in new tab"
     },
@@ -55,6 +80,8 @@
         "draftSection": "Draft Beers",
         "draftSectionDesc": "Current beers on tap",
         "bottleMenuName": "Bottles & Cans",
-        "bottleMenuDesc": "Bottled and canned beers"
+        "bottleMenuDesc": "Bottled and canned beers",
+        "storeDescription": "Craft beer store in Belgrade with bottled and canned beers from local and international breweries.",
+        "storeCatalogName": "Bottles & Cans"
     }
 }

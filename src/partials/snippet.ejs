@@ -1,4 +1,5 @@
-<div class="snippet" itemscope itemtype="https://schema.org/MenuItem">
+<% var isStore = pageType === 'store'; %>
+<div class="snippet" itemscope itemtype="https://schema.org/MenuItem"<% if (isStore) { %> data-search="<%= [item.name, item.brewery, item.style].join(' ').toLowerCase() %>" data-group="<%= item.style_group %>"<% } %>>
     <% if (item.tap_num) { %><meta itemprop="identifier" content="#tap<%= item.tap_num %>"><% } %>
     <div class="snippet-header">
         <div class="title-row">
@@ -9,10 +10,15 @@
                     <%= item.name %>
                 <% } %>
             </h2>
+            <% if (item.abv != null) { %>
             <span class="abv-badge">
                 <%= item.abv.toFixed(1) %>% ABV
                 <% if(item.ibu) { %>| <%= item.ibu %> IBU<% } %>
             </span>
+            <% } else if (/^Non-Alcoholic\b/i.test(item.style || '')) { %>
+            <%# Untappd shows "N/A ABV" for both 0% and unknown; only the style says non-alcoholic %>
+            <span class="abv-badge"><%= t('snippet.nonAlcoholic') %></span>
+            <% } %>
         </div>
         <div class="snippet-subtitle">
             <div class="producer">
@@ -20,12 +26,15 @@
             </div>
             <div class="snippet-style">
                 <%= item.style %>
+                <%# On the store page each size shows its own container instead %>
+                <% if (!isStore) { %>
                 <% if (item.serving_style === 'draft') { %> <i class="fas fa-faucet-drip" aria-hidden="true"></i><% } %>
                 <% if (item.serving_style === 'can') { %> <i class="fas fa-jar" aria-hidden="true"></i><% } %>
                 <% if (item.serving_style === 'bottle') { %> <i class="fas fa-wine-bottle" aria-hidden="true"></i><% } %>
+                <% } %>
             </div>
             <% if (item.on_tap) { %>
-                <div class="on-tap-badge"><i class="fas fa-faucet-drip" aria-hidden="true"></i> <%= t('snippet.alsoOnTap') %></div>
+                <div class="on-tap-badge"><i class="fas fa-faucet-drip" aria-hidden="true"></i> <%= t(isStore ? 'snippet.alsoOnTapInGarden' : 'snippet.alsoOnTap') %></div>
             <% } %>
         </div>
     </div>
@@ -83,7 +92,16 @@
                             <span class="price"><data itemprop="price" value="<%= price %>"><%= price %> <%= t('snippet.currency') %></data></span>
                         </span>
                     <% }) %>
-                <% } else { %>
+                <% } else if (isStore && item.sizes && item.sizes.length > 0) { %>
+                    <%# The store lists volumes but no prices; each volume keeps its own container %>
+                    <% item.sizes.forEach(function(c) { %>
+                        <span class="container-size">
+                            <% if (c.style === 'can') { %><i class="fas fa-jar" aria-hidden="true"></i><% } %>
+                            <% if (c.style === 'bottle') { %><i class="fas fa-wine-bottle" aria-hidden="true"></i><% } %>
+                            <%= c.size %>
+                        </span>
+                    <% }) %>
+                <% } else if (!isStore) { %>
                     <span class="size"><%= t('snippet.askPrice') %></span>
                 <% } %>
             </div>
