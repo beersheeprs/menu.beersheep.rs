@@ -45,8 +45,9 @@ const VENUES = {
     },
 };
 
-// The Beer Store page is built on every deploy but stays hidden (noindex, no nav
-// link, not in the sitemap) until STORE_PUBLIC=true — the repo variable flips it at release.
+// The Beer Store page is a real, indexable page on every deploy, but nothing points to
+// it (no nav tab on the garden pages, not in the sitemap) until STORE_PUBLIC=true —
+// the repo variable flips those at release.
 const STORE_PUBLIC = process.env.STORE_PUBLIC === 'true';
 
 // Filter chips on the store page: first matching group by the style's prefix
@@ -346,7 +347,6 @@ async function build() {
                 try {
                     const storeHtml = await render(storeTemplate, {
                         ...common,
-                        isPublic: locale.public && STORE_PUBLIC,
                         venue: VENUES.store,
                         sections: storeSections,
                         ldJson: ldJson(storeSections, 'store', t, base, localize),
