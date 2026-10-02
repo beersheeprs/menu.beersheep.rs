@@ -90,6 +90,7 @@ Priority order in `src/partials/snippet.ejs`:
 - **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's always fetched from the API, even when `BEER_DATA` is given.
 - **Isolated:** any store fetch or render failure logs a warning and skips `store.html`; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
 - **Hidden until release:** `STORE_PUBLIC` (repo variable, passed by `deploy.yml`) defaults to false. While false, `store.html` is built and deployed but gets `noindex`, no `hreflang` alternates, no nav link on other pages, and no sitemap entry. `STORE_PUBLIC=true` adds the nav tab and the sitemap URL (written into `dist/sitemap.xml` at build) and allows indexing.
+- **No garden tabs:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs. The garden pages link to it only once `STORE_PUBLIC` is true.
 - **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
 - "Beer Store" is a name — never translated in any locale.
 
@@ -139,7 +140,7 @@ Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
 |---|---|
 | `head.ejs` | `<meta>` tags, OG/Twitter cards, favicons, canonical URL |
 | `header.ejs` | `<h1>` + page nav |
-| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links (+ "Beer Store" when `STORE_PUBLIC`, or on the store page itself) |
+| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links on the garden pages (+ "Beer Store" when `STORE_PUBLIC`); the store page has no tabs |
 | `section-nav.ejs` | Jump-to-section links (bottles and store pages) |
 | `snippet.ejs` | Single beer card (image, name, style, ABV, prices, rating) |
 | `ld-json.ejs` | Inlines the `<script type="application/ld+json">` block |
