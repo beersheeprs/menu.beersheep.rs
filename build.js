@@ -26,7 +26,84 @@ function mapApiBeer(apiBeer) {
         serving_style: apiBeer.serving_style,
         on_tap: apiBeer.on_tap,
         untappd_url: apiBeer.untappd_url,
+        // Beer Store only: [{ size, style }] — volumes, since the store lists no prices
+        sizes: apiBeer.sizes,
     };
+}
+
+// Venue shown in the footer of each page (structured data: src/ld-json.js)
+const VENUES = {
+    garden: {
+        name: 'Beersheep Garden',
+        addressKey: 'footer.address',
+        instagram: 'https://www.instagram.com/beersheepgarden/',
+    },
+    store: {
+        name: 'Beersheep Beer Store',
+        addressKey: 'footer.storeAddress',
+        instagram: 'https://www.instagram.com/beersheep_/',
+    },
+};
+
+// The Beer Store page is a real, indexable page on every deploy, but nothing points to
+// it (no nav tab on the garden pages, not in the sitemap) until STORE_PUBLIC=true —
+// the repo variable flips those at release.
+const STORE_PUBLIC = process.env.STORE_PUBLIC === 'true';
+
+// Filter chips on the store page: first matching group by the style's prefix
+// ("IPA - New England" → ipa); anything else is "other". Labels live in i18n (store.groups).
+const STYLE_GROUPS = [
+    ['ipa', /^IPA\b/i],
+    ['paleAle', /^Pale Ale\b/i],
+    ['sour', /^(Sour|Lambic|Wild Ale|Gose)\b/i],
+    ['stout', /^(Stout|Porter)\b/i],
+    ['lager', /^(Lager|Pilsner|Märzen|Bock)\b/i],
+    ['belgian', /^Belgian\b/i],
+    ['cider', /^(Cider|Mead|Hard Ginger Beer|Hard Seltzer)\b/i],
+    ['nonAlcoholic', /^Non-Alcoholic\b/i],
+];
+
+function styleGroup(style) {
+    const match = STYLE_GROUPS.find(([, re]) => re.test(style || ''));
+    return match ? match[0] : 'other';
+}
+
+/**
+ * Map /store/list ([{ section, beers }]) for the store page. Lenient on purpose:
+ * a row without a name is skipped with a warning instead of failing the build,
+ * and a missing ABV (0.0% beers are stored as NULL) just hides the ABV badge.
+ */
+function mapStoreSections(apiData) {
+    if (!Array.isArray(apiData)) throw new Error('store list is not an array');
+    return apiData
+        .map((section) => ({
+            name: section.section,
+            beers: (section.beers || [])
+                .filter((b) => {
+                    if (b.beer_name) return true;
+                    console.warn(`Store: skipping a beer without a name in "${section.section}"`);
+                    return false;
+                })
+                .map((b) => ({ ...mapApiBeer(b), style_group: styleGroup(b.beer_style) })),
+        }))
+        .filter((section) => section.name && section.beers.length > 0);
+}
+
+/** Store menu from the Worker, or null when it can't be loaded (the store page is then skipped). */
+async function fetchStoreSections(apiOrigin) {
+    if (!apiOrigin) {
+        console.warn('Store: API_ORIGIN not set — skipping the store page');
+        return null;
+    }
+    try {
+        console.log(`Fetching from ${apiOrigin}/store/list`);
+        const res = await fetch(`${apiOrigin}/store/list`);
+        if (!res.ok) throw new Error(`API returned ${res.status}: ${res.statusText}`);
+        return mapStoreSections(await res.json());
+    } catch (error) {
+        console.warn(`Store: ${error.message} — skipping the store page`);
+        return null;
+    }
 }
 
 const LOCALES = [
@@ -76,6 +153,22 @@ const minifyOptions = {
     removeAttributeQuotes: true,
     ignoreCustomComments: [/^!/],
 };
+
+/**
+ * GitHub Pages has no server-side redirects: write a page at an old URL that
+ * forwards to the new one (meta refresh + canonical for crawlers, JS to keep
+ * the #section anchor).
+ */
+function writeRedirect(file, target) {
+    const url = `https://menu.beersheep.rs${target}`;
+    fs.writeFileSync(
+        file,
+        `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Redirecting…</title>` +
+            `<link rel="canonical" href="${url}"><meta http-equiv="refresh" content="0; url=${target}">` +
+            `<script>location.replace(${JSON.stringify(target)} + location.hash)</script></head>` +
+            `<body><a href="${target}">${url}</a></body></html>`
+    );
+}
 
 const ensureDir = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
@@ -167,6 +260,9 @@ async function build() {
             validateBeers(section.beers);
         }
 
+        // The store page must never break the garden pages: any failure skips it
+        const storeSections = await fetchStoreSections(process.env.API_ORIGIN);
+
         const ldJson = require('./src/ld-json');
         const buildDate = new Date().toISOString();
         const environment = process.env.NODE_ENV || 'development';
@@ -203,6 +299,7 @@ async function build() {
         };
         const mainTemplate = fs.readFileSync(path.join(__dirname, 'src/index.ejs'), 'utf8');
         const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
+        const storeTemplate = fs.readFileSync(path.join(__dirname, 'src/store.ejs'), 'utf8');
         const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
 
         const render = async (template, data) => {
@@ -220,7 +317,7 @@ async function build() {
             ensureDir(outDir);
             console.log(`Rendering locale "${code}" → ${outDir}`);
 
-            const common = { partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment };
+            const common = { partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC };
 
             const taplistHtml = await render(mainTemplate, {
                 ...common,
@@ -237,10 +334,32 @@ async function build() {
                 sections: bottleSections,
                 ldJson: ldJson(bottleSections, 'bottles', t, base, localize),
                 pageType: 'bottles',
-                pagePath: '/bottles.html',
+                pagePath: '/bottles/',
                 filename: 'src/bottles.ejs',
             });
-            fs.writeFileSync(path.join(outDir, 'bottles.html'), bottlesHtml);
+            // Directory URLs: GitHub Pages serves /bottles/ from bottles/index.html
+            ensureDir(path.join(outDir, 'bottles'));
+            fs.writeFileSync(path.join(outDir, 'bottles', 'index.html'), bottlesHtml);
+            // The page used to live at /bottles.html — keep old links and bookmarks working
+            writeRedirect(path.join(outDir, 'bottles.html'), `${base}/bottles/`);
+
+            if (storeSections) {
+                try {
+                    const storeHtml = await render(storeTemplate, {
+                        ...common,
+                        venue: VENUES.store,
+                        sections: storeSections,
+                        ldJson: ldJson(storeSections, 'store', t, base, localize),
+                        pageType: 'store',
+                        pagePath: '/store/',
+                        filename: 'src/store.ejs',
+                    });
+                    ensureDir(path.join(outDir, 'store'));
+                    fs.writeFileSync(path.join(outDir, 'store', 'index.html'), storeHtml);
+                } catch (error) {
+                    console.warn(`Store: rendering failed for "${code}" (${error.message}) — skipping`);
+                }
+            }
 
             // GitHub Pages only serves the root 404.html, so render it for the default locale only
             if (code === DEFAULT_LOCALE) {
@@ -264,6 +383,21 @@ async function build() {
           path.join(distDir, 'api/v1/fridge.json'),
           JSON.stringify(bottleSections)
         );
+        if (storeSections) {
+            fs.writeFileSync(path.join(distDir, 'api/v1/store.json'), JSON.stringify(storeSections));
+        }
+
+        // The store page joins the sitemap only once it is public
+        if (STORE_PUBLIC && storeSections) {
+            const sitemapPath = path.join(distDir, 'sitemap.xml');
+            const storeEntry =
+                '  <url>\n    <loc>https://menu.beersheep.rs/store/</loc>\n' +
+                '    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n';
+            fs.writeFileSync(
+                sitemapPath,
+                fs.readFileSync(sitemapPath, 'utf8').replace('</urlset>', storeEntry + '</urlset>')
+            );
+        }
         console.log('Successfully built');
     } catch (error) {
         console.error('Build failed:', error.message);

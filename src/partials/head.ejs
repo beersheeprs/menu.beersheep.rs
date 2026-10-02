@@ -1,6 +1,6 @@
 <%
 var origin = 'https://menu.beersheep.rs';
-var pageKey = pageType === 'bottles' ? 'bottles' : pageType === '404' ? 'notFound' : 'taps';
+var pageKey = pageType === 'bottles' || pageType === 'store' ? pageType : pageType === '404' ? 'notFound' : 'taps';
 var pageTitle = t(pageKey + '.title');
 var pageDesc = t(pageKey === 'notFound' ? 'taps.desc' : pageKey + '.desc');
 var pageUrl = origin + base + pagePath;

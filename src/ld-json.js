@@ -1,4 +1,76 @@
+// Beersheep Beer Store: a shop, not a bar — products in an offer catalog, no menu.
+// Opening hours are intentionally left out.
+function storeLdJson(sections, t, base, localize) {
+    const pageUrl = `https://menu.beersheep.rs${base}/store/`;
+    const store = {
+        "@context": "https://schema.org",
+        "@type": "LiquorStore",
+        "@id": "#beersheep-beer-store",
+        "name": "Beersheep Beer Store",
+        "url": pageUrl,
+        "description": t('ld.storeDescription'),
+        "logo": "https://menu.beersheep.rs/mstile-310x310.png",
+        "image": "https://menu.beersheep.rs/mstile-310x310.png",
+        "telephone": "+38163301415",
+        "areaServed": { "@type": "City", "name": "Belgrade" },
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Balkanska 21",
+            "addressLocality": "Belgrade",
+            "addressCountry": "RS"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "44.8111801",
+            "longitude": "20.4603043"
+        },
+        "sameAs": [
+            "https://t.me/Beersheep",
+            "https://www.instagram.com/beersheep_/",
+            "https://www.facebook.com/BeerSheep1/"
+        ]
+    };
+
+    if (sections.length > 0) {
+        store.hasOfferCatalog = {
+            "@type": "OfferCatalog",
+            "name": t('ld.storeCatalogName'),
+            "itemListElement": sections.map(section => ({
+                "@type": "OfferCatalog",
+                "name": localize.country(section.name),
+                "itemListElement": section.beers.map(beer => {
+                    const product = {
+                        "@type": "Product",
+                        "name": beer.name,
+                        "category": beer.style
+                    };
+                    const description = localize.description(beer);
+                    if (description) product.description = description;
+                    if (beer.brewery) product.brand = { "@type": "Brand", "name": beer.brewery };
+                    if (beer.abv != null) {
+                        product.additionalProperty = [{ "@type": "PropertyValue", "name": "ABV", "value": `${beer.abv}%` }];
+                    }
+                    return { "@type": "Offer", "itemOffered": product };
+                })
+            }))
+        };
+    }
+
+    const webSite = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "#website",
+        "url": pageUrl,
+        "inLanguage": t('meta.lang'),
+        "name": "Beersheep Beer Store"
+    };
+
+    return [store, webSite];
+}
+
 module.exports = function (data, pageType, t, base, localize) {
+    if (pageType === 'store') return storeLdJson(data, t, base, localize);
+
     const pageUrl = `https://menu.beersheep.rs${base}/`;
 
     const bar = {
@@ -23,7 +95,7 @@ module.exports = function (data, pageType, t, base, localize) {
         "hasMap": "https://maps.app.goo.gl/z2qo5YZfdFaiDu4n7",
         "sameAs": [
             "https://t.me/Beersheep",
-            "https://www.instagram.com/beersheep_/",
+            "https://www.instagram.com/beersheepgarden/",
             "https://www.facebook.com/BeerSheep1/"
         ],
         "openingHoursSpecification": [

@@ -39,6 +39,8 @@ jobs:
         env:
           BEER_DATA: ${{ inputs.BEER_DATA }}
           API_ORIGIN: ${{ vars.API_ORIGIN }}
+          # 'true' links the Beer Store page (garden nav tab, sitemap); unset until release
+          STORE_PUBLIC: ${{ vars.STORE_PUBLIC }}
           NODE_ENV: production
 
       - name: Upload artifact
