@@ -95,7 +95,7 @@ module.exports = function (data, pageType, t, base, localize) {
         "hasMap": "https://maps.app.goo.gl/z2qo5YZfdFaiDu4n7",
         "sameAs": [
             "https://t.me/Beersheep",
-            "https://www.instagram.com/beersheep_/",
+            "https://www.instagram.com/beersheepgarden/",
             "https://www.facebook.com/BeerSheep1/"
         ],
         "openingHoursSpecification": [

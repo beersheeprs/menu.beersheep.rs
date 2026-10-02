@@ -31,10 +31,18 @@ function mapApiBeer(apiBeer) {
     };
 }
 
-// Venue shown in the footer and structured data of each page
+// Venue shown in the footer of each page (structured data: src/ld-json.js)
 const VENUES = {
-    garden: { name: 'Beersheep Garden', addressKey: 'footer.address' },
-    store: { name: 'Beersheep Beer Store', addressKey: 'footer.storeAddress' },
+    garden: {
+        name: 'Beersheep Garden',
+        addressKey: 'footer.address',
+        instagram: 'https://www.instagram.com/beersheepgarden/',
+    },
+    store: {
+        name: 'Beersheep Beer Store',
+        addressKey: 'footer.storeAddress',
+        instagram: 'https://www.instagram.com/beersheep_/',
+    },
 };
 
 // The Beer Store page is built on every deploy but stays hidden (noindex, no nav
