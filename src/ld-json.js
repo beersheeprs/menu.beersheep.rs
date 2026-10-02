@@ -1,7 +1,7 @@
 // Beersheep Beer Store: a shop, not a bar — products in an offer catalog, no menu.
 // Opening hours are intentionally left out.
 function storeLdJson(sections, t, base, localize) {
-    const pageUrl = `https://menu.beersheep.rs${base}/store.html`;
+    const pageUrl = `https://menu.beersheep.rs${base}/store/`;
     const store = {
         "@context": "https://schema.org",
         "@type": "LiquorStore",

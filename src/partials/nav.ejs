@@ -2,10 +2,10 @@
 <% if (pageType !== 'store') { %>
 <nav class="page-nav" aria-label="<%= t('nav.label') %>">
     <a href="<%= base %>/" class="nav-link<%= pageType === 'taps' ? ' active' : '' %>"><%= t('nav.taps') %></a>
-    <a href="<%= base %>/bottles.html" class="nav-link<%= pageType === 'bottles' ? ' active' : '' %>"><%= t('nav.bottles') %></a>
+    <a href="<%= base %>/bottles/" class="nav-link<%= pageType === 'bottles' ? ' active' : '' %>"><%= t('nav.bottles') %></a>
     <%# Beer Store tab on the garden pages: only once the store is public %>
     <% if (storePublic) { %>
-    <a href="<%= base %>/store.html" class="nav-link"><%= t('nav.store') %></a>
+    <a href="<%= base %>/store/" class="nav-link"><%= t('nav.store') %></a>
     <% } %>
 </nav>
 <% } %>

@@ -153,6 +153,22 @@ const minifyOptions = {
     ignoreCustomComments: [/^!/],
 };
 
+/**
+ * GitHub Pages has no server-side redirects: write a page at an old URL that
+ * forwards to the new one (meta refresh + canonical for crawlers, JS to keep
+ * the #section anchor).
+ */
+function writeRedirect(file, target) {
+    const url = `https://menu.beersheep.rs${target}`;
+    fs.writeFileSync(
+        file,
+        `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Redirecting…</title>` +
+            `<link rel="canonical" href="${url}"><meta http-equiv="refresh" content="0; url=${target}">` +
+            `<script>location.replace(${JSON.stringify(target)} + location.hash)</script></head>` +
+            `<body><a href="${target}">${url}</a></body></html>`
+    );
+}
+
 const ensureDir = (dirPath) => {
     if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
@@ -317,10 +333,14 @@ async function build() {
                 sections: bottleSections,
                 ldJson: ldJson(bottleSections, 'bottles', t, base, localize),
                 pageType: 'bottles',
-                pagePath: '/bottles.html',
+                pagePath: '/bottles/',
                 filename: 'src/bottles.ejs',
             });
-            fs.writeFileSync(path.join(outDir, 'bottles.html'), bottlesHtml);
+            // Directory URLs: GitHub Pages serves /bottles/ from bottles/index.html
+            ensureDir(path.join(outDir, 'bottles'));
+            fs.writeFileSync(path.join(outDir, 'bottles', 'index.html'), bottlesHtml);
+            // The page used to live at /bottles.html — keep old links and bookmarks working
+            writeRedirect(path.join(outDir, 'bottles.html'), `${base}/bottles/`);
 
             if (storeSections) {
                 try {
@@ -331,10 +351,11 @@ async function build() {
                         sections: storeSections,
                         ldJson: ldJson(storeSections, 'store', t, base, localize),
                         pageType: 'store',
-                        pagePath: '/store.html',
+                        pagePath: '/store/',
                         filename: 'src/store.ejs',
                     });
-                    fs.writeFileSync(path.join(outDir, 'store.html'), storeHtml);
+                    ensureDir(path.join(outDir, 'store'));
+                    fs.writeFileSync(path.join(outDir, 'store', 'index.html'), storeHtml);
                 } catch (error) {
                     console.warn(`Store: rendering failed for "${code}" (${error.message}) — skipping`);
                 }
@@ -370,7 +391,7 @@ async function build() {
         if (STORE_PUBLIC && storeSections) {
             const sitemapPath = path.join(distDir, 'sitemap.xml');
             const storeEntry =
-                '  <url>\n    <loc>https://menu.beersheep.rs/store.html</loc>\n' +
+                '  <url>\n    <loc>https://menu.beersheep.rs/store/</loc>\n' +
                 '    <changefreq>daily</changefreq>\n    <priority>0.8</priority>\n  </url>\n';
             fs.writeFileSync(
                 sitemapPath,

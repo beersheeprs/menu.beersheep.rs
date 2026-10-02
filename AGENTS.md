@@ -15,8 +15,8 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
         ▼
     EJS templates:
         src/index.ejs      → dist/index.html     (draft taps)
-        src/bottles.ejs    → dist/bottles.html   (bottles & cans)
-        src/store.ejs      → dist/store.html     (Beer Store, from API_ORIGIN/store/list; hidden until STORE_PUBLIC)
+        src/bottles.ejs    → dist/bottles/index.html  (bottles & cans, URL /bottles/; dist/bottles.html redirects there)
+        src/store.ejs      → dist/store/index.html    (Beer Store, URL /store/, from API_ORIGIN/store/list; hidden until STORE_PUBLIC)
         src/404.ejs        → dist/404.html        (custom error page, default locale only)
         (index/bottles rendered once per locale: en → dist/, sr → dist/sr/)
         src/partials/*     (shared snippets, head, nav, footer…)
@@ -88,8 +88,8 @@ Priority order in `src/partials/snippet.ejs`:
 ## Beer Store page (`store.ejs`)
 
 - **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's always fetched from the API, even when `BEER_DATA` is given.
-- **Isolated:** any store fetch or render failure logs a warning and skips `store.html`; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
-- **Hidden until release:** `STORE_PUBLIC` (repo variable, passed by `deploy.yml`) defaults to false. While false, `store.html` is built and deployed but gets `noindex`, no `hreflang` alternates, no nav link on other pages, and no sitemap entry. `STORE_PUBLIC=true` adds the nav tab and the sitemap URL (written into `dist/sitemap.xml` at build) and allows indexing.
+- **Isolated:** any store fetch or render failure logs a warning and skips the store page; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
+- **Hidden until release:** `STORE_PUBLIC` (repo variable, passed by `deploy.yml`) defaults to false. While false, `/store/` is built and deployed but gets `noindex`, no `hreflang` alternates, no nav link on other pages, and no sitemap entry. `STORE_PUBLIC=true` adds the nav tab and the sitemap URL (written into `dist/sitemap.xml` at build) and allows indexing.
 - **No garden tabs:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs. The garden pages link to it only once `STORE_PUBLIC` is true.
 - **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
 - "Beer Store" is a name — never translated in any locale.
