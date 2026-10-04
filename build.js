@@ -2,6 +2,7 @@ const ejs = require('ejs');
 const fs = require('fs');
 const path = require('path');
 const htmlMinifier = require('html-minifier-terser');
+const { addThumbnails } = require('./src/thumbnails');
 
 if (process.env.NODE_ENV !== 'production') {
     console.debug('not production, loading .env file');
@@ -292,6 +293,11 @@ async function build() {
                 console.debug(`   ✓ ${src} → ${dest}`);
             }
         });
+
+        await addThumbnails(
+            [beerData, ...bottleSections, ...(storeSections || [])].flatMap((s) => s.beers || s),
+            distDir
+        );
 
         const partials = {
             gtag: fs.readFileSync(path.join(__dirname, 'src/partials/gtag.ejs'), 'utf8'),

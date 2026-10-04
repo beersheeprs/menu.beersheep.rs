@@ -72,8 +72,10 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 
 Priority order in `src/partials/snippet.ejs`:
 1. **Local webp** (`image_name`): `<img src="/img/<image_name>.webp">` — static files in `src/assets/img/`, copied to `dist/img/` at build time.
-2. **HD label** (`image_hd_url`): Remote Untappd HD image. Container gets `.has-hd` class (200px, `object-fit: contain`).
-3. **Preview fallback** (`image_url`): Remote Untappd preview. 100px container, `object-fit: cover`.
+2. **HD label** (`image_hd_url`): Untappd HD image. Container gets `.has-hd` class (200px, `object-fit: contain`).
+3. **Preview fallback** (`image_url`): Untappd preview. 100px container, `object-fit: cover`.
+
+**Thumbnails** (`src/thumbnails.js`): the build downloads the label used by 2/3, shrinks it to a 400px WebP (sharp, q75) and serves it as `/thumbs/<sha1-of-url>.webp` (`image_thumb`). A label that fails to download keeps its remote URL; the build never fails on images. Thumbnails are cached in `.cache/thumbnails/` (gitignored), kept between CI runs by `actions/cache` in `deploy.yml`, so only new labels are fetched; cached files unused for 30 days are pruned.
 4. **Placeholder**: Beer icon (`.placeholder`) when no image source exists.
 
 **Untappd link**: The image (any source) is wrapped in `<a href="untappd_url">` when the URL is present.
