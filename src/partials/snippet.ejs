@@ -40,7 +40,7 @@
     </div>
     <div class="snippet-content">
         <%
-           var labelSrc = item.image_hd_url || item.image_url;
+           var labelSrc = item.image_thumb || item.image_hd_url || item.image_url;
            var isHd = !!item.image_hd_url;
         %>
         <div class="snippet-image<%= isHd ? ' has-hd' : '' %>">
