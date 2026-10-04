@@ -25,13 +25,13 @@
         <main>
             <% if (sections && sections.length > 0) { %>
                 <%- include('partials/section-nav') %>
-                <% sections.forEach(section => { %>
+                <% sections.forEach((section, s) => { %>
                     <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
                     <section class="beer-section" id="<%= slug %>">
                         <h2 class="section-header"><%= section.name %></h2>
                         <div class="grid">
-                            <% section.beers.forEach(beer => { %>
-                                <%- include('partials/snippet', {item: beer}); %>
+                            <% section.beers.forEach((beer, i) => { %>
+                                <%- include('partials/snippet', {item: beer, eager: s === 0 && i < eagerImages}); %>
                             <% }) %>
                         </div>
                     </section>
