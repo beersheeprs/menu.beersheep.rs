@@ -317,7 +317,9 @@ async function build() {
             ensureDir(outDir);
             console.log(`Rendering locale "${code}" → ${outDir}`);
 
-            const common = { partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC };
+            // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
+            const eagerImages = 3;
+            const common = { eagerImages, partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC };
 
             const taplistHtml = await render(mainTemplate, {
                 ...common,
