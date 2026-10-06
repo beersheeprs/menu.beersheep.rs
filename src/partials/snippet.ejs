@@ -1,5 +1,6 @@
 <% var isStore = pageType === 'store'; %>
-<div class="snippet" itemscope itemtype="https://schema.org/MenuItem"<% if (isStore) { %> data-search="<%= [item.name, item.brewery, item.style].join(' ').toLowerCase() %>" data-group="<%= item.style_group %>"<% } %>>
+<%# Store items are products for sale, not menu items (matches the store's JSON-LD) %>
+<div class="snippet" itemscope itemtype="https://schema.org/<%= isStore ? 'Product' : 'MenuItem' %>"<% if (isStore) { %> data-search="<%= [item.name, item.brewery, item.style].join(' ').toLowerCase() %>" data-group="<%= item.style_group %>"<% } %>>
     <% if (item.tap_num) { %><meta itemprop="identifier" content="#tap<%= item.tap_num %>"><% } %>
     <div class="snippet-header">
         <div class="title-row">
