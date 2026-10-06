@@ -24,6 +24,8 @@
         "title": "Beersheep Beer Store - Bottles & Cans",
         "desc": "Bottled and canned craft beer at Beersheep Beer Store, Belgrade — local and imported, grouped by country.",
         "h1": "Beersheep Beer Store",
+        "siteName": "Beersheep Beer Store",
+        "keywords": "beersheep, beer store, craft beer, bottles, cans, Belgrade",
         "empty": "No beers listed at the moment. Please check back later!",
         "search": "Search beer, brewery or style",
         "filterLabel": "Filter by style",
