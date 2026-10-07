@@ -256,7 +256,8 @@ async function build() {
         const storeSections = await fetchStoreSections(process.env.API_ORIGIN);
 
         const ldJson = require('./src/ld-json');
-        const buildDate = new Date().toISOString();
+        // One timestamp for every page of the build (og:updated_time, hidden build stamp)
+        const buildDate = new Date();
         const environment = process.env.NODE_ENV || 'development';
         const locales = LOCALES.map(({ code, prefix, public: isPublic }) => ({
             code,
