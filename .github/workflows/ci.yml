@@ -1,0 +1,52 @@
+name: CI
+
+# Unit tests + a full production build from the fixtures in test/fixtures,
+# so template and build errors show up on the PR instead of at deploy time.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Build from fixtures
+        run: |
+          set -o pipefail  # keep the build's exit code through tee
+          export BEER_DATA="$(cat test/fixtures/list.json)"
+          export STORE_DATA="$(cat test/fixtures/store.json)"
+          npm run build 2>&1 | tee build.log
+          # Store failures only warn (they must not block a deploy), so fail on them here
+          if grep -Eq '^Store: .*(skipping the store page|rendering failed)' build.log; then
+            echo "::error::Store page was skipped"
+            exit 1
+          fi
+        env:
+          NODE_ENV: production
+
+      - name: Check pages
+        run: |
+          for page in index.html bottles/index.html store/index.html 404.html \
+                      sr/index.html sr/bottles/index.html sr/store/index.html \
+                      api/v1/taps.json api/v1/fridge.json api/v1/store.json; do
+            test -s "dist/$page" || { echo "::error::dist/$page missing"; exit 1; }
+          done

@@ -1,0 +1,125 @@
+{
+  "Draft Beers": [
+    {
+      "brewery": "MEHANIKA",
+      "country": "Serbia",
+      "tap_number": 1,
+      "beer_name": "JESUS",
+      "beer_style": "IPA - American",
+      "beer_rating": 3.72754,
+      "beer_image": "https://labels.untappd.com/5450176",
+      "image_hd_url": "https://assets.untappd.com/site/beer_logos_hd/beer-5450176_7ae29_hd.jpeg",
+      "abv": 6,
+      "ibu": 50,
+      "description": null,
+      "description_sr": null,
+      "prices": {
+        "0.5L": 550,
+        "0.33L": 470
+      },
+      "serving_style": "draft",
+      "untappd_url": "https://untappd.com/b/beer/5450176"
+    },
+    {
+      "brewery": "Paulaner Brauerei",
+      "country": "Germany",
+      "tap_number": 2,
+      "beer_name": "Hefe-Weißbier / Hefe-Weizen / Weissbier",
+      "beer_style": "Wheat Beer - Hefeweizen",
+      "beer_rating": 3.67127,
+      "beer_image": null,
+      "image_hd_url": null,
+      "abv": 5.5,
+      "ibu": 16,
+      "description": "The No. 1 Hefe-Weißbier in Germany and one of the world's favourites. Naturally cloudy and shining silky gold in the glass under a really strong head of foam. At the first mouthful this Weißbier classic has a mild aroma of banana. Finer palates detect a trace of mango and pineapple and the balance between sweet and bitter. Beer connoisseurs appreciate the fine note of yeast and the mild but sparkling mix of aromas. It is a typical beergarden beer, which brings people together all over the world.",
+      "description_sr": "Хефе-вајсбир број 1 у Немачкој и једно од најомиљенијих пива на свету. Природно мутно, у чаши сија свиленкасто златно испод заиста богате пене. Већ на први гутљај овај класик пшеничног пива открива благу арому банане. Префињенија непца осетиће и траг манга и ананаса, као и баланс између слатког и горког. Познаваоци пива цене фину ноту квасца и благу, а живахну мешавину арома. Ово је типично пиво за пивску башту, које зближава људе широм света.",
+      "prices": {
+        "0.33L": 480,
+        "0.5L": 550
+      },
+      "serving_style": "draft",
+      "untappd_url": "https://untappd.com/b/beer/15677"
+    },
+    {
+      "brewery": "Paulaner Brauerei",
+      "country": "Germany",
+      "tap_number": 3,
+      "beer_name": "Münchner Hell / Münchner Lager / Original Munich Lager",
+      "beer_style": "Lager - Helles",
+      "beer_rating": 3.46105,
+      "beer_image": null,
+      "image_hd_url": null,
+      "abv": 4.9,
+      "ibu": 20,
+      "description": "Original Munich Lager is a true classic with its clear and bright gold sparkling hue, crowned by a pure white head. A beer which always goes down well: mild, elegant malts, with a hint of sweetness and a soft hint of hops in the background. This Munich beer is ideal to accompany spare ribs and spicy dishes.",
+      "description_sr": "Оригинални минхенски лагер је прави класик бистре, сјајне златне боје, крунисан чисто белом пеном. Пиво које увек прија: благ, елегантан слад, са наговештајем слаткоће и нежном нотом хмеља у позадини. Ово минхенско пиво идеално иде уз ребарца и зачињена јела.",
+      "prices": {
+        "0.33L": 490,
+        "0.5L": 560
+      },
+      "serving_style": "draft",
+      "untappd_url": "https://untappd.com/b/beer/3235"
+    }
+  ],
+  "America": [
+    {
+      "brewery": "Tron Brewery",
+      "country": "Serbia",
+      "tap_number": null,
+      "beer_name": "Bienvenido A Miami",
+      "beer_style": "Pale Ale - American",
+      "beer_rating": 3.61406,
+      "beer_image": null,
+      "image_hd_url": null,
+      "abv": 5.5,
+      "ibu": null,
+      "description": null,
+      "description_sr": null,
+      "prices": null,
+      "serving_style": "can",
+      "on_tap": 1,
+      "untappd_url": "https://untappd.com/b/beer/4847776"
+    },
+    {
+      "brewery": "OGroup Kombinat",
+      "country": "Serbia",
+      "tap_number": null,
+      "beer_name": "Cider Punk: Too Much",
+      "beer_style": "Cider - Herbed / Spiced",
+      "beer_rating": 3.81667,
+      "beer_image": null,
+      "image_hd_url": null,
+      "abv": 6.5,
+      "ibu": null,
+      "description": null,
+      "description_sr": null,
+      "prices": null,
+      "serving_style": "bottle",
+      "on_tap": 0,
+      "untappd_url": "https://untappd.com/b/beer/6846203"
+    }
+  ],
+  "Belgian Beers": [
+    {
+      "brewery": "Bières de Chimay",
+      "country": "Belgium",
+      "tap_number": null,
+      "beer_name": "Chimay Cinq Cents (White)",
+      "beer_style": "Belgian Tripel",
+      "beer_rating": 3.71911,
+      "beer_image": "https://labels.untappd.com/10049",
+      "image_hd_url": "https://assets.untappd.com/site/beer_logos_hd/beer-10049_e3ff7_hd.jpeg",
+      "abv": 8,
+      "ibu": 38,
+      "description": null,
+      "description_sr": null,
+      "prices": {
+        "0.33L": 790
+      },
+      "serving_style": "bottle",
+      "on_tap": 0,
+      "untappd_url": "https://untappd.com/b/beer/10049"
+    }
+  ],
+  "Empty Section": []
+}
