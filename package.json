@@ -12,6 +12,8 @@
   "author": "k-pf",
   "license": "ISC",
   "dependencies": {
+    "@fortawesome/free-brands-svg-icons": "^7.3.1",
+    "@fortawesome/free-solid-svg-icons": "^7.3.1",
     "ejs": "^6.0.1",
     "html-minifier-terser": "^7.2.0",
     "sharp": "^0.35.5"

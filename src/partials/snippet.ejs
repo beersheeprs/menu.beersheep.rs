@@ -29,13 +29,13 @@
                 <%= item.style %>
                 <%# On the store page each size shows its own container instead %>
                 <% if (!isStore) { %>
-                <% if (item.serving_style === 'draft') { %> <i class="fas fa-faucet-drip" aria-hidden="true"></i><% } %>
-                <% if (item.serving_style === 'can') { %> <i class="fas fa-jar" aria-hidden="true"></i><% } %>
-                <% if (item.serving_style === 'bottle') { %> <i class="fas fa-wine-bottle" aria-hidden="true"></i><% } %>
+                <% if (item.serving_style === 'draft') { %> <%- icon('faucet-drip') %><% } %>
+                <% if (item.serving_style === 'can') { %> <%- icon('jar') %><% } %>
+                <% if (item.serving_style === 'bottle') { %> <%- icon('wine-bottle') %><% } %>
                 <% } %>
             </div>
             <% if (item.on_tap) { %>
-                <div class="on-tap-badge"><i class="fas fa-faucet-drip" aria-hidden="true"></i> <%= t(isStore ? 'snippet.alsoOnTapInGarden' : 'snippet.alsoOnTap') %></div>
+                <div class="on-tap-badge"><%- icon('faucet-drip') %> <%= t(isStore ? 'snippet.alsoOnTapInGarden' : 'snippet.alsoOnTap') %></div>
             <% } %>
         </div>
     </div>
@@ -53,7 +53,7 @@
                 <img src="<%= labelSrc %>" alt="<%= item.name %>" itemprop="image"
                      <%- typeof eager !== 'undefined' && eager ? 'fetchpriority="high"' : 'loading="lazy"' %> />
             <% } else { %>
-                <div class="placeholder"><i class="fas fa-beer" aria-hidden="true"></i></div>
+                <div class="placeholder"><%- icon('beer') %></div>
             <% } %>
             <% if (item.untappd_url) { %></a><% } %>
         </div>
@@ -98,8 +98,8 @@
                     <%# The store lists volumes but no prices; each volume keeps its own container %>
                     <% item.sizes.forEach(function(c) { %>
                         <span class="container-size">
-                            <% if (c.style === 'can') { %><i class="fas fa-jar" aria-hidden="true"></i><% } %>
-                            <% if (c.style === 'bottle') { %><i class="fas fa-wine-bottle" aria-hidden="true"></i><% } %>
+                            <% if (c.style === 'can') { %><%- icon('jar') %><% } %>
+                            <% if (c.style === 'bottle') { %><%- icon('wine-bottle') %><% } %>
                             <%= c.size %>
                         </span>
                     <% }) %>
