@@ -322,7 +322,8 @@ async function build() {
         const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
 
         const render = async (template, data) => {
-            const html = ejs.render(template, data);
+            // EJS reads options (filename: base path for include()) only from the third argument
+            const html = ejs.render(template, data, { filename: data.filename });
             return process.env.NODE_ENV === 'production'
                 ? htmlMinifier.minify(html, minifyOptions)
                 : html;
