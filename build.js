@@ -5,9 +5,10 @@ const htmlMinifier = require('html-minifier-terser');
 const { addThumbnails } = require('./src/thumbnails');
 const icons = require('./src/icons');
 
-if (process.env.NODE_ENV !== 'production') {
+// Local .env support (Node built-in); variables already set in the shell win
+if (process.env.NODE_ENV !== 'production' && fs.existsSync('.env')) {
     console.debug('not production, loading .env file');
-    require('dotenv').config();
+    process.loadEnvFile();
 }
 
 function mapApiBeer(apiBeer) {
@@ -184,29 +185,6 @@ function writeRedirect(file, target) {
     );
 }
 
-const ensureDir = (dirPath) => {
-    if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
-    }
-};
-
-const copyDir = (src, dest) => {
-    ensureDir(dest);
-
-    const entries = fs.readdirSync(src, { withFileTypes: true });
-
-    for (const entry of entries) {
-        const srcPath = path.join(src, entry.name);
-        const destPath = path.join(dest, entry.name);
-
-        if (entry.isDirectory()) {
-            copyDir(srcPath, destPath);
-        } else {
-            fs.copyFileSync(srcPath, destPath);
-        }
-    }
-};
-
 function validateBeers(beers) {
     if (!beers || !Array.isArray(beers) || beers.length === 0) {
         throw new Error(
@@ -290,10 +268,8 @@ async function build() {
         console.log('Building HTML with EJS...');
 
         const distDir = './dist';
-        if (fs.existsSync(distDir)) {
-            fs.rmSync(distDir, { recursive: true, force: true });
-        }
-        ensureDir(distDir);
+        fs.rmSync(distDir, { recursive: true, force: true });
+        fs.mkdirSync(distDir, { recursive: true });
 
         console.log('Copying static assets');
         const assetDirs = [
@@ -302,7 +278,7 @@ async function build() {
         ];
         assetDirs.forEach(({ src, dest }) => {
             if (fs.existsSync(src)) {
-                copyDir(src, dest);
+                fs.cpSync(src, dest, { recursive: true });
                 console.debug(`   ✓ ${src} → ${dest}`);
             }
         });
@@ -334,7 +310,7 @@ async function build() {
             const t = makeT(code);
             const localize = makeLocalize(code);
             const outDir = path.join(distDir, base);
-            ensureDir(outDir);
+            fs.mkdirSync(outDir, { recursive: true });
             console.log(`Rendering locale "${code}" → ${outDir}`);
 
             // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
@@ -360,7 +336,7 @@ async function build() {
                 filename: 'src/bottles.ejs',
             });
             // Directory URLs: GitHub Pages serves /bottles/ from bottles/index.html
-            ensureDir(path.join(outDir, 'bottles'));
+            fs.mkdirSync(path.join(outDir, 'bottles'), { recursive: true });
             fs.writeFileSync(path.join(outDir, 'bottles', 'index.html'), bottlesHtml);
             // The page used to live at /bottles.html — keep old links and bookmarks working
             writeRedirect(path.join(outDir, 'bottles.html'), `${base}/bottles/`);
@@ -376,7 +352,7 @@ async function build() {
                         pagePath: '/store/',
                         filename: 'src/store.ejs',
                     });
-                    ensureDir(path.join(outDir, 'store'));
+                    fs.mkdirSync(path.join(outDir, 'store'), { recursive: true });
                     fs.writeFileSync(path.join(outDir, 'store', 'index.html'), storeHtml);
                 } catch (error) {
                     console.warn(`Store: rendering failed for "${code}" (${error.message}) — skipping`);
@@ -396,7 +372,7 @@ async function build() {
         }
 
         // API endpoints
-        ensureDir(path.join(distDir, 'api/v1'));
+        fs.mkdirSync(path.join(distDir, 'api/v1'), { recursive: true });
         fs.writeFileSync(
           path.join(distDir, 'api/v1/taps.json'),
           JSON.stringify(beerData)

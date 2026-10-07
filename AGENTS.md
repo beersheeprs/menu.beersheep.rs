@@ -162,4 +162,4 @@ Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixt
 - Templates use EJS `<% ... %>` syntax; partials shared via `include()` with `filename` set so EJS resolves relative paths
 - CSS is a single `src/styles/styles.css` file, copied to `dist/` at build time
 - Production build injects analytics tags and minifies HTML (with `html-minifier-terser`)
-- `dotenv` loaded in non-production for local `.env` support
+- Local `.env` is loaded in non-production with Node's built-in `process.loadEnvFile()` (shell variables win)
