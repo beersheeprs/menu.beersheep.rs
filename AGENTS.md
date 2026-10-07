@@ -51,7 +51,6 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
   "description": "Tasting notes...",
   "image_url": "https://labels.untappd.com/...",
   "image_hd_url": "https://assets.untappd.com/site/beer_logos_hd/...",
-  "image_name": "beer-slug",
   "prices": { "0.33L": 540, "0.5L": 600 },
   "brewery": "Brewery Name",
   "country": "Serbia",
@@ -66,17 +65,15 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 `sizes` (store only): `[{ size, style }]` — the store lists volumes, not prices; each volume keeps its own container icon.  
 `style_group` (store only): filter-chip group from the style prefix (`STYLE_GROUPS` in `build.js`).  
 `abv`: may be null — Untappd menus print "N/A ABV" for both 0% and unknown ABV, so the two can't be told apart. A missing ABV on a `Non-Alcoholic` style shows a "Non-alcoholic" badge (never a made-up 0.0%); any other style shows no ABV badge.  
-`image_name`: slug for a locally hosted `.webp` in `dist/img/`. **Note:** `mapApiBeer()` in `build.js` does not currently map this field from the API response, so local images are only served if the beer data is injected via `BEER_DATA` with `image_name` already set.
 
 ## Image handling
 
 Priority order in `src/partials/snippet.ejs`:
-1. **Local webp** (`image_name`): `<img src="/img/<image_name>.webp">` — static files in `src/assets/img/`, copied to `dist/img/` at build time.
-2. **HD label** (`image_hd_url`): Untappd HD image. Container gets `.has-hd` class (200px, `object-fit: contain`).
-3. **Preview fallback** (`image_url`): Untappd preview. 100px container, `object-fit: cover`.
+1. **HD label** (`image_hd_url`): Untappd HD image. Container gets `.has-hd` class (200px, `object-fit: contain`).
+2. **Preview fallback** (`image_url`): Untappd preview. 100px container, `object-fit: cover`.
 
-**Thumbnails** (`src/thumbnails.js`): the build downloads the label used by 2/3, shrinks it to a 400px WebP (sharp, q75) and serves it as `/thumbs/<sha1-of-url>.webp` (`image_thumb`). A label that fails to download keeps its remote URL; the build never fails on images. Thumbnails are cached in `.cache/thumbnails/` (gitignored), kept between CI runs by `actions/cache` in `deploy.yml`, so only new labels are fetched; cached files unused for 30 days are pruned.
-4. **Placeholder**: Beer icon (`.placeholder`) when no image source exists.
+**Thumbnails** (`src/thumbnails.js`): the build downloads the label used by 1/2, shrinks it to a 400px WebP (sharp, q75) and serves it as `/thumbs/<sha1-of-url>.webp` (`image_thumb`). A label that fails to download keeps its remote URL; the build never fails on images. Thumbnails are cached in `.cache/thumbnails/` (gitignored), kept between CI runs by `actions/cache` in `deploy.yml`, so only new labels are fetched; cached files unused for 30 days are pruned.
+3. **Placeholder**: Beer icon (`.placeholder`) when no image source exists.
 
 **Untappd link**: The image (any source) is wrapped in `<a href="untappd_url">` when the URL is present.
 
