@@ -31,6 +31,7 @@ jobs:
 
       - name: Build from fixtures
         run: |
+          set -o pipefail  # keep the build's exit code through tee
           export BEER_DATA="$(cat test/fixtures/list.json)"
           export STORE_DATA="$(cat test/fixtures/store.json)"
           npm run build 2>&1 | tee build.log
