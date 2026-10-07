@@ -91,8 +91,20 @@ function mapStoreSections(apiData) {
         .filter((section) => section.name && section.beers.length > 0);
 }
 
-/** Store menu from the Worker, or null when it can't be loaded (the store page is then skipped). */
+/**
+ * Store menu from STORE_DATA (JSON, e.g. test/fixtures/store.json) or the Worker,
+ * or null when it can't be loaded (the store page is then skipped).
+ */
 async function fetchStoreSections(apiOrigin) {
+    if (process.env.STORE_DATA) {
+        console.log('Store: using STORE_DATA env var');
+        try {
+            return mapStoreSections(JSON.parse(process.env.STORE_DATA));
+        } catch (error) {
+            console.warn(`Store: ${error.message} — skipping the store page`);
+            return null;
+        }
+    }
     if (!apiOrigin) {
         console.warn('Store: API_ORIGIN not set — skipping the store page');
         return null;
@@ -415,4 +427,17 @@ async function build() {
     }
 }
 
-build();
+// `node build.js` builds; tests require() the helpers without building
+if (require.main === module) {
+    build();
+}
+
+module.exports = {
+    mapApiBeer,
+    mapStoreSections,
+    styleGroup,
+    makeT,
+    makeLocalize,
+    validateBeers,
+    extractSections,
+};

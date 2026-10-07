@@ -1,0 +1,120 @@
+[
+  {
+    "section": "Serbia",
+    "beers": [
+      {
+        "brewery": "Carstvo Piva",
+        "country": "Serbia",
+        "tap_number": null,
+        "beer_name": "Maharadža",
+        "beer_style": "Pale Ale - American",
+        "beer_rating": 3.57597,
+        "beer_image": "https://labels.untappd.com/2690131",
+        "image_hd_url": null,
+        "abv": 5.2,
+        "ibu": 40,
+        "description": null,
+        "description_sr": null,
+        "prices": null,
+        "serving_style": "can",
+        "on_tap": false,
+        "untappd_url": "https://untappd.com/b/beer/2690131",
+        "sizes": [
+          {
+            "size": "0.5L",
+            "style": "can"
+          }
+        ]
+      },
+      {
+        "brewery": "Fenix Craft",
+        "country": "Serbia",
+        "tap_number": null,
+        "beer_name": "DjumBeer Sunstorm",
+        "beer_style": "Hard Ginger Beer",
+        "beer_rating": 3.88,
+        "beer_image": null,
+        "image_hd_url": null,
+        "abv": 4.8,
+        "ibu": null,
+        "description": null,
+        "description_sr": null,
+        "prices": null,
+        "serving_style": "bottle",
+        "on_tap": false,
+        "untappd_url": "https://untappd.com/b/beer/6847977",
+        "sizes": [
+          {
+            "size": "0.33L",
+            "style": "bottle"
+          },
+          {
+            "size": "0.5L",
+            "style": "can"
+          }
+        ]
+      },
+      {
+        "brewery": "Tron Brewery",
+        "country": "Serbia",
+        "tap_number": null,
+        "beer_name": "Bienvenido A Miami",
+        "beer_style": "Pale Ale - American",
+        "beer_rating": 3.61406,
+        "beer_image": null,
+        "image_hd_url": null,
+        "abv": 5.5,
+        "ibu": null,
+        "description": null,
+        "description_sr": null,
+        "prices": null,
+        "serving_style": "can",
+        "on_tap": true,
+        "untappd_url": "https://untappd.com/b/beer/4847776",
+        "sizes": [
+          {
+            "size": "0.5L",
+            "style": "can"
+          }
+        ]
+      },
+      {
+        "beer_name": null,
+        "beer_style": "IPA"
+      }
+    ]
+  },
+  {
+    "section": "Non Alcoholic",
+    "beers": [
+      {
+        "brewery": "Brasserie d'Achouffe",
+        "country": "Belgium",
+        "tap_number": null,
+        "beer_name": "La Chouffe 0.0%",
+        "beer_style": "Non-Alcoholic - Blonde / Golden Ale",
+        "beer_rating": 3.00026,
+        "beer_image": null,
+        "image_hd_url": null,
+        "abv": null,
+        "ibu": null,
+        "description": null,
+        "description_sr": null,
+        "prices": null,
+        "serving_style": "bottle",
+        "on_tap": false,
+        "untappd_url": "https://untappd.com/b/beer/6625491",
+        "sizes": [
+          {
+            "size": "0.33L",
+            "style": "bottle"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "section": "Empty",
+    "beers": []
+  }
+]
