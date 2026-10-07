@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const htmlMinifier = require('html-minifier-terser');
 const { addThumbnails } = require('./src/thumbnails');
+const icons = require('./src/icons');
 
 if (process.env.NODE_ENV !== 'production') {
     console.debug('not production, loading .env file');
@@ -325,7 +326,7 @@ async function build() {
 
             // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
             const eagerImages = 3;
-            const common = { eagerImages, partials, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC };
+            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC };
 
             const taplistHtml = await render(mainTemplate, {
                 ...common,

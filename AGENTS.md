@@ -35,7 +35,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 - **html-minifier-terser** for production HTML minification
 - **GitHub Actions** deploys to GitHub Pages on `workflow_dispatch`
 - **Google Analytics + Cloudflare Web Analytics** (production only, `src/partials/gtag.ejs` and `cftag.ejs`)
-- **Font Awesome 7** for icons
+- **Font Awesome 7** icons, inlined at build time as an SVG sprite (`src/icons.js`, from the `@fortawesome/*-svg-icons` packages; templates call `icon(name)`)
 - **`src/ld-json.js`** generates Schema.org `BarOrPub` + `Menu` structured data for the garden pages, and `LiquorStore` + `OfferCatalog` (no opening hours) for the store page
 
 ## Beer data schema (mapped from API)

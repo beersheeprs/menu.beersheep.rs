@@ -6,19 +6,19 @@
         <%- partials.gtag %>
         <%- partials.cftag %>
     <% } %>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     <link rel="stylesheet" href="/styles.css" fetchpriority="high">
     <link rel="prefetch" href="<%= base %>/bottles/" as="document">
     <%- include('partials/head', {pageType: '404'}) %>
 </head>
 
 <body>
+    <%- iconSprite %>
     <div class="container">
         <%- include('partials/header', {pageType: '404'}) %>
         <main>
             <div class="not-found">
                 <div class="not-found-icon">
-                    <i class="fas fa-beer"></i>
+                    <%- icon('beer') %>
                 </div>
                 <h2><%= t('notFound.heading') %></h2>
                 <p><%= t('notFound.line1') %></p>
