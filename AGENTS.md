@@ -89,7 +89,7 @@ Priority order in `src/partials/snippet.ejs`:
 
 ## Beer Store page (`store.ejs`)
 
-- **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's always fetched from the API, even when `BEER_DATA` is given.
+- **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's fetched from the API even when `BEER_DATA` is given; only `STORE_DATA` (same JSON, used by CI) replaces it.
 - **Isolated:** any store fetch or render failure logs a warning and skips the store page; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
 - **Hidden release:** `/store/` is always a real page, indexable like the other pages of its locale. `STORE_PUBLIC` (repo variable, passed by `deploy.yml`, default false) only controls what points to it: while false, no nav tab on the garden pages and no sitemap entry. `STORE_PUBLIC=true` adds the nav tab and the sitemap URL (written into `dist/sitemap.xml` at build).
 - **No garden tabs:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs. The garden pages link to it only once `STORE_PUBLIC` is true.
@@ -106,15 +106,21 @@ The deploy workflow (`deploy.yml`):
 3. Deploys to GitHub Pages
 4. Sends Telegram notification (suppressed when `inputs.notify: false` — silent deploys from silent scrapes)
 
+## CI
+
+`ci.yml` runs on every pull request and push to `main`: `npm test`, then a production build from `test/fixtures/list.json` (`BEER_DATA`) and `test/fixtures/store.json` (`STORE_DATA`), failing if the store page is skipped or any page is missing. The fixtures are trimmed real API rows covering the template branches (on-tap badge, missing prices, non-alcoholic without ABV, several sizes, a nameless store row); keep them in sync when the API shape changes.
+
 ## Commands
 
 ```bash
+npm test         # Unit tests (node:test, test/*.test.js)
 npm run build    # Build dist/
 npm run serve    # Build + serve at localhost:8000
 npm run clean    # Remove dist/
 ```
 
-Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`
+Local dev: `API_ORIGIN=https://beersheep.whyshouldi.workers.dev npm run serve`  
+Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixtures/store.json)" npm run serve`
 
 ## i18n
 
