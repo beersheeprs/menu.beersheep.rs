@@ -46,9 +46,7 @@
         %>
         <div class="snippet-image<%= isHd ? ' has-hd' : '' %>">
             <% if (item.untappd_url) { %><a href="<%= item.untappd_url %>" target="_blank" rel="noopener"><% } %>
-            <% if(item.image_name){ %>
-                <img src="/img/<%= item.image_name %>.webp" alt="<%= item.name %>" itemprop="image" />
-            <% } else if (labelSrc) { %>
+            <% if (labelSrc) { %>
                 <%# The first cards are on screen at load: fetch them first instead of lazily %>
                 <img src="<%= labelSrc %>" alt="<%= item.name %>" itemprop="image"
                      <%- typeof eager !== 'undefined' && eager ? 'fetchpriority="high"' : 'loading="lazy"' %> />
