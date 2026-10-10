@@ -40,3 +40,17 @@ test('cutWhiteBackground skips white labels with scattered lettering', () => {
     assert.equal(cutWhiteBackground(data, 40, 40), false);
     assert.equal(alpha(data, 40, 1, 1), 255);
 });
+
+test('cutWhiteBackground cuts round labels along the circle, keeping white art at the rim', () => {
+    // Blue disc with a white "cloud" running into its edge, on white
+    const data = image(80, (x, y) => {
+        const dx = x + 0.5 - 40, dy = y + 0.5 - 40;
+        if (Math.hypot(dx, dy) > 36) return null;
+        if (x < 20 && y > 30 && y < 50) return null; // white cloud touching the rim
+        return [60, 140, 220];
+    });
+    assert.equal(cutWhiteBackground(data, 80, 80), true);
+    assert.equal(alpha(data, 80, 0, 0), 0, 'outside the circle');
+    assert.equal(alpha(data, 80, 40, 40), 255, 'inside');
+    assert.equal(alpha(data, 80, 10, 40), 255, 'white cloud at the rim stays');
+});

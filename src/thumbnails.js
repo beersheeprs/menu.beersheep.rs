@@ -16,7 +16,7 @@ const FETCH_TIMEOUT_MS = 15000;
 const MAX_UNUSED_DAYS = 30;
 
 // Bump when the image processing changes: new file names make the build redo every label
-const PROCESSING_VERSION = 3;
+const PROCESSING_VERSION = 4;
 
 const fileName = (url) =>
     crypto.createHash('sha1').update(`${url}#v${PROCESSING_VERSION}`).digest('hex').slice(0, 16) + '.webp';
@@ -33,6 +33,14 @@ const MIN_CUT_SHARE = 0.02;
 // … or leave scattered bits (a white label with thin lettering), not one solid shape:
 // the kept pixels must fill at least this share of their own bounding box
 const MIN_KEPT_DENSITY = 0.4;
+// Round labels: when the kept pixels form a disc (box nearly square, almost nothing kept
+// outside the inscribed circle, most of the circle kept), the cut follows the circle, so
+// white art touching the rim (clouds, foam, birds) stays with the label
+const ROUND_TOLERANCE = 0.06;
+const ROUND_MAX_OUTSIDE = 0.005;
+const ROUND_MIN_FILL = 0.8;
+// Pulled in slightly (working pixels) so the label's pale outer rim does not show
+const ROUND_INSET = 1.5;
 
 /**
  * Make the white background of a label transparent, in place (RGBA, 4 bytes per pixel).
@@ -78,17 +86,51 @@ function cutWhiteBackground(data, width, height) {
     }
     if (cutCount < n * MIN_CUT_SHARE || cutCount === n) return false;
 
-    let minX = width, maxX = -1, minY = height, maxY = -1;
+    // Bounding box of the kept pixels; a row or column needs 2 of them, so stray JPEG
+    // noise left in the background does not stretch it
+    const cols = new Uint32Array(width);
+    const rows = new Uint32Array(height);
     for (let i = 0; i < n; i++) {
         if (cut[i]) continue;
-        const x = i % width, y = (i - x) / width;
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
+        const x = i % width;
+        cols[x]++;
+        rows[(i - x) / width]++;
     }
+    const first = (counts) => counts.findIndex((c) => c >= 2);
+    const last = (counts) => counts.length - 1 - [...counts].reverse().findIndex((c) => c >= 2);
+    const minX = first(cols), maxX = last(cols), minY = first(rows), maxY = last(rows);
+    if (minX < 0 || minY < 0) return false;
     const boxArea = (maxX - minX + 1) * (maxY - minY + 1);
     if ((n - cutCount) / boxArea < MIN_KEPT_DENSITY) return false;
+
+    const cx = (minX + maxX + 1) / 2, cy = (minY + maxY + 1) / 2;
+    const rx = (maxX - minX + 1) / 2, ry = (maxY - minY + 1) / 2;
+    if (Math.abs(rx - ry) <= ROUND_TOLERANCE * Math.max(rx, ry)) {
+        const radius = Math.min(rx, ry);
+        // Distance from the centre, 1 on the circle
+        const r = (i) => {
+            const x = i % width;
+            return Math.hypot((x + 0.5 - cx) / rx, ((i - x) / width + 0.5 - cy) / ry);
+        };
+        let inside = 0, keptInside = 0, keptOutside = 0;
+        for (let i = 0; i < n; i++) {
+            const ri = r(i);
+            if (ri <= 1) {
+                inside++;
+                if (!cut[i]) keptInside++;
+            } else if (!cut[i] && ri > 1.04) {
+                keptOutside++;
+            }
+        }
+        if (keptOutside <= ROUND_MAX_OUTSIDE * (n - cutCount) && keptInside >= ROUND_MIN_FILL * inside) {
+            for (let i = 0; i < n; i++) {
+                // Anti-aliased: the share of the pixel inside the (pulled-in) circle
+                const coverage = Math.max(0, Math.min(1, 0.5 - ((r(i) - 1) * radius + ROUND_INSET)));
+                data[i * 4 + 3] = Math.round(data[i * 4 + 3] * coverage);
+            }
+            return true;
+        }
+    }
 
     // Distance (in steps) from the cut for the kept pixels near it, up to EDGE_BAND
     const near = new Uint8Array(n);
