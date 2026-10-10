@@ -40,6 +40,10 @@ jobs:
             echo "::error::Store page was skipped"
             exit 1
           fi
+          if grep -q '^Beta: ' build.log; then
+            echo "::error::Beta previews were skipped"
+            exit 1
+          fi
         env:
           NODE_ENV: production
 

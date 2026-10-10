@@ -366,7 +366,6 @@ async function build() {
         const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
         const storeTemplate = fs.readFileSync(path.join(__dirname, 'src/store.ejs'), 'utf8');
         const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
-        const betaTemplate = fs.readFileSync(path.join(__dirname, 'src/beta.ejs'), 'utf8');
 
         const render = async (template, data) => {
             // EJS reads options (filename: base path for include()) only from the third argument
@@ -448,8 +447,10 @@ async function build() {
             }
         }
 
-        // Beta design previews: English pages per theme + an index at /beta/
-        {
+        // Beta design previews: English pages per theme + an index at /beta/.
+        // Like the store, they must never block a deploy: any failure skips them all.
+        try {
+            const betaTemplate = fs.readFileSync(path.join(__dirname, 'src/beta.ejs'), 'utf8');
             const locale = locales.find((l) => l.code === DEFAULT_LOCALE);
             const t = makeT(DEFAULT_LOCALE);
             const localize = makeLocalize(DEFAULT_LOCALE);
@@ -470,6 +471,9 @@ async function build() {
                     filename: 'src/beta.ejs',
                 })
             );
+        } catch (error) {
+            console.warn(`Beta: ${error.message} — skipping the beta previews`);
+            fs.rmSync(path.join(distDir, 'beta'), { recursive: true, force: true });
         }
 
         // API endpoints
