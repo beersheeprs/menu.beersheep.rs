@@ -42,7 +42,7 @@ h1 { font-family:"Rubik Mono One",sans-serif; font-weight:400; color:var(--blue)
 .container-size .icon { color:var(--green); }
 .footer { border-top:2px solid var(--blue); color:var(--soft); }
 .footer .icon, .footer a { color:var(--green-deep); }
-.scroll-top { background:var(--paper); border:2px solid var(--blue); box-shadow:4px 4px 0 var(--green); }
+.scroll-top { background:var(--paper); border:2px solid var(--blue); box-shadow:none; }
 .scroll-top .icon { color:var(--blue); }
 .scroll-top-ring circle { stroke:var(--green); }
 .store-search { color:var(--blue); background:var(--paper); border:2px solid var(--blue); border-radius:0; }
