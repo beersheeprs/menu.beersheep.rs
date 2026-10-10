@@ -1,0 +1,55 @@
+/* Beta theme (/beta/): Riso zine — two-ink risograph print: blue and fluoro pink on off-white, misregistered headings, halftone dots — loaded after styles.css, overrides only */
+:root { --paper:#f3efe6; --blue:#1d4fa0; --soft:#3f5f9f; --pink:#ff4fa3; --deep-pink:#d42f86; --dots:rgba(29,79,160,.16); }
+* { font-family: "Golos Text", system-ui, sans-serif; }
+body { background: var(--paper); color: var(--blue); max-width: 1160px; }
+header { text-align:left; border-bottom:none; padding-bottom:0; margin-bottom:26px; }
+header::after { content:""; display:block; height:14px; margin-top:16px;
+  background: radial-gradient(var(--pink) 1.6px, transparent 2px) 0 0 / 9px 9px; }
+h1 { font-family:"Rubik Mono One",sans-serif; font-weight:400; color:var(--blue); text-transform:uppercase; letter-spacing:0;
+  font-size:clamp(1.6rem,4.8vw,3.1rem); line-height:1.1; text-shadow:4px 3px 0 rgba(255,79,163,.85); word-spacing:-.45em; margin-bottom:12px; }
+.page-nav { justify-content:flex-start; gap:18px; margin-top:0; }
+.nav-link { color:var(--soft); font-weight:600; padding:0 2px; border-radius:0; }
+.nav-link:hover { background:none; color:var(--blue); }
+.nav-link.active { color:var(--blue); background:linear-gradient(transparent 55%, var(--pink) 55%); }
+.section-nav { border-bottom:none; padding:0; }
+.section-nav-links { justify-content:flex-start; gap:4px 16px; }
+.section-nav-link { color:var(--soft); padding:0; border-radius:0; font-weight:500; }
+.section-nav-link:hover { background:linear-gradient(transparent 60%, rgba(255,79,163,.6) 60%); color:var(--blue); }
+.section-nav-select { color:var(--blue); background-color:var(--paper); border:2px solid var(--blue); border-radius:0; }
+.section-header { font-family:"Rubik Mono One",sans-serif; font-weight:400; color:var(--blue); border-bottom:none; display:inline-block;
+  background:linear-gradient(transparent 50%, rgba(255,79,163,.75) 50%); padding:0 6px; letter-spacing:0;
+  font-size:clamp(1.1rem,3.2vw,1.45rem); margin:40px 0 22px; }
+.grid { gap:28px; }
+.snippet { background:var(--paper); border:2px solid var(--blue); border-radius:0; box-shadow:7px 7px 0 var(--pink); }
+.snippet-header { border-bottom:2px dashed var(--blue); }
+.snippet-name { color:var(--blue); font-weight:800; letter-spacing:-.01em; }
+.abv-badge { background:var(--pink); color:#fff; border-radius:0; font-weight:700; padding:3px 9px; }
+.producer { color:var(--soft); font-weight:500; }
+.snippet-style { color:var(--deep-pink); font-style:normal; font-weight:600; }
+.on-tap-badge { color:var(--deep-pink); font-weight:600; }
+.snippet-image, .snippet-image.has-hd { background:transparent; border-color:var(--blue); border-radius:0; }
+.snippet-image.has-hd { border:none; }
+.snippet-image img, .snippet-image.has-hd img { border-radius:0; mix-blend-mode:multiply; }
+.snippet-image .placeholder { color:var(--pink); }
+.snippet-description { color:var(--soft); }
+.circle-rating { --filled:var(--pink); --empty:#cdd3e2; }
+.circle-rating .value { color:var(--blue); font-weight:700; }
+.rating-label { color:var(--soft); }
+.snippet-prices { background: radial-gradient(var(--dots) 1.1px, transparent 1.5px) 0 0 / 6px 6px; border-top:2px solid var(--blue); }
+.size { color:var(--soft); font-weight:600; }
+.price, .price data { font-family:"Rubik Mono One",sans-serif; font-weight:400; color:var(--blue); font-size:1.05rem; word-spacing:-.4em; }
+.container-size { color:var(--blue); font-weight:700; }
+.container-size .icon { color:var(--pink); }
+.footer { border-top:2px solid var(--blue); color:var(--soft); }
+.footer .icon, .footer a { color:var(--deep-pink); }
+.scroll-top { background:var(--paper); border:2px solid var(--blue); box-shadow:4px 4px 0 var(--pink); }
+.scroll-top .icon { color:var(--blue); }
+.scroll-top-ring circle { stroke:var(--pink); }
+.store-search { color:var(--blue); background:var(--paper); border:2px solid var(--blue); border-radius:0; }
+.store-search::placeholder { color:var(--soft); }
+.store-chip { color:var(--blue); background:var(--paper); border:2px solid var(--blue); border-radius:0; font-weight:600; }
+.store-chip:hover { color:var(--blue); background:rgba(255,79,163,.25); border-color:var(--blue); }
+.store-chip.active { color:#fff; background:var(--pink); border-color:var(--blue); }
+.store-no-results { color:var(--soft); }
+.not-found h2 { color:var(--blue); }
+.not-found-link { background:var(--pink); color:#fff; border-radius:0; box-shadow:4px 4px 0 var(--blue); }

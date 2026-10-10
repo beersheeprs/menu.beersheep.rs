@@ -1,0 +1,49 @@
+/* Beta theme (/beta/): Taproom — warm charcoal, cream, brass, condensed type — loaded after styles.css, overrides only */
+:root { --bg:#1b1916; --card:#23201c; --line:#3b362f; --ink:#efe6d4; --muted:#a89c86; --brass:#d9a441; --hop:#9cc27a; }
+* { font-family: "Rubik", system-ui, sans-serif; }
+body { background: var(--bg); color: var(--ink); max-width: 1180px; }
+header { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:12px 24px;
+  text-align:left; border-bottom:3px double var(--line); padding-bottom:16px; margin-bottom:22px; }
+h1 { font-family:"Oswald",sans-serif; font-weight:600; color:var(--ink); letter-spacing:.01em; line-height:1;
+  font-size:clamp(2rem,5vw,3.3rem); margin:0; }
+.page-nav { margin:0; gap:2px; }
+.nav-link { font-family:"Oswald",sans-serif; text-transform:uppercase; letter-spacing:.1em; font-size:.95rem; color:var(--muted);
+  border-radius:0; padding:4px 12px; border-bottom:2px solid transparent; }
+.nav-link:hover { background:none; color:var(--ink); }
+.nav-link.active { background:none; color:var(--brass); border-bottom-color:var(--brass); }
+.section-nav { border-bottom:none; padding:0; margin-bottom:10px; }
+.section-nav-links { justify-content:flex-start; gap:0; }
+.section-nav-link { color:var(--muted); border-radius:0; padding:2px 10px 2px 0; font-size:.9rem; }
+.section-nav-link + .section-nav-link::before { content:"/"; color:var(--line); margin-right:10px; }
+.section-nav-link:hover { background:none; color:var(--brass); }
+.section-nav-select { background-color:var(--card); border-color:var(--line); border-radius:2px; }
+.section-header { font-family:"Oswald",sans-serif; font-weight:500; color:var(--brass); letter-spacing:.08em;
+  border-bottom:none; display:flex; align-items:center; gap:14px; margin:38px 0 16px; }
+.section-header::after { content:""; flex:1; height:1px; background:var(--line); }
+.grid { gap:18px; }
+.snippet { background:var(--card); border:1px solid var(--line); border-radius:3px; box-shadow:none; }
+.snippet-header { border-bottom:1px dashed var(--line); }
+.snippet-name { font-family:"Oswald",sans-serif; font-weight:500; color:var(--ink); letter-spacing:.01em; }
+.abv-badge { background:none; color:var(--brass); border:1px solid currentColor; border-radius:2px; font-weight:500;
+  padding:2px 8px; font-variant-numeric:tabular-nums; }
+.producer { color:var(--muted); font-weight:400; }
+.snippet-style { color:var(--hop); font-style:normal; font-weight:400; }
+.on-tap-badge { color:var(--brass); }
+.snippet-image { background:#2c2823; border-color:var(--line); border-radius:2px; }
+.snippet-image.has-hd { background:transparent; }
+.snippet-image.has-hd img { border-radius:2px; }
+.snippet-description { color:#cfc4ae; }
+.circle-rating { --filled:var(--brass); --empty:#4a443b; }
+.snippet-prices { background:transparent; border-top:1px dashed var(--line); }
+.size { color:var(--muted); }
+.price, .price data { font-family:"Oswald",sans-serif; color:var(--ink); font-weight:500; letter-spacing:.02em; }
+.container-size { color:var(--ink); font-weight:500; }
+.container-size .icon { color:var(--brass); }
+.footer { border-top:3px double var(--line); color:var(--muted); }
+.footer .icon, .footer a { color:var(--brass); }
+.scroll-top { background:var(--card); border-color:var(--line); }
+.scroll-top-ring circle { stroke:var(--brass); }
+.store-search, .store-chip { background:var(--card); border-color:var(--line); border-radius:2px; }
+.store-chip.active { background:var(--brass); border-color:var(--brass); }
+.not-found-link { background:var(--brass); border-radius:2px; }
+.not-found-icon { color:var(--brass); }

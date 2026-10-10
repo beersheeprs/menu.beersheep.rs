@@ -8,6 +8,7 @@ const {
     makeLocalize,
     validateBeers,
     extractSections,
+    BETA_THEMES,
 } = require('../build');
 const list = require('./fixtures/list.json');
 const store = require('./fixtures/store.json');
@@ -82,4 +83,12 @@ test('localize translates countries and falls back to the English description', 
     assert.equal(sr.description({ description: 'Hoppy', description_sr: 'Хмељно' }), 'Хмељно');
     assert.equal(sr.description({ description: 'Hoppy', description_sr: '  ' }), 'Hoppy');
     assert.equal(en.description({ description: 'Hoppy', description_sr: 'Хмељно' }), 'Hoppy');
+});
+
+test('every beta theme has its stylesheet', () => {
+    const fs = require('node:fs');
+    const path = require('node:path');
+    for (const theme of BETA_THEMES) {
+        assert.ok(fs.existsSync(path.join(__dirname, '..', 'src/styles/beta', `${theme.slug}.css`)), theme.slug);
+    }
 });

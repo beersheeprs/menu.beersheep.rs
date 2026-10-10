@@ -1,0 +1,61 @@
+/* Beta theme (/beta/): Paper ledger — paper menu colours with the ledger layout: no boxes, hairlines, monospace numbers — loaded after styles.css, overrides only */
+:root { --paper:#f5efe3; --ink:#1f1c18; --muted:#776f62; --line:#d8cdb9; --green:#2d6a3e; --red:#9a3a28; }
+* { font-family: "IBM Plex Sans", system-ui, sans-serif; }
+body { background: var(--paper); color: var(--ink); max-width: 1180px; }
+header { display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:8px 24px;
+  text-align:left; border-bottom:1px solid var(--ink); padding-bottom:14px; margin-bottom:20px; }
+h1 { font-weight:500; text-transform:none; letter-spacing:-.02em; color:var(--ink); font-size:clamp(1.7rem,4.4vw,2.7rem); margin:0; line-height:1.1; }
+.page-nav { margin:0; gap:18px; }
+.nav-link { font-family:"IBM Plex Mono",monospace; text-transform:uppercase; letter-spacing:.06em; font-size:.82rem; color:var(--muted); padding:0; border-radius:0; }
+.nav-link:hover { background:none; color:var(--ink); }
+.nav-link.active { background:none; color:var(--green); }
+.nav-link.active::before { content:"● "; }
+.section-nav { border-bottom:none; padding:0 0 8px; }
+.section-nav-links { justify-content:flex-start; gap:4px 18px; }
+.section-nav-link { font-family:"IBM Plex Mono",monospace; font-size:.8rem; color:var(--muted); padding:0; border-radius:0; }
+.section-nav-link:hover { background:none; color:var(--green); }
+.section-nav-select { color:var(--ink); background-color:#fbf7ef; border-color:var(--line); border-radius:0; font-family:"IBM Plex Mono",monospace; }
+.section-header { font-family:"IBM Plex Mono",monospace; font-weight:500; font-size:.85rem; color:var(--green); letter-spacing:.14em;
+  border-bottom:1px solid var(--ink); margin:48px 0 0; padding-bottom:6px; }
+.grid { gap:0 48px; }
+.snippet { background:none; border:none; border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; }
+.snippet-header { border-bottom:none; padding:20px 0 6px; min-height:0; }
+.snippet-name { font-weight:600; color:var(--ink); letter-spacing:-.01em; }
+.abv-badge { background:none; color:var(--red); font-family:"IBM Plex Mono",monospace; font-weight:500; font-size:.8rem; padding:4px 0 0; border-radius:0; }
+.producer { color:var(--muted); font-weight:400; }
+.snippet-style { color:var(--green); font-style:normal; font-weight:400; }
+.on-tap-badge { color:var(--red); font-family:"IBM Plex Mono",monospace; font-size:.78rem; }
+.snippet-content { padding:10px 0 14px; }
+.snippet-image { background:#ece4d4; border:none; border-radius:0; }
+.snippet-image.has-hd { background:transparent; }
+.snippet-image.has-hd img { border-radius:0; }
+.snippet-image .placeholder { color:#b7ab95; }
+.snippet-description { color:#4a443c; }
+.circle-rating { --filled:var(--green); --empty:#dcd2c0; --size:11px; }
+.circle-rating .value { font-family:"IBM Plex Mono",monospace; font-size:.9rem; }
+.rating-label { font-family:"IBM Plex Mono",monospace; color:var(--muted); }
+.snippet-prices { background:none; border-top:1px dotted var(--line); padding:10px 0 18px; }
+.size-price { justify-content:flex-start; }
+.price-option { align-items:flex-start; }
+.size { font-family:"IBM Plex Mono",monospace; color:var(--muted); font-size:.8rem; }
+.price, .price data { font-family:"IBM Plex Mono",monospace; color:var(--ink); font-weight:500; font-size:1.05rem; }
+.container-size { font-family:"IBM Plex Mono",monospace; color:var(--ink); font-weight:500; margin:0 14px 0 0; }
+.container-size .icon { color:var(--green); }
+.footer { border-top:1px solid var(--ink); color:var(--muted); font-size:.8rem; }
+.footer .icon, .footer a { color:var(--green); }
+.scroll-top { background:var(--paper); border-color:var(--line); box-shadow:none; }
+.scroll-top .icon { color:var(--ink); }
+.scroll-top-ring circle { stroke:var(--green); stroke-width:2; }
+.store-filter { align-items:flex-start; }
+.store-chips { justify-content:flex-start; }
+.store-search { color:var(--ink); background:#fbf7ef; border-color:var(--line); border-radius:0; }
+.store-chip { color:var(--muted); background:none; border-color:var(--line); border-radius:0; font-family:"IBM Plex Mono",monospace; font-size:.78rem; }
+.store-chip:hover { color:var(--ink); border-color:var(--muted); }
+.store-chip.active { color:var(--paper); background:var(--green); border-color:var(--green); }
+.store-no-results { color:var(--muted); }
+.not-found h2 { color:var(--ink); }
+.not-found-link { background:var(--green); color:var(--paper); border-radius:0; }
+@media (max-width: 768px) { .snippet-image, .snippet-image.has-hd { align-self:flex-start; } }
+/* White label backgrounds take the paper colour behind them (light themes only) */
+.snippet-image, .snippet-image.has-hd { background:transparent; }
+.snippet-image img { mix-blend-mode:multiply; }

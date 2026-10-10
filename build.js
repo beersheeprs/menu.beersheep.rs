@@ -121,6 +121,68 @@ async function fetchStoreSections(apiOrigin) {
     }
 }
 
+// Design previews at /beta/<slug>/ (English only): the same pages and data, plus an
+// override stylesheet (src/styles/beta/<slug>.css) and its Google Fonts. Never indexed:
+// noindex meta, Disallow in robots.txt, not in the sitemap, not linked from public pages.
+const BETA_THEMES = [
+    {
+        slug: 'taproom',
+        name: 'Taproom',
+        desc: 'Warm charcoal, cream and brass, condensed headings',
+        fonts: 'family=Oswald:wght@400;500;600&family=Rubik:ital,wght@0,400;0,500;1,400',
+        color: '#1b1916',
+    },
+    {
+        slug: 'paper',
+        name: 'Paper menu',
+        desc: 'Printed restaurant card: serif type, ink on cream',
+        fonts: 'family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400',
+        color: '#f5efe3',
+    },
+    {
+        slug: 'label',
+        name: 'Beer label',
+        desc: 'Kraft paper, black outlines, sticker badges',
+        fonts: 'family=Unbounded:wght@600;700;800&family=Manrope:wght@400;500;600;700;800',
+        color: '#e7dac0',
+    },
+    {
+        slug: 'ledger',
+        name: 'Ledger',
+        desc: 'Quiet dark list, hairlines, monospace numbers',
+        fonts: 'family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500',
+        color: '#121412',
+    },
+    {
+        slug: 'paper-label',
+        name: 'Paper label',
+        desc: 'Paper menu type and colours with beer-label outlines and stickers',
+        fonts: 'family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400',
+        color: '#f5efe3',
+    },
+    {
+        slug: 'paper-ledger',
+        name: 'Paper ledger',
+        desc: 'Paper menu colours with the ledger layout: hairlines, monospace numbers',
+        fonts: 'family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500',
+        color: '#f5efe3',
+    },
+    {
+        slug: 'riso',
+        name: 'Riso zine',
+        desc: 'Two-ink risograph print: blue and fluoro pink on off-white, halftone dots',
+        fonts: 'family=Rubik+Mono+One&family=Golos+Text:wght@400;500;600;700;800',
+        color: '#f3efe6',
+    },
+    {
+        slug: 'beer-hall',
+        name: 'Beer hall',
+        desc: 'Bottle green, cream and gold, classic serif capitals, double-framed cards',
+        fonts: 'family=Cormorant+Garamond:wght@600;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400',
+        color: '#13251c',
+    },
+];
+
 const LOCALES = [
     { code: 'en', prefix: '', public: true },
     // Not public yet: /sr/ pages get noindex and are left out of hreflang alternates
@@ -297,6 +359,7 @@ async function build() {
         const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
         const storeTemplate = fs.readFileSync(path.join(__dirname, 'src/store.ejs'), 'utf8');
         const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
+        const betaTemplate = fs.readFileSync(path.join(__dirname, 'src/beta.ejs'), 'utf8');
 
         const render = async (template, data) => {
             // EJS reads options (filename: base path for include()) only from the third argument
@@ -306,18 +369,9 @@ async function build() {
                 : html;
         };
 
-        for (const locale of locales) {
-            const { code, base } = locale;
-            const t = makeT(code);
-            const localize = makeLocalize(code);
-            const outDir = path.join(distDir, base);
-            fs.mkdirSync(outDir, { recursive: true });
-            console.log(`Rendering locale "${code}" → ${outDir}`);
-
-            // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
-            const eagerImages = 3;
-            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC };
-
+        // Taplist, bottles and (when loaded) store pages into outDir, for a locale or a beta theme
+        const writePages = async (outDir, common) => {
+            const { t, base, localize, lang: code } = common;
             const taplistHtml = await render(mainTemplate, {
                 ...common,
                 beers: { data: beerData },
@@ -339,8 +393,6 @@ async function build() {
             // Directory URLs: GitHub Pages serves /bottles/ from bottles/index.html
             fs.mkdirSync(path.join(outDir, 'bottles'), { recursive: true });
             fs.writeFileSync(path.join(outDir, 'bottles', 'index.html'), bottlesHtml);
-            // The page used to live at /bottles.html — keep old links and bookmarks working
-            writeRedirect(path.join(outDir, 'bottles.html'), `${base}/bottles/`);
 
             if (storeSections) {
                 try {
@@ -359,6 +411,23 @@ async function build() {
                     console.warn(`Store: rendering failed for "${code}" (${error.message}) — skipping`);
                 }
             }
+        };
+
+        for (const locale of locales) {
+            const { code, base } = locale;
+            const t = makeT(code);
+            const localize = makeLocalize(code);
+            const outDir = path.join(distDir, base);
+            fs.mkdirSync(outDir, { recursive: true });
+            console.log(`Rendering locale "${code}" → ${outDir}`);
+
+            // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
+            const eagerImages = 3;
+            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC, theme: null };
+
+            await writePages(outDir, common);
+            // The page used to live at /bottles.html — keep old links and bookmarks working
+            writeRedirect(path.join(outDir, 'bottles.html'), `${base}/bottles/`);
 
             // GitHub Pages only serves the root 404.html, so render it for the default locale only
             if (code === DEFAULT_LOCALE) {
@@ -370,6 +439,30 @@ async function build() {
                 });
                 fs.writeFileSync(path.join(outDir, '404.html'), notFoundHtml);
             }
+        }
+
+        // Beta design previews: English pages per theme + an index at /beta/
+        {
+            const locale = locales.find((l) => l.code === DEFAULT_LOCALE);
+            const t = makeT(DEFAULT_LOCALE);
+            const localize = makeLocalize(DEFAULT_LOCALE);
+            for (const theme of BETA_THEMES) {
+                const base = `/beta/${theme.slug}`;
+                console.log(`Rendering beta theme "${theme.slug}" → ${path.join(distDir, base)}`);
+                fs.mkdirSync(path.join(distDir, base), { recursive: true });
+                await writePages(path.join(distDir, base), {
+                    eagerImages: 3, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize,
+                    lang: DEFAULT_LOCALE, base, locales, isPublic: false, buildDate, environment,
+                    venue: VENUES.garden, storePublic: STORE_PUBLIC, theme,
+                });
+            }
+            fs.writeFileSync(
+                path.join(distDir, 'beta', 'index.html'),
+                await render(betaTemplate, {
+                    themes: BETA_THEMES, hasStore: !!storeSections, buildDate, lang: locale.code,
+                    filename: 'src/beta.ejs',
+                })
+            );
         }
 
         // API endpoints
@@ -410,6 +503,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+    BETA_THEMES,
     mapApiBeer,
     mapStoreSections,
     styleGroup,

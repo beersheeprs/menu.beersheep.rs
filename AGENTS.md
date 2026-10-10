@@ -18,6 +18,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
         src/bottles.ejs    → dist/bottles/index.html  (bottles & cans, URL /bottles/; dist/bottles.html redirects there)
         src/store.ejs      → dist/store/index.html    (Beer Store, URL /store/, from API_ORIGIN/store/list; unlinked until STORE_PUBLIC)
         src/404.ejs        → dist/404.html        (custom error page, default locale only)
+        src/beta.ejs       → dist/beta/index.html (design previews index; themes at /beta/<slug>/)
         (index/bottles rendered once per locale: en → dist/, sr → dist/sr/)
         src/partials/*     (shared snippets, head, nav, footer…)
         │
@@ -92,6 +93,13 @@ Priority order in `src/partials/snippet.ejs`:
 - **No garden tabs:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs. The garden pages link to it only once `STORE_PUBLIC` is true.
 - **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
 - "Beer Store" is a name — never translated in any locale.
+
+## Beta design previews (`/beta/`)
+
+- `BETA_THEMES` in `build.js` lists the themes; each renders the English On Tap / Bottles & Cans / Store pages into `dist/beta/<slug>/` from the same data, with `src/styles/beta/<slug>.css` (overrides loaded after `styles.css`) and its Google Fonts (added in `head.ejs` when `theme` is set).
+- `src/beta.ejs` → `dist/beta/index.html` links them all.
+- Never indexed: `noindex, nofollow` on every beta page, `Disallow: /beta/` in `robots.txt`, no sitemap entries, no links from public pages.
+- Templates get `theme` (`null` outside beta).
 
 ## Deployment
 
