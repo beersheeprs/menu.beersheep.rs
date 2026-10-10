@@ -16,14 +16,18 @@ const FETCH_TIMEOUT_MS = 15000;
 const MAX_UNUSED_DAYS = 30;
 
 // Bump when the image processing changes: new file names make the build redo every label
-const PROCESSING_VERSION = 2;
+const PROCESSING_VERSION = 3;
 
 const fileName = (url) =>
     crypto.createHash('sha1').update(`${url}#v${PROCESSING_VERSION}`).digest('hex').slice(0, 16) + '.webp';
 
-// Near-white: every channel at least this bright and nearly grey (JPEG noise included)
-const WHITE_MIN = 235;
-const WHITE_MAX_SPREAD = 18;
+// Background: every channel at least this bright, i.e. white up to JPEG noise. Strict on
+// purpose: cream or pale-sky label art just inside the edge must not count as background
+const WHITE_MIN = 243;
+// Kept pixels this close to the cut fade out by how light they are (from EDGE_FADE_FROM
+// up to WHITE_MIN), which takes off the light JPEG fringe and anti-aliases the edge
+const EDGE_BAND = 2;
+const EDGE_FADE_FROM = 190;
 // Skip the cut when it would remove almost nothing (full-bleed labels) …
 const MIN_CUT_SHARE = 0.02;
 // … or leave scattered bits (a white label with thin lettering), not one solid shape:
@@ -43,9 +47,7 @@ function cutWhiteBackground(data, width, height) {
     const isBackground = (i) => {
         const o = i * 4;
         if (data[o + 3] < 16) return true; // already transparent (PNG labels)
-        const r = data[o], g = data[o + 1], b = data[o + 2];
-        const min = Math.min(r, g, b);
-        return min >= WHITE_MIN && Math.max(r, g, b) - min <= WHITE_MAX_SPREAD;
+        return Math.min(data[o], data[o + 1], data[o + 2]) >= WHITE_MIN;
     };
 
     const cut = new Uint8Array(n);
@@ -88,20 +90,27 @@ function cutWhiteBackground(data, width, height) {
     const boxArea = (maxX - minX + 1) * (maxY - minY + 1);
     if ((n - cutCount) / boxArea < MIN_KEPT_DENSITY) return false;
 
+    // Distance (in steps) from the cut for the kept pixels near it, up to EDGE_BAND
+    const near = new Uint8Array(n);
+    const touches = (i, set, value) => {
+        const x = i % width;
+        return (x > 0 && set[i - 1] === value) || (x < width - 1 && set[i + 1] === value) ||
+            (i >= width && set[i - width] === value) || (i < n - width && set[i + width] === value);
+    };
+    for (let i = 0; i < n; i++) if (!cut[i] && touches(i, cut, 1)) near[i] = 1;
+    for (let d = 2; d <= EDGE_BAND; d++) {
+        for (let i = 0; i < n; i++) if (!cut[i] && !near[i] && touches(i, near, d - 1)) near[i] = d;
+    }
+
     for (let i = 0; i < n; i++) {
         const o = i * 4;
         if (cut[i]) {
             data[o + 3] = 0;
             continue;
         }
-        // Soft edge: a kept pixel touching the cut loses alpha by its whiteness
-        const x = i % width;
-        const touchesCut =
-            (x > 0 && cut[i - 1]) || (x < width - 1 && cut[i + 1]) ||
-            (i >= width && cut[i - width]) || (i < n - width && cut[i + width]);
-        if (!touchesCut) continue;
-        const r = data[o], g = data[o + 1], b = data[o + 2];
-        const whiteness = Math.max(0, Math.min(1, (Math.min(r, g, b) - 170) / (WHITE_MIN - 170)));
+        if (!near[i]) continue;
+        const min = Math.min(data[o], data[o + 1], data[o + 2]);
+        const whiteness = Math.max(0, Math.min(1, (min - EDGE_FADE_FROM) / (WHITE_MIN - EDGE_FADE_FROM)));
         if (whiteness === 0) continue;
         const keep = 1 - whiteness;
         // Un-blend from white: the colour this pixel would have without the white behind it
@@ -113,16 +122,24 @@ function cutWhiteBackground(data, width, height) {
     return true;
 }
 
+// The cut runs at twice the thumbnail size and is then scaled down, so its edge is
+// anti-aliased like the rest of the image, also for small (200px) source labels
+const SUPERSAMPLE = 2;
+
 async function toThumbnail(input) {
+    const thumbnail = () =>
+        sharp(input).resize({ width: WIDTH, height: WIDTH, fit: 'inside', withoutEnlargement: true });
+    const { width, height } = (await thumbnail().raw().toBuffer({ resolveWithObject: true })).info;
     const { data, info } = await sharp(input)
-        .resize({ width: WIDTH, height: WIDTH, fit: 'inside', withoutEnlargement: true })
+        .resize({ width: width * SUPERSAMPLE, height: height * SUPERSAMPLE, fit: 'fill' })
         .ensureAlpha()
         .raw()
         .toBuffer({ resolveWithObject: true });
     const cut = cutWhiteBackground(data, info.width, info.height);
-    const image = sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
-        .webp({ quality: QUALITY, alphaQuality: 90 });
-    return { image, cut };
+    const image = cut
+        ? sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).resize({ width, height, fit: 'fill' })
+        : thumbnail(); // untouched labels: no supersampling round trip
+    return { image: image.webp({ quality: QUALITY, alphaQuality: 90 }), cut };
 }
 
 async function download(url, file) {
