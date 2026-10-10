@@ -15,17 +15,124 @@ const FETCH_TIMEOUT_MS = 15000;
 // Cached thumbnails not used by any build for this long are deleted
 const MAX_UNUSED_DAYS = 30;
 
-const fileName = (url) => crypto.createHash('sha1').update(url).digest('hex').slice(0, 16) + '.webp';
+// Bump when the image processing changes: new file names make the build redo every label
+const PROCESSING_VERSION = 2;
+
+const fileName = (url) =>
+    crypto.createHash('sha1').update(`${url}#v${PROCESSING_VERSION}`).digest('hex').slice(0, 16) + '.webp';
+
+// Near-white: every channel at least this bright and nearly grey (JPEG noise included)
+const WHITE_MIN = 235;
+const WHITE_MAX_SPREAD = 18;
+// Skip the cut when it would remove almost nothing (full-bleed labels) …
+const MIN_CUT_SHARE = 0.02;
+// … or leave scattered bits (a white label with thin lettering), not one solid shape:
+// the kept pixels must fill at least this share of their own bounding box
+const MIN_KEPT_DENSITY = 0.4;
+
+/**
+ * Make the white background of a label transparent, in place (RGBA, 4 bytes per pixel).
+ * Flood-fills near-white pixels from the image border, so white inside the label
+ * (text, a white circle) stays. The pixels along the cut get partial alpha by how
+ * white they are, with the white taken out of their colour, so no light halo is left
+ * on a dark page. Returns false (buffer untouched) when the image has no white
+ * background to cut or the cut would not leave one solid shape.
+ */
+function cutWhiteBackground(data, width, height) {
+    const n = width * height;
+    const isBackground = (i) => {
+        const o = i * 4;
+        if (data[o + 3] < 16) return true; // already transparent (PNG labels)
+        const r = data[o], g = data[o + 1], b = data[o + 2];
+        const min = Math.min(r, g, b);
+        return min >= WHITE_MIN && Math.max(r, g, b) - min <= WHITE_MAX_SPREAD;
+    };
+
+    const cut = new Uint8Array(n);
+    const stack = [];
+    const visit = (i) => {
+        if (!cut[i] && isBackground(i)) {
+            cut[i] = 1;
+            stack.push(i);
+        }
+    };
+    for (let x = 0; x < width; x++) {
+        visit(x);
+        visit((height - 1) * width + x);
+    }
+    for (let y = 0; y < height; y++) {
+        visit(y * width);
+        visit(y * width + width - 1);
+    }
+    let cutCount = 0;
+    while (stack.length) {
+        const i = stack.pop();
+        cutCount++;
+        const x = i % width;
+        if (x > 0) visit(i - 1);
+        if (x < width - 1) visit(i + 1);
+        if (i >= width) visit(i - width);
+        if (i < n - width) visit(i + width);
+    }
+    if (cutCount < n * MIN_CUT_SHARE || cutCount === n) return false;
+
+    let minX = width, maxX = -1, minY = height, maxY = -1;
+    for (let i = 0; i < n; i++) {
+        if (cut[i]) continue;
+        const x = i % width, y = (i - x) / width;
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    }
+    const boxArea = (maxX - minX + 1) * (maxY - minY + 1);
+    if ((n - cutCount) / boxArea < MIN_KEPT_DENSITY) return false;
+
+    for (let i = 0; i < n; i++) {
+        const o = i * 4;
+        if (cut[i]) {
+            data[o + 3] = 0;
+            continue;
+        }
+        // Soft edge: a kept pixel touching the cut loses alpha by its whiteness
+        const x = i % width;
+        const touchesCut =
+            (x > 0 && cut[i - 1]) || (x < width - 1 && cut[i + 1]) ||
+            (i >= width && cut[i - width]) || (i < n - width && cut[i + width]);
+        if (!touchesCut) continue;
+        const r = data[o], g = data[o + 1], b = data[o + 2];
+        const whiteness = Math.max(0, Math.min(1, (Math.min(r, g, b) - 170) / (WHITE_MIN - 170)));
+        if (whiteness === 0) continue;
+        const keep = 1 - whiteness;
+        // Un-blend from white: the colour this pixel would have without the white behind it
+        for (let c = 0; c < 3; c++) {
+            data[o + c] = Math.max(0, Math.min(255, Math.round((data[o + c] - 255 * whiteness) / keep)));
+        }
+        data[o + 3] = Math.round(data[o + 3] * keep);
+    }
+    return true;
+}
+
+async function toThumbnail(input) {
+    const { data, info } = await sharp(input)
+        .resize({ width: WIDTH, height: WIDTH, fit: 'inside', withoutEnlargement: true })
+        .ensureAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+    const cut = cutWhiteBackground(data, info.width, info.height);
+    const image = sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
+        .webp({ quality: QUALITY, alphaQuality: 90 });
+    return { image, cut };
+}
 
 async function download(url, file) {
     const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const tmp = `${file}.tmp`;
-    await sharp(Buffer.from(await res.arrayBuffer()))
-        .resize({ width: WIDTH, height: WIDTH, fit: 'inside', withoutEnlargement: true })
-        .webp({ quality: QUALITY })
-        .toFile(tmp);
+    const { image, cut } = await toThumbnail(Buffer.from(await res.arrayBuffer()));
+    await image.toFile(tmp);
     fs.renameSync(tmp, file);
+    return cut;
 }
 
 /**
@@ -40,6 +147,7 @@ async function addThumbnails(beers, distDir) {
     const urls = [...new Set(beers.map((b) => b.image_hd_url || b.image_url).filter(Boolean))];
     const thumbs = new Map();
     let fetched = 0;
+    let cutCount = 0;
     let failed = 0;
 
     const queue = [...urls];
@@ -52,7 +160,7 @@ async function addThumbnails(beers, distDir) {
                     const now = new Date();
                     fs.utimesSync(cached, now, now); // mark as used for pruning
                 } else {
-                    await download(url, cached);
+                    if (await download(url, cached)) cutCount++;
                     fetched++;
                 }
                 fs.copyFileSync(cached, path.join(distDir, OUT_DIR, name));
@@ -82,8 +190,9 @@ async function addThumbnails(beers, distDir) {
 
     console.log(
         `Thumbnails: ${thumbs.size}/${urls.length} labels (${fetched} fetched, ` +
-            `${thumbs.size - fetched} cached, ${failed} failed, ${pruned} pruned)`
+            `${thumbs.size - fetched} cached, ${failed} failed, ${pruned} pruned; ` +
+            `white background cut on ${cutCount} of the fetched)`
     );
 }
 
-module.exports = { addThumbnails };
+module.exports = { addThumbnails, cutWhiteBackground };
