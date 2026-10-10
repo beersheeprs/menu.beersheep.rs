@@ -1,0 +1,54 @@
+/* Beta theme (/beta/): Paper menu — printed restaurant card, serif, ink on cream — loaded after styles.css, overrides only */
+:root { --paper:#f5efe3; --card:#fffcf5; --ink:#1f1c18; --muted:#6f675a; --line:#dcd2c0; --green:#2d6a3e; --red:#9a3a28; }
+* { font-family: "PT Serif", Georgia, serif; }
+body { background: var(--paper); color: var(--ink); max-width: 1120px; }
+header { border-bottom:none; padding-bottom:0; margin-bottom:28px; }
+header::after { content:""; display:block; height:4px; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); margin-top:18px; }
+h1 { font-family:"Playfair Display",serif; font-weight:800; color:var(--ink); text-transform:none; letter-spacing:0;
+  font-size:clamp(2.1rem,5.5vw,3.5rem); line-height:1.1; }
+.page-nav { gap:8px; margin-top:10px; }
+.nav-link { font-variant:small-caps; text-transform:lowercase; letter-spacing:.1em; font-size:1.1rem; color:var(--muted); border-radius:0; padding:2px 10px; }
+.nav-link:hover { background:none; color:var(--ink); }
+.nav-link.active { background:none; color:var(--ink); text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:6px; }
+.section-nav { border-bottom:none; padding:0; }
+.section-nav-link { color:var(--muted); font-style:italic; font-size:.95rem; border-radius:0; }
+.section-nav-link:hover { background:none; color:var(--green); text-decoration:underline; }
+.section-nav-select { color:var(--ink); background-color:var(--card); border-color:var(--line); border-radius:0; }
+.section-header { font-family:"Playfair Display",serif; font-style:italic; font-weight:600; text-transform:none; letter-spacing:0;
+  color:var(--green); border-bottom:none; display:flex; align-items:center; gap:18px; font-size:clamp(1.5rem,4vw,2rem); margin:44px 0 20px; }
+.section-header::before, .section-header::after { content:""; flex:1; height:1px; background:var(--ink); opacity:.35; }
+.grid { gap:22px; }
+.snippet { background:var(--card); border:1px solid var(--line); border-radius:0; box-shadow:0 1px 0 var(--line); }
+.snippet-header { border-bottom:1px solid var(--line); }
+.snippet-name { font-family:"Playfair Display",serif; font-weight:700; color:var(--ink); }
+.abv-badge { background:none; color:var(--red); padding:4px 0 0; border-radius:0; font-weight:400; font-style:italic; font-size:.95rem; }
+.producer { color:var(--muted); font-variant:small-caps; letter-spacing:.03em; font-weight:400; font-size:1rem; }
+.snippet-style { color:var(--green); font-weight:400; }
+.on-tap-badge { color:var(--red); font-style:italic; }
+.snippet-image { background:#efe7d8; border-color:var(--line); border-radius:0; }
+.snippet-image.has-hd { background:transparent; }
+.snippet-image.has-hd img { border-radius:0; }
+.snippet-image .placeholder { color:#b7ab95; }
+.snippet-description { color:#3d3832; font-size:.98rem; }
+.circle-rating { --filled:#b8862b; --empty:#ded4c2; }
+.circle-rating .value { font-weight:700; }
+.rating-label { color:var(--muted); }
+.snippet-prices { background:transparent; border-top:1px solid var(--line); }
+.size { color:var(--muted); font-style:italic; }
+.price { color:var(--ink); font-weight:700; font-size:1.15rem; }
+.container-size { color:var(--ink); font-weight:700; }
+.container-size .icon { color:var(--green); }
+.footer { border-top:1px solid var(--ink); color:var(--muted); font-style:italic; }
+.footer .icon, .footer a { color:var(--green); }
+.scroll-top { background:var(--card); border-color:var(--line); box-shadow:0 2px 6px rgba(0,0,0,.12); }
+.scroll-top .icon { color:var(--ink); }
+.scroll-top-ring circle { stroke:var(--green); }
+.store-search { color:var(--ink); background:var(--card); border-color:var(--line); border-radius:0; }
+.store-chip { color:var(--muted); background:var(--card); border-color:var(--line); border-radius:0; }
+.store-chip:hover { color:var(--ink); }
+.store-chip.active { color:var(--card); background:var(--green); border-color:var(--green); }
+.not-found h2 { color:var(--ink); }
+.not-found-link { background:var(--ink); color:var(--paper); border-radius:0; }
+/* White label backgrounds take the paper colour behind them (light themes only) */
+.snippet-image, .snippet-image.has-hd { background:transparent; }
+.snippet-image img { mix-blend-mode:multiply; }

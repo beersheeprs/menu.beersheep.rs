@@ -40,6 +40,10 @@ jobs:
             echo "::error::Store page was skipped"
             exit 1
           fi
+          if grep -q '^Beta: ' build.log; then
+            echo "::error::Beta previews were skipped"
+            exit 1
+          fi
         env:
           NODE_ENV: production
 
@@ -47,6 +51,8 @@ jobs:
         run: |
           for page in index.html bottles/index.html store/index.html 404.html \
                       sr/index.html sr/bottles/index.html sr/store/index.html \
-                      api/v1/taps.json api/v1/fridge.json api/v1/store.json; do
+                      api/v1/taps.json api/v1/fridge.json api/v1/store.json \
+                      beta/index.html beta/taproom/index.html beta/taproom/bottles/index.html \
+                      beta/taproom/store/index.html beta/taproom.css; do
             test -s "dist/$page" || { echo "::error::dist/$page missing"; exit 1; }
           done
