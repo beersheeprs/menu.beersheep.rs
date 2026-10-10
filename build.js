@@ -175,6 +175,13 @@ const BETA_THEMES = [
         color: '#f3efe6',
     },
     {
+        slug: 'riso-green',
+        name: 'Riso green',
+        desc: 'The riso zine with green as the second ink: blue and riso green on off-white',
+        fonts: 'family=Rubik+Mono+One&family=Golos+Text:wght@400;500;600;700;800',
+        color: '#00a95c',
+    },
+    {
         slug: 'beer-hall',
         name: 'Beer hall',
         desc: 'Bottle green, cream and gold, classic serif capitals, double-framed cards',
