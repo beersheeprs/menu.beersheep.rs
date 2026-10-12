@@ -93,3 +93,37 @@ test('every beta theme has its stylesheet', () => {
         assert.ok(fs.existsSync(path.join(__dirname, '..', 'src/styles/beta', `${theme.slug}.css`)), theme.slug);
     }
 });
+
+// A 0.0% / "N/A ABV" beer arrives from /list with abv: null (Kriek 0,0%, deploy run 38318137520)
+const nullAbvBeer = mapApiBeer({
+    ...list['Draft Beers'][0],
+    tap_number: null,
+    beer_name: 'Kriek 0,0%',
+    beer_style: 'Lambic - Kriek',
+    abv: null,
+    ibu: null,
+    serving_style: 'bottle',
+});
+
+test('JSON-LD omits the ABV property for a beer without ABV', () => {
+    const ldJson = require('../src/ld-json');
+    const bottles = [{ name: 'Belgian Beers', beers: [nullAbvBeer] }];
+    const out = JSON.stringify(ldJson(bottles, 'bottles', makeT('en'), '', makeLocalize('en')));
+    assert.ok(out.includes('Kriek 0,0%'));
+    assert.ok(!out.includes('null%'), out);
+    assert.ok(!out.includes('"name":"ABV"'), out);
+});
+
+test('beer card renders without an ABV badge for a beer without ABV', () => {
+    const ejs = require('ejs');
+    const path = require('node:path');
+    const { icon } = require('../src/icons');
+    const html = ejs.render(
+        `<%- include('partials/snippet', { item }) %>`,
+        { item: nullAbvBeer, pageType: 'bottles', icon, t: makeT('en'), localize: makeLocalize('en') },
+        { filename: path.join(__dirname, '..', 'src', 'index.ejs') }
+    );
+    assert.ok(html.includes('Kriek 0,0%'));
+    assert.ok(!html.includes('abv-badge'), html);
+    assert.ok(!html.includes('null'), html);
+});
