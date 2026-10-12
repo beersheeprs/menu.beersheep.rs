@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const {
     mapApiBeer,
+    isNonAlcoholic,
     mapStoreSections,
     styleGroup,
     makeT,
@@ -114,16 +115,43 @@ test('JSON-LD omits the ABV property for a beer without ABV', () => {
     assert.ok(!out.includes('"name":"ABV"'), out);
 });
 
-test('beer card renders without an ABV badge for a beer without ABV', () => {
+function renderCard(item) {
     const ejs = require('ejs');
     const path = require('node:path');
     const { icon } = require('../src/icons');
-    const html = ejs.render(
+    return ejs.render(
         `<%- include('partials/snippet', { item }) %>`,
-        { item: nullAbvBeer, pageType: 'bottles', icon, t: makeT('en'), localize: makeLocalize('en') },
+        { item, pageType: 'bottles', icon, t: makeT('en'), localize: makeLocalize('en') },
         { filename: path.join(__dirname, '..', 'src', 'index.ejs') }
     );
+}
+
+test('beer card without ABV shows the non-alcoholic badge only for a 0.0% name', () => {
+    const html = renderCard(nullAbvBeer);
     assert.ok(html.includes('Kriek 0,0%'));
-    assert.ok(!html.includes('abv-badge'), html);
+    assert.match(html, /abv-badge">Non-alcoholic</);
     assert.ok(!html.includes('null'), html);
+
+    const unknown = renderCard({ ...nullAbvBeer, name: 'Kriek', non_alcoholic: false });
+    assert.ok(!unknown.includes('abv-badge'), unknown);
+});
+
+test('isNonAlcoholic: only an explicit zero, and only when the ABV is unknown', () => {
+    const na = (name, extra = {}) => isNonAlcoholic({ name, style: 'Lambic - Kriek', abv: null, ...extra });
+    // alcohol-free
+    for (const name of ['Kriek 0,0%', 'Pecheresse 0,0%', 'La Chouffe 0.0%', 'Free 0.00%', 'Zero 0,0 %']) {
+        assert.equal(na(name), true, name);
+    }
+    assert.equal(na('Clausthaler', { style: 'Non-Alcoholic Beer - Pale Lager' }), true);
+    // not certainly alcohol-free: no badge
+    for (const name of [
+        'Kriek', 'Lady Cupcake #10', '10.0%', 'Imperial 10,0%', 'Strong 20.0%',
+        'Light 0.5%', 'Light 0,5%', 'Almost 0.05%', 'Weird 1.0.0%', 'Zero 0%', 'Heineken 0.0',
+    ]) {
+        assert.equal(na(name), false, name);
+    }
+    // a known ABV always wins
+    assert.equal(na('Kriek 0,0%', { abv: 3.5 }), false);
+    assert.equal(na('Kriek 0,0%', { abv: 0 }), false);
+    assert.equal(na('Clausthaler', { style: 'Non-Alcoholic Beer - Pale Lager', abv: 0.4 }), false);
 });

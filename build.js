@@ -11,8 +11,22 @@ if (process.env.NODE_ENV !== 'production' && fs.existsSync('.env')) {
     process.loadEnvFile();
 }
 
+// An explicit zero in the name ("Kriek 0,0%", "La Chouffe 0.0%"), not part of a larger
+// number (10.0%) and not a low-alcohol value (0.5%, 0.05%). A bare "0%" doesn't count.
+const ZERO_ABV_NAME = /(?<![\d.,])0[.,]0+\s?%/;
+
+/**
+ * True only when the beer is certainly alcohol-free and has no ABV to show:
+ * a "Non-Alcoholic" style or a 0.0% name. A known ABV always wins (0 shows as "0.0% ABV").
+ * When unsure, false: the card then shows no badge at all.
+ */
+function isNonAlcoholic(beer) {
+    if (beer.abv != null) return false;
+    return /^Non-Alcoholic\b/i.test(beer.style || '') || ZERO_ABV_NAME.test(beer.name || '');
+}
+
 function mapApiBeer(apiBeer) {
-    return {
+    const beer = {
         tap_num: apiBeer.tap_number,
         name: apiBeer.beer_name,
         style: apiBeer.beer_style,
@@ -32,6 +46,8 @@ function mapApiBeer(apiBeer) {
         // Beer Store only: [{ size, style }] — volumes, since the store lists no prices
         sizes: apiBeer.sizes,
     };
+    beer.non_alcoholic = isNonAlcoholic(beer);
+    return beer;
 }
 
 // Venue shown in the footer of each page (structured data: src/ld-json.js)
@@ -517,6 +533,7 @@ if (require.main === module) {
 module.exports = {
     BETA_THEMES,
     mapApiBeer,
+    isNonAlcoholic,
     mapStoreSections,
     styleGroup,
     makeT,
