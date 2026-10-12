@@ -262,9 +262,10 @@ function validateBeers(beers) {
     }
     for (let i = 0; i < beers.length; i++) {
         const beer = beers[i];
-        if (!beer.name || typeof beer.abv !== 'number') {
+        // abv may be null: 0.0% and "N/A ABV" beers are stored without one
+        if (!beer.name || (beer.abv != null && typeof beer.abv !== 'number')) {
             throw new Error(
-                `Invalid beer at index ${i}: missing name or abv. Got: ${JSON.stringify(beer)}`
+                `Invalid beer at index ${i}: missing name or invalid abv. Got: ${JSON.stringify(beer)}`
             );
         }
     }

@@ -45,10 +45,11 @@ test('extractSections skips draft beers and empty sections', () => {
     assert.ok(sections.every((s) => s.beers.length > 0 && s.beers[0].name));
 });
 
-test('validateBeers rejects empty lists and beers without name or ABV', () => {
+test('validateBeers rejects empty lists, nameless beers and non-numeric ABV', () => {
     assert.doesNotThrow(() => validateBeers(list['Draft Beers'].map(mapApiBeer)));
+    assert.doesNotThrow(() => validateBeers([{ name: 'Kriek 0,0%', abv: null }]));
     assert.throws(() => validateBeers([]), /non-empty array/);
-    assert.throws(() => validateBeers([{ name: 'X', abv: null }]), /index 0/);
+    assert.throws(() => validateBeers([{ name: 'X', abv: '5%' }]), /index 0/);
     assert.throws(() => validateBeers([{ abv: 5 }]), /index 0/);
 });
 
