@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const {
     mapApiBeer,
+    isNonAlcoholic,
     mapStoreSections,
     styleGroup,
     makeT,
@@ -45,10 +46,11 @@ test('extractSections skips draft beers and empty sections', () => {
     assert.ok(sections.every((s) => s.beers.length > 0 && s.beers[0].name));
 });
 
-test('validateBeers rejects empty lists and beers without name or ABV', () => {
+test('validateBeers rejects empty lists, nameless beers and non-numeric ABV', () => {
     assert.doesNotThrow(() => validateBeers(list['Draft Beers'].map(mapApiBeer)));
+    assert.doesNotThrow(() => validateBeers([{ name: 'Kriek 0,0%', abv: null }]));
     assert.throws(() => validateBeers([]), /non-empty array/);
-    assert.throws(() => validateBeers([{ name: 'X', abv: null }]), /index 0/);
+    assert.throws(() => validateBeers([{ name: 'X', abv: '5%' }]), /index 0/);
     assert.throws(() => validateBeers([{ abv: 5 }]), /index 0/);
 });
 
@@ -91,4 +93,65 @@ test('every beta theme has its stylesheet', () => {
     for (const theme of BETA_THEMES) {
         assert.ok(fs.existsSync(path.join(__dirname, '..', 'src/styles/beta', `${theme.slug}.css`)), theme.slug);
     }
+});
+
+// A 0.0% / "N/A ABV" beer arrives from /list with abv: null (Kriek 0,0%, deploy run 38318137520)
+const nullAbvBeer = mapApiBeer({
+    ...list['Draft Beers'][0],
+    tap_number: null,
+    beer_name: 'Kriek 0,0%',
+    beer_style: 'Lambic - Kriek',
+    abv: null,
+    ibu: null,
+    serving_style: 'bottle',
+});
+
+test('JSON-LD omits the ABV property for a beer without ABV', () => {
+    const ldJson = require('../src/ld-json');
+    const bottles = [{ name: 'Belgian Beers', beers: [nullAbvBeer] }];
+    const out = JSON.stringify(ldJson(bottles, 'bottles', makeT('en'), '', makeLocalize('en')));
+    assert.ok(out.includes('Kriek 0,0%'));
+    assert.ok(!out.includes('null%'), out);
+    assert.ok(!out.includes('"name":"ABV"'), out);
+});
+
+function renderCard(item) {
+    const ejs = require('ejs');
+    const path = require('node:path');
+    const { icon } = require('../src/icons');
+    return ejs.render(
+        `<%- include('partials/snippet', { item }) %>`,
+        { item, pageType: 'bottles', icon, t: makeT('en'), localize: makeLocalize('en') },
+        { filename: path.join(__dirname, '..', 'src', 'index.ejs') }
+    );
+}
+
+test('beer card without ABV shows the non-alcoholic badge only for a 0.0% name', () => {
+    const html = renderCard(nullAbvBeer);
+    assert.ok(html.includes('Kriek 0,0%'));
+    assert.match(html, /abv-badge">Non-alcoholic</);
+    assert.ok(!html.includes('null'), html);
+
+    const unknown = renderCard({ ...nullAbvBeer, name: 'Kriek', non_alcoholic: false });
+    assert.ok(!unknown.includes('abv-badge'), unknown);
+});
+
+test('isNonAlcoholic: only an explicit zero, and only when the ABV is unknown', () => {
+    const na = (name, extra = {}) => isNonAlcoholic({ name, style: 'Lambic - Kriek', abv: null, ...extra });
+    // alcohol-free
+    for (const name of ['Kriek 0,0%', 'Pecheresse 0,0%', 'La Chouffe 0.0%', 'Free 0.00%', 'Zero 0,0 %']) {
+        assert.equal(na(name), true, name);
+    }
+    assert.equal(na('Clausthaler', { style: 'Non-Alcoholic Beer - Pale Lager' }), true);
+    // not certainly alcohol-free: no badge
+    for (const name of [
+        'Kriek', 'Lady Cupcake #10', '10.0%', 'Imperial 10,0%', 'Strong 20.0%',
+        'Light 0.5%', 'Light 0,5%', 'Almost 0.05%', 'Weird 1.0.0%', 'Zero 0%', 'Heineken 0.0',
+    ]) {
+        assert.equal(na(name), false, name);
+    }
+    // a known ABV always wins
+    assert.equal(na('Kriek 0,0%', { abv: 3.5 }), false);
+    assert.equal(na('Kriek 0,0%', { abv: 0 }), false);
+    assert.equal(na('Clausthaler', { style: 'Non-Alcoholic Beer - Pale Lager', abv: 0.4 }), false);
 });

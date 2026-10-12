@@ -16,8 +16,8 @@
                 <%= item.abv.toFixed(1) %>% ABV
                 <% if(item.ibu) { %>| <%= item.ibu %> IBU<% } %>
             </span>
-            <% } else if (/^Non-Alcoholic\b/i.test(item.style || '')) { %>
-            <%# Untappd shows "N/A ABV" for both 0% and unknown; only the style says non-alcoholic %>
+            <% } else if (item.non_alcoholic) { %>
+            <%# Untappd shows "N/A ABV" for both 0% and unknown; only the style or a 0.0% name says non-alcoholic %>
             <span class="abv-badge"><%= t('snippet.nonAlcoholic') %></span>
             <% } %>
         </div>

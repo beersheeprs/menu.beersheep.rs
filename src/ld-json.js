@@ -111,9 +111,10 @@ module.exports = function (data, pageType, t, base, localize) {
     };
 
     function makeMenuItem(beer, idPrefix) {
-        const props = [
-            { "@type": "PropertyValue", "name": "ABV", "value": `${beer.abv}%` }
-        ];
+        const props = [];
+        if (beer.abv != null) {
+            props.push({ "@type": "PropertyValue", "name": "ABV", "value": `${beer.abv}%` });
+        }
         if (beer.ibu != null) {
             props.push({ "@type": "PropertyValue", "name": "IBU", "value": String(beer.ibu) });
         }
