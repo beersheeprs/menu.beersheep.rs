@@ -17,10 +17,18 @@ permissions:
   pages: write
   id-token: write
 
+# Queue scraper-triggered runs so deploys never overlap or land out of order
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 jobs:
-  build:
+  # One job for build + deploy: a second job would wait for another runner
+  deploy:
     runs-on: ubuntu-latest
-    environment: github-pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - uses: actions/checkout@v7
@@ -37,7 +45,7 @@ jobs:
       # WebP label thumbnails from earlier runs: only new labels are downloaded
       # (caches are immutable, so each run saves a new key and restores the latest)
       - name: Restore label thumbnails
-        uses: actions/cache@v6
+        uses: actions/cache/restore@v6
         with:
           path: .cache/thumbnails
           key: thumbnails-${{ github.run_id }}
@@ -52,24 +60,26 @@ jobs:
           STORE_PUBLIC: ${{ vars.STORE_PUBLIC }}
           NODE_ENV: production
 
+      # Saved right after Build, so a failed deploy or notification keeps the new thumbnails
+      - name: Save label thumbnails
+        uses: actions/cache/save@v6
+        with:
+          path: .cache/thumbnails
+          key: thumbnails-${{ github.run_id }}
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:
           path: ./dist
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
 
+      # The site is live by now: a Telegram failure must not fail the run
       - name: Notify group
         if: ${{ inputs.notify != false }}
+        continue-on-error: true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_GROUP_CHAT_ID: ${{ secrets.TELEGRAM_GROUP_CHAT_ID }}
