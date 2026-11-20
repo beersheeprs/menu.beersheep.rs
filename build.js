@@ -25,6 +25,45 @@ function isNonAlcoholic(beer) {
     return /^Non-Alcoholic\b/i.test(beer.style || '') || ZERO_ABV_NAME.test(beer.name || '');
 }
 
+/**
+ * Volume label from the API ("0.33L", "0,5 l", "330ml", "1L") → milliliters, or null.
+ * A bare number is liters below 10 (0.5) and milliliters otherwise (330).
+ */
+function parseVolumeMl(label) {
+    const match = /^\s*(\d+(?:[.,]\d+)?)\s*(ml|cl|l)?\s*$/i.exec(String(label ?? ''));
+    if (!match) return null;
+    const value = parseFloat(match[1].replace(',', '.'));
+    const unit = (match[2] || (value < 10 ? 'l' : 'ml')).toLowerCase();
+    const ml = Math.round(value * { ml: 1, cl: 10, l: 1000 }[unit]);
+    return ml > 0 ? ml : null;
+}
+
+/** { "0.5L": 550, "0.33L": 470 } → [{ volume_ml: 330, price: 470 }, …]: priced only, small to large */
+function mapPrices(prices) {
+    if (!prices || typeof prices !== 'object') return [];
+    return Object.entries(prices)
+        .filter(([, price]) => price > 0)
+        .map(([label, price]) => {
+            const volume_ml = parseVolumeMl(label);
+            if (volume_ml == null) console.warn(`Skipping a price with an unreadable volume "${label}"`);
+            return { volume_ml, price };
+        })
+        .filter((p) => p.volume_ml != null)
+        .sort((a, b) => a.volume_ml - b.volume_ml);
+}
+
+/** Store [{ size: "0.5L", style }] → [{ volume_ml: 500, style }] */
+function mapSizes(sizes) {
+    if (!Array.isArray(sizes)) return undefined;
+    return sizes
+        .map((c) => ({ volume_ml: parseVolumeMl(c.size), style: c.style }))
+        .filter((c) => {
+            if (c.volume_ml != null) return true;
+            console.warn('Skipping a store size with an unreadable volume');
+            return false;
+        });
+}
+
 function mapApiBeer(apiBeer) {
     const beer = {
         tap_num: apiBeer.tap_number,
@@ -39,12 +78,13 @@ function mapApiBeer(apiBeer) {
         ibu: apiBeer.ibu,
         description: apiBeer.description,
         description_sr: apiBeer.description_sr,
-        prices: apiBeer.prices,
+        // [{ volume_ml, price }], priced entries only, small to large
+        prices: mapPrices(apiBeer.prices),
         serving_style: apiBeer.serving_style,
         on_tap: apiBeer.on_tap,
         untappd_url: apiBeer.untappd_url,
-        // Beer Store only: [{ size, style }] — volumes, since the store lists no prices
-        sizes: apiBeer.sizes,
+        // Beer Store only: [{ volume_ml, style }] — volumes, since the store lists no prices
+        sizes: mapSizes(apiBeer.sizes),
     };
     beer.non_alcoholic = isNonAlcoholic(beer);
     return beer;
@@ -533,6 +573,7 @@ if (require.main === module) {
 module.exports = {
     BETA_THEMES,
     mapApiBeer,
+    parseVolumeMl,
     isNonAlcoholic,
     mapStoreSections,
     styleGroup,

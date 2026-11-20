@@ -23,7 +23,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
         src/partials/*     (shared snippets, head, nav, footer…)
         │
         ├─ dist/           (static assets: CSS, images, favicons)
-        └─ dist/api/v1/    (taps.json, fridge.json, store.json — JSON mirror of beer data)
+        └─ dist/api/v1/    (taps.json, fridge.json, store.json — mapped beer data, volumes in ml)
         │
         ▼
     GitHub Pages (via workflow_dispatch in deploy.yml)
@@ -52,7 +52,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
   "description": "Tasting notes...",
   "image_url": "https://labels.untappd.com/...",
   "image_hd_url": "https://assets.untappd.com/site/beer_logos_hd/...",
-  "prices": { "0.33L": 540, "0.5L": 600 },
+  "prices": [{ "volume_ml": 330, "price": 540 }, { "volume_ml": 500, "price": 600 }],
   "brewery": "Brewery Name",
   "country": "Serbia",
   "serving_style": "draft",
@@ -63,7 +63,8 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 
 `serving_style`: `"draft"` | `"can"` | `"bottle"` — drives the icon in `snippet.ejs`.  
 `on_tap`: when `true` on a bottles/cans entry, renders an "also on tap" badge ("also on tap in Garden" on the store page).  
-`sizes` (store only): `[{ size, style }]` — the store lists volumes, not prices; each volume keeps its own container icon.  
+`prices`: the API's `{ "0.33L": 540 }` is mapped in `mapApiBeer()` to `[{ volume_ml, price }]` (milliliters via `parseVolumeMl()`; accepts `L`/`cl`/`ml`, `,` or `.`; unreadable volumes are dropped with a warning). Templates render `volume_ml / 1000` + `L`.  
+`sizes` (store only): `[{ volume_ml, style }]` (API: `[{ size: "0.5L", style }]`) — the store lists volumes, not prices; each volume keeps its own container icon.  
 `style_group` (store only): filter-chip group from the style prefix (`STYLE_GROUPS` in `build.js`).  
 `abv`: may be null — Untappd menus print "N/A ABV" for both 0% and unknown ABV, so the two can't be told apart. A missing ABV on a `Non-Alcoholic` style shows a "Non-alcoholic" badge (never a made-up 0.0%); any other style shows no ABV badge.  
 
@@ -80,10 +81,9 @@ Priority order in `src/partials/snippet.ejs`:
 
 ## Price rendering
 
-- Prices sorted **small-to-large** by volume (`parseFloat` sort on keys).
-- Entries with `price > 0` only — zero or null prices are filtered out.
+- Prices sorted **small-to-large** by `volume_ml`, and only entries with `price > 0` — both done in `mapPrices()` (`build.js`), so the templates, JSON-LD and the `dist/api/v1/` mirror all get the same list.
 - If no valid prices remain, shows "Please ask the bartender for price details" — except on the store page, which shows the volumes (`sizes`) instead.
-- Old `price_small`/`price_big` fallback removed — all beers use the `prices` object.
+- Old `price_small`/`price_big` fallback removed — all beers use `prices`.
 
 ## Beer Store page (`store.ejs`)
 

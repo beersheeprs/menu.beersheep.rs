@@ -2,6 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const {
     mapApiBeer,
+    parseVolumeMl,
     isNonAlcoholic,
     mapStoreSections,
     styleGroup,
@@ -22,7 +23,29 @@ test('mapApiBeer maps API fields to template fields', () => {
     assert.equal(beer.style, api.beer_style);
     assert.equal(beer.rating, api.beer_rating);
     assert.equal(beer.image_url, api.beer_image);
-    assert.deepEqual(beer.prices, api.prices);
+    assert.deepEqual(beer.prices, [
+        { volume_ml: 330, price: 470 },
+        { volume_ml: 500, price: 550 },
+    ]);
+});
+
+test('parseVolumeMl reads liter and milliliter labels', () => {
+    assert.equal(parseVolumeMl('0.33L'), 330);
+    assert.equal(parseVolumeMl('0,5 l'), 500);
+    assert.equal(parseVolumeMl('1L'), 1000);
+    assert.equal(parseVolumeMl('330ml'), 330);
+    assert.equal(parseVolumeMl('33cl'), 330);
+    assert.equal(parseVolumeMl('0.5'), 500);
+    assert.equal(parseVolumeMl('750'), 750);
+    assert.equal(parseVolumeMl('big'), null);
+    assert.equal(parseVolumeMl(null), null);
+});
+
+test('mapApiBeer drops unpriced and unreadable volumes, maps store sizes', () => {
+    const beer = mapApiBeer({ beer_name: 'X', prices: { '0.5L': 600, '0.3L': 0, '?': 500 }, sizes: [{ size: '0.33L', style: 'bottle' }] });
+    assert.deepEqual(beer.prices, [{ volume_ml: 500, price: 600 }]);
+    assert.deepEqual(beer.sizes, [{ volume_ml: 330, style: 'bottle' }]);
+    assert.deepEqual(mapApiBeer({ beer_name: 'Y', prices: null }).prices, []);
 });
 
 test('styleGroup groups styles by prefix', () => {
