@@ -122,17 +122,13 @@ module.exports = function (data, pageType, t, base, localize) {
             "@type": "Offer",
             "priceCurrency": "RSD"
         };
-        if (beer.prices) {
-            offers.priceSpecification = Object.entries(beer.prices).map(([volume, price]) => {
-                const v = parseFloat(volume);
-                const liters = v >= 1 ? v / 1000 : v;
-                return {
-                    "@type": "UnitPriceSpecification",
-                    "price": price,
-                    "unitCode": "LTR",
-                    "referenceQuantity": { "@type": "QuantitativeValue", "value": liters, "unitCode": "LTR" }
-                };
-            });
+        if (beer.prices && beer.prices.length > 0) {
+            offers.priceSpecification = beer.prices.map(({ volume_ml, price }) => ({
+                "@type": "UnitPriceSpecification",
+                "price": price,
+                "unitCode": "LTR",
+                "referenceQuantity": { "@type": "QuantitativeValue", "value": volume_ml / 1000, "unitCode": "LTR" }
+            }));
         }
         return {
             "@type": "MenuItem",
