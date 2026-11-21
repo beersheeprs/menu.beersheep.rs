@@ -72,6 +72,21 @@ jobs:
         with:
           path: ./dist
 
+      # The artifacts API can lag a moment behind the upload, and deploy-pages looks the
+      # artifact up there only once ("No artifacts named github-pages were found"):
+      # wait until it is listed. Same job, so build and deploy share one runner.
+      - name: Wait for the artifact to be listed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 12); do
+            n=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?name=github-pages" --jq .total_count) || n=0
+            [ "$n" -gt 0 ] && exit 0
+            echo "Artifact not listed yet ($i/12), retrying in 5s"
+            sleep 5
+          done
+          echo "::warning::github-pages artifact still not listed after 60s, deploying anyway"
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
