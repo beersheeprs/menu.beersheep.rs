@@ -16,7 +16,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
     EJS templates:
         src/index.ejs      → dist/index.html     (draft taps)
         src/bottles.ejs    → dist/bottles/index.html  (bottles & cans, URL /bottles/; dist/bottles.html redirects there)
-        src/store.ejs      → dist/store/index.html    (Beer Store, URL /store/, from API_ORIGIN/store/list; unlinked until STORE_PUBLIC)
+        src/store.ejs      → dist/store/index.html    (Beer Store, URL /store/, from API_ORIGIN/store/list; not in the sitemap until STORE_PUBLIC)
         src/404.ejs        → dist/404.html        (custom error page, default locale only)
         src/beta.ejs       → dist/beta/index.html (design previews index; themes at /beta/<slug>/)
         (index/bottles rendered once per locale: en → dist/, sr → dist/sr/)
@@ -89,8 +89,8 @@ Priority order in `src/partials/snippet.ejs`:
 
 - **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's fetched from the API even when `BEER_DATA` is given; only `STORE_DATA` (same JSON, used by CI) replaces it.
 - **Isolated:** any store fetch or render failure logs a warning and skips the store page; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
-- **Hidden release:** `/store/` is always a real page, indexable like the other pages of its locale. `STORE_PUBLIC` (repo variable, passed by `deploy.yml`, default false) only controls what points to it: while false, no link from the garden pages and no sitemap entry. `STORE_PUBLIC=true` adds the garden footer link ("Also visit Beersheep Beer Store") and the sitemap URL (written into `dist/sitemap.xml` at build).
-- **No tabs between venues:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs and the garden nav has no store tab. The venues link to each other in the footer only (garden → store once `STORE_PUBLIC` is true).
+- **Hidden release:** `/store/` is always a real page, indexable like the other pages of its locale. `STORE_PUBLIC` (repo variable, passed by `deploy.yml`, default false) only controls the sitemap: `STORE_PUBLIC=true` adds the store URL (written into `dist/sitemap.xml` at build). The garden footers link to it whenever the store page is built.
+- **No tabs between venues:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs and the garden nav has no store tab. The venues link to each other in the footer only.
 - **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
 - "Beer Store" is a name — never translated in any locale.
 
@@ -165,7 +165,7 @@ Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixt
 | `snippet.ejs` | Single beer card (image, name, style, ABV, prices, rating) |
 | `ld-json.ejs` | Inlines the `<script type="application/ld+json">` block |
 | `scroll-top.ejs` | Fixed scroll-to-top button + CSS scroll-progress ring |
-| `footer.ejs` | Venue name, address and Instagram from `venue` (garden: @beersheepgarden, store: @beersheep_), "Also visit" link to `otherVenue` (store → garden always; garden → store only when `STORE_PUBLIC`), Telegram/Facebook links (rendered via `include()`, so `t()` works) |
+| `footer.ejs` | Venue name, address and Instagram from `venue` (garden: @beersheepgarden, store: @beersheep_), "Also visit" link to `otherVenue` (store → garden; garden → store whenever the store page is built), Telegram/Facebook links (rendered via `include()`, so `t()` works) |
 | `gtag.ejs` | Google Analytics snippet (injected only in production) |
 | `cftag.ejs` | Cloudflare Web Analytics beacon (injected only in production) |
 

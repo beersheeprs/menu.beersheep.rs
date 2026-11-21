@@ -1,7 +1,7 @@
 <div class="footer">
         <p><%= venue.name %></p>
         <p><%= t(venue.addressKey) %></p>
-        <%# Cross-link to the other venue: store → garden always, garden → store once STORE_PUBLIC %>
+        <%# Cross-link to the other venue: store → garden, garden → store (when the store page was built) %>
         <% if (typeof otherVenue !== 'undefined' && otherVenue) { %>
         <p class="footer-venue"><%= t('footer.alsoVisit') %> <a href="<%= base %><%= otherVenue.path %>"><%= otherVenue.name %></a> · <%= t(otherVenue.addressKey) %></p>
         <% } %>
