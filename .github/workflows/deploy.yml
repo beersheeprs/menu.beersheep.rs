@@ -56,7 +56,7 @@ jobs:
         env:
           BEER_DATA: ${{ inputs.BEER_DATA }}
           API_ORIGIN: ${{ vars.API_ORIGIN }}
-          # 'true' links the Beer Store page (garden footer link, sitemap); unset until release
+          # 'true' adds the Beer Store page to the sitemap; unset until release
           STORE_PUBLIC: ${{ vars.STORE_PUBLIC }}
           NODE_ENV: production
 

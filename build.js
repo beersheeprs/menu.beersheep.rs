@@ -106,9 +106,8 @@ const VENUES = {
     },
 };
 
-// The Beer Store page is a real, indexable page on every deploy, but nothing points to
-// it (no footer link from the garden pages, not in the sitemap) until STORE_PUBLIC=true —
-// the repo variable flips those at release.
+// The Beer Store page is a real, indexable page on every deploy (the garden footers link
+// to it), but it joins the sitemap only once STORE_PUBLIC=true — the repo variable for the release.
 const STORE_PUBLIC = process.env.STORE_PUBLIC === 'true';
 
 // Filter chips on the store page: first matching group by the style's prefix
@@ -452,7 +451,7 @@ async function build() {
 
             // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
             const eagerImages = 3;
-            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, otherVenue: STORE_PUBLIC ? VENUES.store : null, theme: null, colorScheme: COLOR_SCHEME };
+            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, otherVenue: storeSections ? VENUES.store : null, theme: null, colorScheme: COLOR_SCHEME };
 
             await writePages(outDir, common);
             // The page used to live at /bottles.html — keep old links and bookmarks working
@@ -484,7 +483,7 @@ async function build() {
                 await writePages(path.join(distDir, base), {
                     eagerImages: 3, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize,
                     lang: DEFAULT_LOCALE, base, locales, isPublic: false, buildDate, environment,
-                    venue: VENUES.garden, otherVenue: STORE_PUBLIC ? VENUES.store : null, theme,
+                    venue: VENUES.garden, otherVenue: storeSections ? VENUES.store : null, theme,
                 });
             }
             fs.writeFileSync(
