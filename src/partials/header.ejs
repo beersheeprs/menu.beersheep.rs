@@ -1,4 +1,27 @@
 <header>
     <h1><%= t(pageType === 'bottles' || pageType === 'store' ? pageType + '.h1' : pageType === '404' ? 'notFound.h1' : 'taps.h1') %></h1>
     <%- include('nav') %>
+    <% if (!theme) { %>
+    <%# Light/dark switcher (applyColorScheme is defined in head.ejs; not on beta themes) %>
+    <button type="button" class="scheme-toggle" aria-label="<%= t('nav.darkMode') %>" aria-pressed="true">
+        <%# Line icons drawn here: Font Awesome's solid sun reads as a gear at this size %>
+        <svg class="scheme-icon scheme-icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+        <svg class="scheme-icon scheme-icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>
+    </button>
+    <script>
+    (function(){
+      var b = document.querySelector('.scheme-toggle');
+      applyColorScheme(document.documentElement.dataset.theme);
+      b.addEventListener('click', function(){
+        applyColorScheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light', true);
+      });
+      // No saved choice and the default is 'system': keep following the system when it switches
+      matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e){
+        if (colorSchemeDefault !== 'system') return;
+        var saved; try { saved = localStorage.getItem('color-scheme'); } catch (err) {}
+        if (!saved) applyColorScheme(e.matches ? 'light' : 'dark');
+      });
+    })();
+    </script>
+    <% } %>
 </header>

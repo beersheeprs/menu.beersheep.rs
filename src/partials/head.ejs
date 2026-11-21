@@ -38,11 +38,35 @@ var metaKey = pageType === 'store' ? 'store' : 'meta';
 <link rel="icon" type="image/png" href="/favicon-196x196.png" sizes="196x196" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <meta name="application-name" content="<%= venue.name %>" />
-<meta name="theme-color" content="<%= theme ? theme.color : '#231f20' %>" />
+<meta name="theme-color" content="<%= theme ? theme.color : colorScheme[colorScheme.default === 'light' ? 'light' : 'dark'] %>" />
+<% if (!theme) { %>
+<%# Light/dark scheme (COLOR_SCHEME in build.js): set data-theme before first paint, so there is no
+    flash. A saved choice (header switcher) wins, then the default; 'system' follows the device.
+    Beta themes skip this: they are designed on the dark colours. %>
+<script>
+(function(){
+  var d = document.documentElement, mode, def = <%- JSON.stringify(colorScheme.default) %>;
+  window.colorSchemeDefault = def;
+  try { mode = localStorage.getItem('color-scheme'); } catch (e) {}
+  if (mode !== 'light' && mode !== 'dark') mode = def === 'light' || def === 'dark' ? def : matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  d.dataset.theme = mode;
+  window.applyColorScheme = function(m, save){
+    d.dataset.theme = m;
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = m === 'light' ? '<%= colorScheme.light %>' : '<%= colorScheme.dark %>';
+    var b = document.querySelector('.scheme-toggle');
+    if (b) b.setAttribute('aria-pressed', m === 'light' ? 'false' : 'true');
+    if (save) { try { localStorage.setItem('color-scheme', m); } catch (e) {} }
+  };
+})();
+</script>
+<% } %>
 <% if (theme) { %>
 <%# Beta theme: overrides on top of /styles.css (linked by the page before this partial) %>
+<% if (theme.fonts) { %>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?<%- theme.fonts %>&display=swap">
+<% } %>
 <link rel="stylesheet" href="/beta/<%= theme.slug %>.css">
 <% } %>

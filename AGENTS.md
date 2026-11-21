@@ -89,8 +89,8 @@ Priority order in `src/partials/snippet.ejs`:
 
 - **Data:** `build.js` fetches `API_ORIGIN/store/list` (`[{ section, beers }]`, sections are countries in Untappd order). It's fetched from the API even when `BEER_DATA` is given; only `STORE_DATA` (same JSON, used by CI) replaces it.
 - **Isolated:** any store fetch or render failure logs a warning and skips the store page; the garden pages still build and deploy. Store rows are validated leniently (no name → skipped; no ABV → no badge).
-- **Hidden release:** `/store/` is always a real page, indexable like the other pages of its locale. `STORE_PUBLIC` (repo variable, passed by `deploy.yml`, default false) only controls what points to it: while false, no nav tab on the garden pages and no sitemap entry. `STORE_PUBLIC=true` adds the nav tab and the sitemap URL (written into `dist/sitemap.xml` at build).
-- **No garden tabs:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs. The garden pages link to it only once `STORE_PUBLIC` is true.
+- **Hidden release:** `/store/` is always a real page, indexable like the other pages of its locale. `STORE_PUBLIC` (repo variable, passed by `deploy.yml`, default false) only controls what points to it: while false, no link from the garden pages and no sitemap entry. `STORE_PUBLIC=true` adds the garden footer link ("Also visit Beersheep Beer Store") and the sitemap URL (written into `dist/sitemap.xml` at build).
+- **No tabs between venues:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs and the garden nav has no store tab. The venues link to each other in the footer only (garden → store once `STORE_PUBLIC` is true).
 - **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
 - "Beer Store" is a name — never translated in any locale.
 
@@ -100,6 +100,7 @@ Priority order in `src/partials/snippet.ejs`:
 - `src/beta.ejs` → `dist/beta/index.html` links them all.
 - Never indexed: `noindex, nofollow` on every beta page, `Disallow: /beta/` in `robots.txt`, no sitemap entries, no links from public pages.
 - Templates get `theme` (`null` outside beta).
+- `fonts: null` skips Google Fonts. Beta themes get no light/dark switcher: they build on the dark colours.
 
 ## Deployment
 
@@ -138,6 +139,12 @@ Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixt
 - Beer descriptions use `description_<code>` from the API (e.g. `description_sr`, maintained manually in D1) via `localize.description()`, falling back to English; country names via the `countries` map in the locale file.
 - Adding a language: create `src/i18n/<code>.json` and add it to `LOCALES` (start with `public: false`).
 
+## Light / dark
+
+- Colours are CSS variables (`--c-*`) at the top of `styles.css`: `:root` is the original dark palette, `:root[data-theme="light"]` the light one. Use the variables for any new colour (print styles keep fixed colours).
+- `COLOR_SCHEME` in `build.js`: `default` (`'light'` | `'dark'` | `'system'`) is what a first visit gets; `light`/`dark` are the `theme-color` of each.
+- `head.ejs` sets `data-theme` on `<html>` before first paint (saved choice in `localStorage` `color-scheme` → default → device setting for `'system'`); the round button in `header.ejs` (sun/moon line icons, label `nav.darkMode`) switches and saves it.
+
 ## CSS breakpoints
 
 - Desktop: default
@@ -152,13 +159,13 @@ Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixt
 | File | Purpose |
 |---|---|
 | `head.ejs` | `<meta>` tags, OG/Twitter cards, favicons, canonical URL |
-| `header.ejs` | `<h1>` + page nav |
-| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links on the garden pages (+ "Beer Store" when `STORE_PUBLIC`); the store page has no tabs |
+| `header.ejs` | `<h1>` + page nav + light/dark switcher |
+| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links on the garden pages; the store page has no tabs |
 | `section-nav.ejs` | Jump-to-section links (bottles and store pages) |
 | `snippet.ejs` | Single beer card (image, name, style, ABV, prices, rating) |
 | `ld-json.ejs` | Inlines the `<script type="application/ld+json">` block |
 | `scroll-top.ejs` | Fixed scroll-to-top button + CSS scroll-progress ring |
-| `footer.ejs` | Venue name, address and Instagram from `venue` (garden: @beersheepgarden, store: @beersheep_), Telegram/Facebook links (rendered via `include()`, so `t()` works) |
+| `footer.ejs` | Venue name, address and Instagram from `venue` (garden: @beersheepgarden, store: @beersheep_), "Also visit" link to `otherVenue` (store → garden always; garden → store only when `STORE_PUBLIC`), Telegram/Facebook links (rendered via `include()`, so `t()` works) |
 | `gtag.ejs` | Google Analytics snippet (injected only in production) |
 | `cftag.ejs` | Cloudflare Web Analytics beacon (injected only in production) |
 

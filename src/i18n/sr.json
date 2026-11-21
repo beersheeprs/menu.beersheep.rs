@@ -56,7 +56,7 @@
         "taps": "Точилице",
         "bottles": "Флаше и лименке",
         "language": "Језик",
-        "store": "Beer Store"
+        "darkMode": "Тамни режим"
     },
     "snippet": {
         "alsoOnTap": "има и на точилици",
@@ -70,7 +70,8 @@
         "address": "Кнегиње Зорке 3, Врачар",
         "storeAddress": "Балканска 21, Београд",
         "responsibly": "Пијте одговорно",
-        "opensNewTab": "отвара се у новој картици"
+        "opensNewTab": "отвара се у новој картици",
+        "alsoVisit": "Посетите и"
     },
     "scrollTop": {
         "label": "Назад на врх"
