@@ -95,17 +95,19 @@ const VENUES = {
     garden: {
         name: 'Beersheep Garden',
         addressKey: 'footer.address',
+        path: '/',
         instagram: 'https://www.instagram.com/beersheepgarden/',
     },
     store: {
         name: 'Beersheep Beer Store',
         addressKey: 'footer.storeAddress',
+        path: '/store/',
         instagram: 'https://www.instagram.com/beersheep_/',
     },
 };
 
 // The Beer Store page is a real, indexable page on every deploy, but nothing points to
-// it (no nav tab on the garden pages, not in the sitemap) until STORE_PUBLIC=true —
+// it (no footer link from the garden pages, not in the sitemap) until STORE_PUBLIC=true —
 // the repo variable flips those at release.
 const STORE_PUBLIC = process.env.STORE_PUBLIC === 'true';
 
@@ -182,46 +184,11 @@ async function fetchStoreSections(apiOrigin) {
 // noindex meta, Disallow in robots.txt, not in the sitemap, not linked from public pages.
 const BETA_THEMES = [
     {
-        slug: 'taproom',
-        name: 'Taproom',
-        desc: 'Warm charcoal, cream and brass, condensed headings',
-        fonts: 'family=Oswald:wght@400;500;600&family=Rubik:ital,wght@0,400;0,500;1,400',
-        color: '#1b1916',
-    },
-    {
-        slug: 'paper',
-        name: 'Paper menu',
-        desc: 'Printed restaurant card: serif type, ink on cream',
-        fonts: 'family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400',
-        color: '#f5efe3',
-    },
-    {
         slug: 'label',
         name: 'Beer label',
         desc: 'Kraft paper, black outlines, sticker badges',
         fonts: 'family=Unbounded:wght@600;700;800&family=Manrope:wght@400;500;600;700;800',
         color: '#e7dac0',
-    },
-    {
-        slug: 'ledger',
-        name: 'Ledger',
-        desc: 'Quiet dark list, hairlines, monospace numbers',
-        fonts: 'family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500',
-        color: '#121412',
-    },
-    {
-        slug: 'paper-label',
-        name: 'Paper label',
-        desc: 'Paper menu type and colours with beer-label outlines and stickers',
-        fonts: 'family=Playfair+Display:ital,wght@0,700;0,800;1,600&family=PT+Serif:ital,wght@0,400;0,700;1,400',
-        color: '#f5efe3',
-    },
-    {
-        slug: 'paper-ledger',
-        name: 'Paper ledger',
-        desc: 'Paper menu colours with the ledger layout: hairlines, monospace numbers',
-        fonts: 'family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500',
-        color: '#f5efe3',
     },
     {
         slug: 'riso',
@@ -237,14 +204,12 @@ const BETA_THEMES = [
         fonts: 'family=Rubik+Mono+One&family=Golos+Text:wght@400;500;600;700;800',
         color: '#00a95c',
     },
-    {
-        slug: 'beer-hall',
-        name: 'Beer hall',
-        desc: 'Bottle green, cream and gold, classic serif capitals, double-framed cards',
-        fonts: 'family=Cormorant+Garamond:wght@600;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400',
-        color: '#13251c',
-    },
 ];
+
+// Light/dark colour schemes (palettes in styles.css). `default` is what a first visit gets until the
+// visitor picks one with the header switcher (saved in localStorage): 'light' | 'dark' | 'system'
+// (follow the device setting). The colours are the browser-bar theme-color of each scheme.
+const COLOR_SCHEME = { default: 'light', light: '#f6f4ef', dark: '#231f20' };
 
 const LOCALES = [
     { code: 'en', prefix: '', public: true },
@@ -462,6 +427,7 @@ async function build() {
                     const storeHtml = await render(storeTemplate, {
                         ...common,
                         venue: VENUES.store,
+                        otherVenue: VENUES.garden,
                         sections: storeSections,
                         ldJson: ldJson(storeSections, 'store', t, base, localize),
                         pageType: 'store',
@@ -486,7 +452,7 @@ async function build() {
 
             // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
             const eagerImages = 3;
-            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, storePublic: STORE_PUBLIC, theme: null };
+            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, otherVenue: STORE_PUBLIC ? VENUES.store : null, theme: null, colorScheme: COLOR_SCHEME };
 
             await writePages(outDir, common);
             // The page used to live at /bottles.html — keep old links and bookmarks working
@@ -518,7 +484,7 @@ async function build() {
                 await writePages(path.join(distDir, base), {
                     eagerImages: 3, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize,
                     lang: DEFAULT_LOCALE, base, locales, isPublic: false, buildDate, environment,
-                    venue: VENUES.garden, storePublic: STORE_PUBLIC, theme,
+                    venue: VENUES.garden, otherVenue: STORE_PUBLIC ? VENUES.store : null, theme,
                 });
             }
             fs.writeFileSync(

@@ -1,3 +1,65 @@
+/* Colours: dark is the original design; light is the default for new visitors (COLOR_SCHEME in
+   build.js). head.ejs sets data-theme on <html> before first paint; the header button switches it.
+   Beta themes get no data-theme, so they always build on the dark values. */
+:root {
+  color-scheme: dark;
+  --c-bg: #231f20;
+  --c-surface: #1a1a1a;
+  --c-surface-2: #2a2a2a;
+  --c-hover: #333;
+  --c-line: #333;
+  --c-line-strong: #444;
+  --c-line-hover: #666;
+  --c-ink: #f5f5f5;
+  --c-muted: #aaa;
+  --c-muted-2: #888;
+  --c-text: #bbb;
+  --c-faint: #666;
+  --c-sep: #555;
+  --c-accent: #4dac68;          /* green text */
+  --c-accent-bg: #4dac68;       /* green fills: ABV badge, active chip, buttons */
+  --c-accent-bg-hover: #5cc07a;
+  --c-on-accent: #000;
+  --c-footer-link: #4caf50;
+  --c-on-tap: #e8a838;
+  --c-rating-empty: #444;
+  --c-rating-filled: #f59e0b;
+  --c-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+  --c-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+  --c-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --c-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.7);
+}
+
+/* Light: warm off-white page, white cards, darker greens and amber for readable text */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --c-bg: #f6f4ef;
+  --c-surface: #ffffff;
+  --c-surface-2: #f1eee7;
+  --c-hover: #e9e5dc;
+  --c-line: #e2ddd2;
+  --c-line-strong: #d3cdc0;
+  --c-line-hover: #a9a294;
+  --c-ink: #1e1b1c;
+  --c-muted: #5f5a55;
+  --c-muted-2: #6e6862;
+  --c-text: #46413d;
+  --c-faint: #a39d93;
+  --c-sep: #b9b3a8;
+  --c-accent: #237a42;
+  --c-accent-bg: #3f9d5b;
+  --c-accent-bg-hover: #358a4e;
+  --c-on-accent: #fff;
+  --c-footer-link: #237a42;
+  --c-on-tap: #a05e00;
+  --c-rating-empty: #ddd8cd;
+  --c-rating-filled: #e08a00;
+  --c-shadow: 0 4px 10px rgba(60, 45, 30, 0.08);
+  --c-shadow-lg: 0 6px 14px rgba(60, 45, 30, 0.1);
+  --c-shadow-sm: 0 2px 8px rgba(60, 45, 30, 0.15);
+  --c-shadow-hover: 0 4px 16px rgba(60, 45, 30, 0.2);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -16,8 +78,8 @@
 }
 
 body {
-  background-color: #231f20;
-  color: #f5f5f5;
+  background-color: var(--c-bg);
+  color: var(--c-ink);
   line-height: 1.6;
   padding: 15px;
   max-width: 1200px;
@@ -32,11 +94,11 @@ header {
   text-align: center;
   margin-bottom: 25px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #4dac68;
+  border-bottom: 2px solid var(--c-accent);
 }
 
 h1 {
-  color: #4dac68;
+  color: var(--c-accent);
   font-size: clamp(1.8rem, 5vw, 2.8rem);
   margin-bottom: 6px;
   text-transform: uppercase;
@@ -51,7 +113,7 @@ h1 {
 }
 
 .nav-link {
-  color: #aaa;
+  color: var(--c-muted);
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
@@ -61,13 +123,13 @@ h1 {
 }
 
 .nav-link:hover {
-  color: #f5f5f5;
-  background-color: #333;
+  color: var(--c-ink);
+  background-color: var(--c-hover);
 }
 
 .nav-link.active {
-  color: #4dac68;
-  background-color: #1a1a1a;
+  color: var(--c-accent);
+  background-color: var(--c-surface);
   cursor: default;
 }
 
@@ -82,11 +144,11 @@ h1 {
 }
 
 .lang-sep {
-  color: #555;
+  color: var(--c-sep);
 }
 
 .lang-link {
-  color: #888;
+  color: var(--c-muted-2);
   text-decoration: none;
   padding: 2px 6px;
   border-radius: 4px;
@@ -94,18 +156,18 @@ h1 {
 }
 
 .lang-link:hover {
-  color: #f5f5f5;
+  color: var(--c-ink);
 }
 
 .lang-link.active {
-  color: #4dac68;
+  color: var(--c-accent);
   font-weight: 600;
 }
 
 .section-nav {
   margin-bottom: 24px;
   padding: 12px 0;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--c-line);
 }
 
 .section-nav-links {
@@ -116,7 +178,7 @@ h1 {
 }
 
 .section-nav-link {
-  color: #888;
+  color: var(--c-muted-2);
   text-decoration: none;
   font-size: 0.85rem;
   padding: 4px 12px;
@@ -126,8 +188,8 @@ h1 {
 }
 
 .section-nav-link:hover {
-  color: #f5f5f5;
-  background-color: #2a2a2a;
+  color: var(--c-ink);
+  background-color: var(--c-surface-2);
 }
 
 .section-nav-select {
@@ -137,9 +199,9 @@ h1 {
   margin: 0 auto;
   padding: 10px 14px;
   font-size: 1rem;
-  color: #f5f5f5;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
+  color: var(--c-ink);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-line-strong);
   border-radius: 8px;
   -webkit-appearance: none;
   appearance: none;
@@ -160,11 +222,11 @@ h1 {
 }
 
 .section-header {
-  color: #4dac68;
+  color: var(--c-accent);
   font-size: clamp(1.3rem, 4vw, 1.6rem);
   margin: 30px 0 16px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--c-line);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -181,11 +243,11 @@ h1 {
 }
 
 .snippet {
-  background-color: #1a1a1a;
+  background-color: var(--c-surface);
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
-  border: 1px solid #333;
+  box-shadow: var(--c-shadow);
+  border: 1px solid var(--c-line);
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -193,7 +255,7 @@ h1 {
 
 .snippet-header {
   padding: 16px 16px 12px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--c-line);
   flex-shrink: 0;
   min-height: 90px;
 }
@@ -209,7 +271,7 @@ h1 {
 
 .snippet-name {
   font-size: clamp(1.25rem, 4vw, 1.5rem);
-  color: #f5f5f5;
+  color: var(--c-ink);
   font-weight: 700;
   line-height: 1.3;
   flex: 1;
@@ -219,8 +281,8 @@ h1 {
 }
 
 .abv-badge {
-  background-color: #4dac68;
-  color: #000;
+  background-color: var(--c-accent-bg);
+  color: var(--c-on-accent);
   padding: 6px 12px;
   border-radius: 20px;
   font-weight: bold;
@@ -239,14 +301,14 @@ h1 {
 
 .producer {
   font-size: 0.95rem;
-  color: #aaa;
+  color: var(--c-muted);
   font-weight: 500;
   line-height: 1.3;
 }
 
 .snippet-style {
   font-size: 0.9rem;
-  color: #4dac68;
+  color: var(--c-accent);
   font-weight: 500;
   font-style: italic;
   line-height: 1.3;
@@ -254,7 +316,7 @@ h1 {
 
 .on-tap-badge {
   font-size: 0.82rem;
-  color: #e8a838;
+  color: var(--c-on-tap);
   font-weight: 500;
   margin-top: 2px;
 }
@@ -275,8 +337,8 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #2a2a2a;
-  border: 1px solid #444;
+  background-color: var(--c-surface-2);
+  border: 1px solid var(--c-line-strong);
 }
 
 /* Untappd link must fill the container, or the inline img gets a baseline gap and shifts up */
@@ -294,7 +356,7 @@ h1 {
 }
 
 .snippet-image .placeholder {
-  color: #666;
+  color: var(--c-faint);
   font-size: 2rem;
 }
 
@@ -328,7 +390,7 @@ h1 {
 }
 
 .snippet-description {
-  color: #bbb;
+  color: var(--c-text);
   margin-bottom: 16px;
   font-size: 0.92rem;
   line-height: 1.5;
@@ -338,9 +400,9 @@ h1 {
 .snippet-prices {
   display: flex;
   justify-content: space-between;
-  background-color: #2a2a2a;
+  background-color: var(--c-surface-2);
   padding: 12px 14px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--c-line);
 }
 
 .price-option {
@@ -362,12 +424,12 @@ h1 {
 
 .size {
   font-size: 0.85rem;
-  color: #aaa;
+  color: var(--c-muted);
 }
 
 .price {
   font-size: 1.2rem;
-  color: #4dac68;
+  color: var(--c-accent);
   font-weight: 700;
 }
 
@@ -375,18 +437,26 @@ h1 {
   text-align: center;
   margin-top: 35px;
   padding-top: 18px;
-  border-top: 1px solid #333;
-  color: #888;
+  border-top: 1px solid var(--c-line);
+  color: var(--c-muted-2);
   font-size: 0.85rem;
 }
 
 .footer .icon {
-  color: #4caf50;
+  color: var(--c-footer-link);
 }
 
 .footer a {
-  color: #4caf50;
+  color: var(--c-footer-link);
   text-decoration: none;
+}
+
+.footer-venue {
+  margin: 6px 0;
+}
+
+.footer-venue a {
+  font-weight: 600;
 }
 
 .footer a:hover {
@@ -394,7 +464,7 @@ h1 {
 }
 
 .footer a:focus-visible {
-  outline: 2px solid #4caf50;
+  outline: 2px solid var(--c-footer-link);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -408,18 +478,18 @@ h1 {
 
 .not-found-icon {
   font-size: 4rem;
-  color: #4dac68;
+  color: var(--c-accent);
   margin-bottom: 20px;
 }
 
 .not-found h2 {
-  color: #f5f5f5;
+  color: var(--c-ink);
   font-size: 1.6rem;
   margin-bottom: 16px;
 }
 
 .not-found p {
-  color: #aaa;
+  color: var(--c-muted);
   font-size: 1rem;
   margin-bottom: 12px;
 }
@@ -428,8 +498,8 @@ h1 {
   display: inline-block;
   margin-top: 24px;
   padding: 10px 28px;
-  background-color: #4dac68;
-  color: #000;
+  background-color: var(--c-accent-bg);
+  color: var(--c-on-accent);
   text-decoration: none;
   border-radius: 6px;
   font-weight: 600;
@@ -438,7 +508,7 @@ h1 {
 }
 
 .not-found-link:hover {
-  background-color: #5cc07a;
+  background-color: var(--c-accent-bg-hover);
 }
 
 /* Tablet and Desktop - Override mobile styles */
@@ -450,7 +520,7 @@ h1 {
 
   .snippet {
     border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--c-shadow-lg);
   }
 
   .snippet-header {
@@ -637,23 +707,23 @@ html {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9998;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  box-shadow: var(--c-shadow-sm);
   transition: box-shadow 0.2s;
 }
 
 .scroll-top:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+  box-shadow: var(--c-shadow-hover);
 }
 
 .scroll-top .icon {
-  color: #f5f5f5;
+  color: var(--c-ink);
   font-size: 1rem;
   z-index: 1;
 }
@@ -694,8 +764,8 @@ html {
   --rating: 0;
   --size: 14px;
   --gap: 1px;
-  --empty: #444;
-  --filled: #f59e0b;
+  --empty: var(--c-rating-empty);
+  --filled: var(--c-rating-filled);
 
   display: flex;
   align-items: center;
@@ -729,12 +799,12 @@ html {
 .rating-value {
   font-weight: 600;
   font-size: 0.95rem;
-  color: #f5f5f5;
+  color: var(--c-ink);
 }
 
 .rating-label {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--c-muted-2);
   margin-left: 4px;
 }
 
@@ -759,14 +829,14 @@ html {
   max-width: 420px;
   padding: 10px 14px;
   font-size: 1rem;
-  color: #f5f5f5;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
+  color: var(--c-ink);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-line-strong);
   border-radius: 8px;
 }
 
 .store-search:focus-visible {
-  outline: 2px solid #4dac68;
+  outline: 2px solid var(--c-accent);
   outline-offset: 2px;
 }
 
@@ -778,9 +848,9 @@ html {
 }
 
 .store-chip {
-  color: #aaa;
-  background-color: #1a1a1a;
-  border: 1px solid #444;
+  color: var(--c-muted);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-line-strong);
   border-radius: 16px;
   padding: 4px 12px;
   font-size: 0.85rem;
@@ -789,18 +859,18 @@ html {
 }
 
 .store-chip:hover {
-  color: #f5f5f5;
-  border-color: #666;
+  color: var(--c-ink);
+  border-color: var(--c-line-hover);
 }
 
 .store-chip.active {
-  color: #000;
-  background-color: #4dac68;
-  border-color: #4dac68;
+  color: var(--c-on-accent);
+  background-color: var(--c-accent-bg);
+  border-color: var(--c-accent-bg);
 }
 
 .store-chip:focus-visible {
-  outline: 2px solid #4dac68;
+  outline: 2px solid var(--c-accent);
   outline-offset: 2px;
 }
 
@@ -811,35 +881,113 @@ html {
 
 .store-no-results {
   text-align: center;
-  color: #aaa;
+  color: var(--c-muted);
   margin: 30px 0;
 }
 
 /* Symmetric margins keep several sizes centred, also when they wrap */
 .container-size {
   font-size: 1rem;
-  color: #f5f5f5;
+  color: var(--c-ink);
   font-weight: 600;
   white-space: nowrap;
   margin: 0 7px;
 }
 
 .container-size .icon {
-  color: #4dac68;
+  color: var(--c-accent);
   margin-right: 4px;
 }
 
-/* Three tabs (On Tap / Bottles & Cans / Beer Store) don't fit a phone at the
-   default spacing; the two-tab garden nav keeps its layout */
-@media (max-width: 480px) {
-  .page-nav:has(> .nav-link:nth-child(3)) {
-    gap: 4px;
+/* Light/dark switcher (header.ejs): round button in the header's top-right corner, centred on
+   the title's first line. --h1-size mirrors the h1 font size above (line-height 1.6) */
+header {
+  position: relative;
+  --h1-size: clamp(1.8rem, 5vw, 2.8rem);
+  --scheme-toggle-size: 40px;
+}
+
+.scheme-toggle {
+  position: absolute;
+  top: calc((var(--h1-size) * 1.6 - var(--scheme-toggle-size)) / 2);
+  right: 0;
+  width: var(--scheme-toggle-size);
+  height: var(--scheme-toggle-size);
+  padding: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-muted);
+  background-color: var(--c-surface);
+  border: 1px solid var(--c-line);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.scheme-toggle:hover {
+  color: var(--c-accent);
+  border-color: var(--c-line-hover);
+}
+
+.scheme-toggle:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+}
+
+.scheme-icon {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Shows the mode you switch to: the sun in dark mode, the moon in light mode */
+.scheme-icon-moon {
+  display: none;
+}
+
+:root[data-theme="light"] .scheme-icon-moon {
+  display: block;
+}
+
+:root[data-theme="light"] .scheme-icon-sun {
+  display: none;
+}
+
+/* Light cards lose the dark page's contrast: outline the active tab instead */
+:root[data-theme="light"] .nav-link.active {
+  box-shadow: inset 0 0 0 1px var(--c-line);
+}
+
+.scroll-top-ring circle {
+  stroke: var(--c-accent);
+}
+
+/* Keep the centred title clear of the button (only pages that have one) */
+@media (max-width: 768px) {
+  header {
+    --scheme-toggle-size: 36px;
   }
 
-  .page-nav:has(> .nav-link:nth-child(3)) .nav-link {
-    padding: 6px 8px;
-    font-size: 0.92rem;
-    white-space: nowrap;
+  header:has(.scheme-toggle) h1 {
+    padding: 0 44px;
+  }
+
+  .scheme-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    --h1-size: 1.7rem;
   }
 }
 
@@ -866,6 +1014,7 @@ html {
 
   .page-nav,
   .lang-switch,
+  .scheme-toggle,
   .store-filter {
     display: none;
   }

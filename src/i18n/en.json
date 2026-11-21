@@ -56,7 +56,7 @@
         "taps": "On Tap",
         "bottles": "Bottles & Cans",
         "language": "Language",
-        "store": "Beer Store"
+        "darkMode": "Dark mode"
     },
     "snippet": {
         "alsoOnTap": "also on tap",
@@ -70,7 +70,8 @@
         "address": "Kneginje Zorke 3. Vračar",
         "storeAddress": "Balkanska 21, Belgrade",
         "responsibly": "Always drink responsibly",
-        "opensNewTab": "opens in new tab"
+        "opensNewTab": "opens in new tab",
+        "alsoVisit": "Also visit"
     },
     "scrollTop": {
         "label": "Back to top"
