@@ -23,7 +23,8 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
         src/partials/*     (shared snippets, head, nav, footer…)
         │
         ├─ dist/           (static assets: CSS, images, favicons)
-        └─ dist/api/v1/    (taps.json, fridge.json, store.json — mapped beer data, volumes in ml)
+        └─ dist/api/v1/    (taps.json, fridge.json, store.json — mapped beer data, volumes in ml;
+                            meta.json — per file: last feed time from the Worker's Last-Modified + beer count)
         │
         ▼
     GitHub Pages (via workflow_dispatch in deploy.yml)

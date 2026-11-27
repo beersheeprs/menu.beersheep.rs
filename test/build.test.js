@@ -11,6 +11,8 @@ const {
     validateBeers,
     extractSections,
     BETA_THEMES,
+    lastModifiedIso,
+    buildMeta,
 } = require('../build');
 const list = require('./fixtures/list.json');
 const store = require('./fixtures/store.json');
@@ -177,4 +179,45 @@ test('isNonAlcoholic: only an explicit zero, and only when the ABV is unknown', 
     assert.equal(na('Kriek 0,0%', { abv: 3.5 }), false);
     assert.equal(na('Kriek 0,0%', { abv: 0 }), false);
     assert.equal(na('Clausthaler', { style: 'Non-Alcoholic Beer - Pale Lager', abv: 0.4 }), false);
+});
+
+test('lastModifiedIso reads the Worker header as ISO, null when missing or unreadable', () => {
+    const res = (h) => new Response('{}', { headers: h ? { 'Last-Modified': h } : {} });
+    assert.equal(lastModifiedIso(res('Fri, 27 Nov 2026 00:15:06 GMT')), '2026-11-27T00:15:06.000Z');
+    assert.equal(lastModifiedIso(res(null)), null);
+    assert.equal(lastModifiedIso(res('not a date')), null);
+});
+
+test('buildMeta: per-file update time and beer count; taps and fridge share the garden feed', () => {
+    const taps = list['Draft Beers'].map(mapApiBeer);
+    const fridgeSections = extractSections(list);
+    const storeSections = mapStoreSections(store);
+    const beers = (sections) => sections.reduce((n, s) => n + s.beers.length, 0);
+    const meta = buildMeta({
+        generatedAt: new Date('2026-11-27T00:15:06.076Z'),
+        taps,
+        fridgeSections,
+        storeSections,
+        gardenUpdatedAt: '2026-11-27T00:14:50.000Z',
+        storeUpdatedAt: '2026-11-26T18:00:00.000Z',
+    });
+    assert.deepEqual(meta, {
+        generated_at: '2026-11-27T00:15:06.076Z',
+        taps: { updated_at: '2026-11-27T00:14:50.000Z', count: taps.length },
+        fridge: { updated_at: '2026-11-27T00:14:50.000Z', count: beers(fridgeSections) },
+        store: { updated_at: '2026-11-26T18:00:00.000Z', count: beers(storeSections) },
+    });
+    assert.ok(meta.taps.count > 0 && meta.fridge.count > 0 && meta.store.count > 0);
+
+    // the store page was skipped; the times are unknown (BEER_DATA build, older Worker)
+    const partial = buildMeta({
+        generatedAt: new Date('2026-11-27T00:15:06.076Z'),
+        taps,
+        fridgeSections,
+        storeSections: null,
+        gardenUpdatedAt: null,
+        storeUpdatedAt: null,
+    });
+    assert.equal(partial.store, null);
+    assert.equal(partial.taps.updated_at, null);
 });

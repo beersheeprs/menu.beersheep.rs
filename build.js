@@ -149,32 +149,56 @@ function mapStoreSections(apiData) {
         .filter((section) => section.name && section.beers.length > 0);
 }
 
+/** A response's Last-Modified header as ISO 8601, or null (missing or unreadable). */
+function lastModifiedIso(res) {
+    const header = res.headers.get('last-modified');
+    const date = header ? new Date(header) : null;
+    return date && !Number.isNaN(date.getTime()) ? date.toISOString() : null;
+}
+
 /**
- * Store menu from STORE_DATA (JSON, e.g. test/fixtures/store.json) or the Worker,
- * or null when it can't be loaded (the store page is then skipped).
+ * api/v1/meta.json: when each api/v1 file's menu was last fed to the Worker (the Worker's
+ * Last-Modified; taps and fridge share the garden feed) and how many beers it has, for
+ * monitoring. `store` is null when the store page was skipped; `updated_at` is null when
+ * the time is unknown (BEER_DATA/STORE_DATA builds, or an older Worker).
+ */
+function buildMeta({ generatedAt, taps, fridgeSections, storeSections, gardenUpdatedAt, storeUpdatedAt }) {
+    const count = (sections) => sections.reduce((n, s) => n + s.beers.length, 0);
+    return {
+        generated_at: generatedAt.toISOString(),
+        taps: { updated_at: gardenUpdatedAt, count: taps.length },
+        fridge: { updated_at: gardenUpdatedAt, count: count(fridgeSections) },
+        store: storeSections ? { updated_at: storeUpdatedAt, count: count(storeSections) } : null,
+    };
+}
+
+/**
+ * Store menu from STORE_DATA (JSON, e.g. test/fixtures/store.json) or the Worker:
+ * { sections, updatedAt }, sections null when it can't be loaded (the store page is then
+ * skipped).
  */
 async function fetchStoreSections(apiOrigin) {
     if (process.env.STORE_DATA) {
         console.log('Store: using STORE_DATA env var');
         try {
-            return mapStoreSections(JSON.parse(process.env.STORE_DATA));
+            return { sections: mapStoreSections(JSON.parse(process.env.STORE_DATA)), updatedAt: null };
         } catch (error) {
             console.warn(`Store: ${error.message} — skipping the store page`);
-            return null;
+            return { sections: null, updatedAt: null };
         }
     }
     if (!apiOrigin) {
         console.warn('Store: API_ORIGIN not set — skipping the store page');
-        return null;
+        return { sections: null, updatedAt: null };
     }
     try {
         console.log(`Fetching from ${apiOrigin}/store/list`);
         const res = await fetch(`${apiOrigin}/store/list`);
         if (!res.ok) throw new Error(`API returned ${res.status}: ${res.statusText}`);
-        return mapStoreSections(await res.json());
+        return { sections: mapStoreSections(await res.json()), updatedAt: lastModifiedIso(res) };
     } catch (error) {
         console.warn(`Store: ${error.message} — skipping the store page`);
-        return null;
+        return { sections: null, updatedAt: null };
     }
 }
 
@@ -308,6 +332,7 @@ async function build() {
     try {
         let beerData;
         let bottleSections = [];
+        let gardenUpdatedAt = null;
 
         if (process.env.BEER_DATA) {
             console.log('Using BEER_DATA env var');
@@ -329,6 +354,7 @@ async function build() {
                 throw new Error(`API returned ${res.status}: ${res.statusText}`);
             }
             const apiData = await res.json();
+            gardenUpdatedAt = lastModifiedIso(res);
             const draftBeers = apiData['Draft Beers'];
             if (!draftBeers || !Array.isArray(draftBeers)) {
                 throw new Error('API response missing "Draft Beers" array');
@@ -343,7 +369,9 @@ async function build() {
         }
 
         // The store page must never break the garden pages: any failure skips it
-        const storeSections = await fetchStoreSections(process.env.API_ORIGIN);
+        const { sections: storeSections, updatedAt: storeUpdatedAt } = await fetchStoreSections(
+            process.env.API_ORIGIN
+        );
 
         const ldJson = require('./src/ld-json');
         // One timestamp for every page of the build (og:updated_time, hidden build stamp)
@@ -511,6 +539,19 @@ async function build() {
         if (storeSections) {
             fs.writeFileSync(path.join(distDir, 'api/v1/store.json'), JSON.stringify(storeSections));
         }
+        fs.writeFileSync(
+          path.join(distDir, 'api/v1/meta.json'),
+          JSON.stringify(
+            buildMeta({
+              generatedAt: buildDate,
+              taps: beerData,
+              fridgeSections: bottleSections,
+              storeSections,
+              gardenUpdatedAt,
+              storeUpdatedAt,
+            })
+          )
+        );
 
         // The store page joins the sitemap only once it is public
         if (STORE_PUBLIC && storeSections) {
@@ -546,4 +587,6 @@ module.exports = {
     makeLocalize,
     validateBeers,
     extractSections,
+    lastModifiedIso,
+    buildMeta,
 };
