@@ -1,0 +1,18 @@
+<ul class="drinks-list">
+    <% items.forEach(function(item) { %>
+    <li class="drinks-item">
+        <div class="drinks-name">
+            <span><%= item.name %></span>
+            <% if (item.note) { %><span class="drinks-note"><%= item.note %></span><% } %>
+        </div>
+        <div class="drinks-prices">
+            <% item.prices.forEach(function(p) { %>
+            <span class="drinks-price">
+                <% if (p.volume_ml) { %><span class="size"><%= p.volume_ml / 1000 %>L</span><% } %>
+                <span class="price"><%= p.price %> <%= t('snippet.currency') %></span>
+            </span>
+            <% }) %>
+        </div>
+    </li>
+    <% }) %>
+</ul>

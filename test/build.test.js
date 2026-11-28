@@ -13,6 +13,7 @@ const {
     BETA_THEMES,
     lastModifiedIso,
     buildMeta,
+    mapDrinkSections,
 } = require('../build');
 const list = require('./fixtures/list.json');
 const store = require('./fixtures/store.json');
@@ -220,4 +221,74 @@ test('buildMeta: per-file update time and beer count; taps and fridge share the 
     });
     assert.equal(partial.store, null);
     assert.equal(partial.taps.updated_at, null);
+});
+
+test('mapDrinkSections: titles, serving, groups, prices and localized names', () => {
+    const data = {
+        sections: [
+            {
+                id: 'soda',
+                items: [
+                    { name: 'Coca-Cola', prices: [{ volume: '0.33L', price: 290 }, { volume: '0.25L', price: 260 }, { price: 0 }] },
+                    { prices: [{ price: 100 }] },
+                ],
+            },
+            { id: 'rakija', serving: '5cl', items: [{ name: 'Kovilj Dunja', note: 'Quince', note_sr: '', prices: [{ price: 480 }] }] },
+            { id: 'whisky', serving: '2.5cl', groups: [{ id: 'islay', items: [{ name: 'Ardbeg 10', prices: [{ price: 630 }] }] }, { id: 'speyside', items: [] }] },
+            { id: 'empty', items: [] },
+        ],
+    };
+    const en = mapDrinkSections(data, 'en', makeT('en'));
+    assert.deepEqual(en.map((s) => s.name), ['soda', 'rakija', 'whisky']);
+    assert.equal(en[0].title, 'Soft drinks');
+    assert.equal(en[0].items.length, 1, 'nameless item skipped');
+    assert.deepEqual(en[0].items[0].prices, [{ volume_ml: 250, price: 260 }, { volume_ml: 330, price: 290 }]);
+    assert.equal(en[1].serving_ml, 50);
+    assert.equal(en[1].items[0].note, 'Quince');
+    assert.equal(en[2].serving_ml, 25);
+    assert.deepEqual(en[2].groups.map((g) => g.title), ['Islay — smoky & peaty'], 'empty group dropped');
+
+    const sr = mapDrinkSections(data, 'sr', makeT('sr'));
+    assert.equal(sr[1].items[0].note, '', 'empty note_sr hides the note');
+    assert.equal(sr[2].groups[0].title, 'Islay / dimljeni i tresetni');
+    assert.throws(() => mapDrinkSections({}, 'en', makeT('en')), /no sections/);
+});
+
+test('src/data/drinks.json maps to non-empty sections in every locale', () => {
+    const data = require('../src/data/drinks.json');
+    for (const code of ['en', 'sr']) {
+        const t = makeT(code);
+        const sections = mapDrinkSections(data, code, t);
+        assert.ok(sections.length > 0);
+        for (const s of sections) {
+            assert.notEqual(s.title, `drinks.sections.${s.name}`, `missing ${code} title for ${s.name}`);
+            for (const g of s.groups) assert.ok(!g.title.startsWith('drinks.groups.'), `missing ${code} group title`);
+            for (const item of [...s.items, ...s.groups.flatMap((g) => g.items)]) {
+                assert.ok(item.prices.length > 0, `${item.name} has no price`);
+            }
+        }
+    }
+});
+
+test('drinks ld-json: bar with a Menu, nested whisky sections, unique ids, priced per volume or serving', () => {
+    const ldJson = require('../src/ld-json');
+    const data = require('../src/data/drinks.json');
+    for (const code of ['en', 'sr']) {
+        const t = makeT(code);
+        const sections = mapDrinkSections(data, code, t);
+        const [bar, site] = ldJson(sections, 'drinks', t, code === 'en' ? '' : '/sr', makeLocalize(code));
+        assert.equal(bar['@type'], 'BarOrPub');
+        assert.equal(site['@type'], 'WebSite');
+        assert.equal(bar.hasMenu['@type'], 'Menu');
+        const items = [];
+        const walk = (s) => { items.push(...(s.hasMenuItem || [])); (s.hasMenuSection || []).forEach(walk); };
+        bar.hasMenu.hasMenuSection.forEach(walk);
+        const total = sections.reduce((n, s) => n + s.items.length + s.groups.reduce((m, g) => m + g.items.length, 0), 0);
+        assert.equal(items.length, total);
+        assert.equal(new Set(items.map((i) => i['@id'])).size, total, 'unique @ids');
+        const byName = Object.fromEntries(items.map((i) => [i.name, i.offers]));
+        assert.equal(byName['Espresso'].price, 240, 'per-serving price');
+        assert.equal(byName['Caol Ila 12'].priceSpecification[0].referenceQuantity.value, 0.025, 'section serving');
+        assert.equal(byName['Schweppes Tonic Water'].priceSpecification[0].referenceQuantity.value, 0.25, 'bottle volume');
+    }
 });

@@ -1,0 +1,136 @@
+{
+    "_comment": "Garden drinks menu (/drinks/), from the printed 'Piće menu' as of 2026-11-28. Prices in RSD. `serving` (\"5cl\") is the section's serving size; `volume` on a price is a bottle size (\"0.25L\"); without either, the price is per serving. `name_sr` / `note_sr` override the English text on /sr/ (`note_sr: \"\"` hides the note there: the rakija names already say the fruit in Serbian). Whisky uses `groups` (regions); titles of sections and groups live in src/i18n (drinks.sections, drinks.groups).",
+    "sections": [
+        {
+            "id": "tea",
+            "items": [
+                { "name": "Aqua de Jamaika", "prices": [{ "price": 230 }] },
+                { "name": "Berry Sextet", "prices": [{ "price": 230 }] },
+                { "name": "Chamomile", "name_sr": "Камилица", "prices": [{ "price": 230 }] },
+                { "name": "China Sencha", "prices": [{ "price": 230 }] },
+                { "name": "English Breakfast", "prices": [{ "price": 230 }] },
+                { "name": "Fire Place", "prices": [{ "price": 230 }] },
+                { "name": "Mint", "name_sr": "Нана", "prices": [{ "price": 230 }] },
+                { "name": "Strawberry", "name_sr": "Јагода", "prices": [{ "price": 230 }] },
+                { "name": "Wild Cherry", "name_sr": "Дивља вишња", "prices": [{ "price": 230 }] }
+            ]
+        },
+        {
+            "id": "coffee",
+            "items": [
+                { "name": "Espresso", "prices": [{ "price": 240 }] },
+                { "name": "Cappuccino", "prices": [{ "price": 280 }] },
+                { "name": "Macchiato", "prices": [{ "price": 260 }] },
+                { "name": "Double Espresso", "name_sr": "Дупли espresso", "prices": [{ "price": 400 }] }
+            ]
+        },
+        {
+            "id": "soda",
+            "items": [
+                { "name": "Sprite", "prices": [{ "volume": "0.25L", "price": 260 }] },
+                { "name": "Coca-Cola", "prices": [{ "volume": "0.25L", "price": 260 }] },
+                { "name": "Coca-Cola Zero", "prices": [{ "volume": "0.33L", "price": 290 }] },
+                { "name": "Fanta", "prices": [{ "volume": "0.25L", "price": 260 }] },
+                { "name": "Schweppes Bitter Lemon", "prices": [{ "volume": "0.25L", "price": 270 }] },
+                { "name": "Schweppes Tonic Water", "prices": [{ "volume": "0.25L", "price": 270 }] }
+            ]
+        },
+        {
+            "id": "water",
+            "items": [
+                { "name": "Rosa still", "name_sr": "Роса негазирана", "prices": [{ "volume": "0.33L", "price": 230 }] },
+                { "name": "Rosa sparkling", "name_sr": "Роса газирана", "prices": [{ "volume": "0.33L", "price": 230 }] }
+            ]
+        },
+        {
+            "id": "rakija",
+            "serving": "5cl",
+            "items": [
+                { "name": "Emperus Nocino Orah", "note": "Walnut", "note_sr": "", "prices": [{ "price": 500 }] },
+                { "name": "Kovilj Dunja", "note": "Quince", "note_sr": "", "prices": [{ "price": 480 }] },
+                { "name": "Kovilj Kajsija", "note": "Apricot", "note_sr": "", "prices": [{ "price": 550 }] },
+                { "name": "Kovilj Šljiva", "note": "Plum", "note_sr": "", "prices": [{ "price": 550 }] },
+                { "name": "Perun Dunja", "note": "Quince", "note_sr": "", "prices": [{ "price": 450 }] },
+                { "name": "Perun Medovina", "note": "Honey", "note_sr": "", "prices": [{ "price": 450 }] },
+                { "name": "Perun Šljiva", "note": "Plum", "note_sr": "", "prices": [{ "price": 420 }] },
+                { "name": "Zarić Kraljica", "prices": [{ "price": 480 }] },
+                { "name": "Branko Dunja", "note": "Quince", "note_sr": "", "prices": [{ "price": 540 }] },
+                { "name": "Branko Kajsija", "note": "Apricot", "note_sr": "", "prices": [{ "price": 540 }] },
+                { "name": "Branko Šljiva", "note": "Plum", "note_sr": "", "prices": [{ "price": 500 }] }
+            ]
+        },
+        {
+            "id": "gin",
+            "serving": "5cl",
+            "items": [
+                { "name": "2 Tales Gin", "prices": [{ "price": 550 }] },
+                { "name": "2 Tales Coffee Gin", "prices": [{ "price": 650 }] },
+                { "name": "2 Tales Pink Gin", "prices": [{ "price": 650 }] },
+                { "name": "2 Tales Ginger Gin", "prices": [{ "price": 550 }] }
+            ]
+        },
+        {
+            "id": "vodka",
+            "serving": "5cl",
+            "items": [
+                { "name": "2 Tales Vodka", "prices": [{ "price": 450 }] }
+            ]
+        },
+        {
+            "id": "whisky",
+            "serving": "2.5cl",
+            "groups": [
+                {
+                    "id": "islay",
+                    "items": [
+                        { "name": "Caol Ila 12", "prices": [{ "price": 560 }] },
+                        { "name": "Port Charlotte 10", "prices": [{ "price": 640 }] },
+                        { "name": "Ardbeg 10", "prices": [{ "price": 630 }] },
+                        { "name": "Lagavulin 16", "prices": [{ "price": 1050 }] },
+                        { "name": "Bruichladdich The Classic Laddie", "prices": [{ "price": 580 }] },
+                        { "name": "Laphroaig 10", "prices": [{ "price": 490 }] }
+                    ]
+                },
+                {
+                    "id": "highlands",
+                    "items": [
+                        { "name": "Oban 14", "prices": [{ "price": 790 }] },
+                        { "name": "Aberfeldy 16", "prices": [{ "price": 895 }] },
+                        { "name": "Highland Park 14", "prices": [{ "price": 1350 }] },
+                        { "name": "Dalmore Cigar Malt Reserve", "prices": [{ "price": 1490 }] },
+                        { "name": "Glencadam 10", "prices": [{ "price": 440 }] }
+                    ]
+                },
+                {
+                    "id": "speyside",
+                    "items": [
+                        { "name": "Craigellachie 13", "prices": [{ "price": 580 }] },
+                        { "name": "Aberlour 12", "prices": [{ "price": 450 }] },
+                        { "name": "Macallan 12", "prices": [{ "price": 1250 }] },
+                        { "name": "The Balvenie DoubleWood 12", "prices": [{ "price": 980 }] },
+                        { "name": "Aberlour A'bunadh", "prices": [{ "price": 780 }] },
+                        { "name": "Benriach The Original Ten", "prices": [{ "price": 390 }] }
+                    ]
+                },
+                {
+                    "id": "american",
+                    "items": [
+                        { "name": "Maker's Mark", "prices": [{ "price": 330 }] },
+                        { "name": "Wild Turkey 101", "prices": [{ "price": 340 }] },
+                        { "name": "Bulleit Bourbon", "prices": [{ "price": 340 }] },
+                        { "name": "Bulleit 95 Rye", "prices": [{ "price": 450 }] },
+                        { "name": "Knob Creek 9", "prices": [{ "price": 450 }] },
+                        { "name": "Gentleman Jack", "prices": [{ "price": 340 }] }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "rum",
+            "serving": "2.5cl",
+            "items": [
+                { "name": "Appleton Estate 12", "prices": [{ "price": 460 }] }
+            ]
+        }
+    ]
+}

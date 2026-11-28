@@ -40,6 +40,11 @@ jobs:
             echo "::error::Store page was skipped"
             exit 1
           fi
+          # Same for the drinks page (src/data/drinks.json is edited by hand)
+          if grep -q '^Drinks: ' build.log; then
+            echo "::error::Drinks page was skipped"
+            exit 1
+          fi
           if grep -q '^Beta: ' build.log; then
             echo "::error::Beta previews were skipped"
             exit 1
@@ -51,8 +56,8 @@ jobs:
         run: |
           # Every beta theme listed in build.js, so adding or removing one needs no change here
           beta=$(node -p "require('./build.js').BETA_THEMES.map(t => ['index.html', 'bottles/index.html', 'store/index.html'].map(p => 'beta/' + t.slug + '/' + p).concat('beta/' + t.slug + '.css')).flat().join(' ')")
-          for page in index.html bottles/index.html store/index.html 404.html \
-                      sr/index.html sr/bottles/index.html sr/store/index.html \
+          for page in index.html bottles/index.html store/index.html drinks/index.html 404.html \
+                      sr/index.html sr/bottles/index.html sr/store/index.html sr/drinks/index.html \
                       api/v1/taps.json api/v1/fridge.json api/v1/store.json api/v1/meta.json \
                       beta/index.html $beta; do
             test -s "dist/$page" || { echo "::error::dist/$page missing"; exit 1; }

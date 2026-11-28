@@ -43,6 +43,30 @@
             "other": "Other"
         }
     },
+    "drinks": {
+        "title": "Beersheep Garden - Coffee, Tea & Spirits",
+        "desc": "Tea, coffee, soft drinks, rakija, gin, vodka, whisky and rum at Beersheep Garden, Belgrade.",
+        "h1": "Beersheep Garden Drinks",
+        "empty": "The drinks menu is not available at the moment.",
+        "sections": {
+            "tea": "Tea",
+            "coffee": "Coffee",
+            "soda": "Soft drinks",
+            "water": "Water",
+            "rakija": "Rakija",
+            "gin": "Gin",
+            "vodka": "Vodka",
+            "whisky": "Whisky",
+            "rum": "Rum"
+        },
+        "groups": {
+            "islay": "Islay — smoky & peaty",
+            "highlands": "Highlands & Islands",
+            "speyside": "Speyside",
+            "american": "Bourbon & American whiskey"
+        },
+        "serving": "{volume} serving"
+    },
     "notFound": {
         "title": "Beersheep Garden - Page Not Found",
         "h1": "Beersheep Garden Taplist",
@@ -56,7 +80,8 @@
         "taps": "On Tap",
         "bottles": "Bottles & Cans",
         "language": "Language",
-        "darkMode": "Dark mode"
+        "darkMode": "Dark mode",
+        "drinks": "Drinks"
     },
     "snippet": {
         "alsoOnTap": "also on tap",
@@ -85,6 +110,8 @@
         "bottleMenuName": "Bottles & Cans",
         "bottleMenuDesc": "Bottled and canned beers",
         "storeDescription": "Craft beer store in Belgrade with bottled and canned beers from local and international breweries.",
-        "storeCatalogName": "Bottles & Cans"
+        "storeCatalogName": "Bottles & Cans",
+        "drinksMenuName": "Drinks",
+        "drinksMenuDesc": "Tea, coffee, soft drinks and spirits"
     }
 }

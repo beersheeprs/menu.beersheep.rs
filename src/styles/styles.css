@@ -133,6 +133,19 @@ h1 {
   cursor: default;
 }
 
+/* Three garden tabs (On Tap / Bottles & Cans / Drinks) must stay on one line down to 360px */
+@media (max-width: 480px) {
+  .page-nav {
+    gap: 4px;
+  }
+
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+  }
+}
+
 .lang-switch {
   /* Hidden until the Serbian version is public; set to `flex` to show the EN / СР switcher */
   display: none;
@@ -1158,4 +1171,92 @@ header {
   .soc-link {
     display: none;
   }
+}
+
+/* Drinks page (drinks.ejs): text-only price list — coffee, tea, soft drinks, spirits */
+.drinks-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  column-gap: 32px;
+}
+
+.drinks-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 1px dashed var(--c-line-strong);
+  color: var(--c-ink);
+  font-size: 1.05rem;
+}
+
+.drinks-name {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.drinks-note {
+  font-size: 0.85rem;
+  color: var(--c-muted);
+}
+
+.drinks-prices {
+  display: flex;
+  gap: 16px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.drinks-price {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.drinks-price .price {
+  font-size: 1.05rem;
+}
+
+@media (max-width: 480px) {
+  .drinks-list {
+    grid-template-columns: 1fr;
+  }
+
+  .drinks-prices {
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-end;
+  }
+}
+
+@media print {
+  .drinks-item {
+    color: #000;
+    border-bottom-color: #ccc;
+    padding: 1.5mm 0;
+    font-size: 10pt;
+  }
+
+  .drinks-price .price {
+    color: #000;
+    font-size: 10pt;
+  }
+}
+
+.drinks-serving {
+  margin: -8px 0 8px;
+  color: var(--c-muted);
+  font-size: 0.9rem;
+}
+
+.drinks-group {
+  margin: 18px 0 4px;
+  color: var(--c-on-tap);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+
+<head>
+    <%# Must come first: browsers only look for the charset in the first 1024 bytes %>
+    <meta charset="utf-8">
+    <% if (process.env.NODE_ENV === 'production' && !theme) { %>
+        <%- partials.gtag %>
+        <%- partials.cftag %>
+    <% } %>
+    <link rel="stylesheet" href="/styles.css" fetchpriority="high">
+    <%- include('partials/head', {pageType}) %>
+    <meta property="og:updated_time" content="<%= buildDate.toISOString() %>" />
+</head>
+
+<body>
+    <%- iconSprite %>
+    <%- include('partials/scroll-top') %>
+    <div class="container">
+        <%- include('partials/header', {pageType}) %>
+        <%- include('partials/ld-json', {ldJson}) %>
+        <main>
+            <% if (sections && sections.length > 0) { %>
+                <%# section-nav.ejs builds its anchors from section.name %>
+                <%- include('partials/section-nav', {sections}) %>
+                <% sections.forEach(function(section) { %>
+                    <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
+                    <section class="beer-section drinks-section" id="<%= slug %>">
+                        <h2 class="section-header"><%= section.title %></h2>
+                        <% if (section.serving_ml) { %>
+                            <p class="drinks-serving"><%= t('drinks.serving', {volume: section.serving_ml / 10 + ' cl'}) %></p>
+                        <% } %>
+                        <% if (section.items.length) { %>
+                            <%- include('partials/drinks-list', {items: section.items}) %>
+                        <% } %>
+                        <% section.groups.forEach(function(group) { %>
+                            <h3 class="drinks-group"><%= group.title %></h3>
+                            <%- include('partials/drinks-list', {items: group.items}) %>
+                        <% }) %>
+                    </section>
+                <% }) %>
+            <% } else { %>
+                <p><%= t('drinks.empty') %></p>
+            <% } %>
+        </main>
+    </div>
+    <%- include('partials/footer') %>
+    <div style="display: none;"><%= buildDate.toUTCString() %></div>
+</body>
+
+</html>

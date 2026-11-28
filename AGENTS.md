@@ -2,7 +2,7 @@
 
 ## Project overview
 
-Static site builder for the **Beersheep Garden** beer menu and the **Beersheep Beer Store** menu (launched 2026-11-28). Fetches beer data from the Cloudflare Worker API, renders it into responsive HTML pages via EJS templates, and deploys to GitHub Pages.
+Static site builder for the **Beersheep Garden** beer and drinks menus and the **Beersheep Beer Store** menu (launched 2026-11-28). Fetches beer data from the Cloudflare Worker API, renders it into responsive HTML pages via EJS templates, and deploys to GitHub Pages.
 
 ## Architecture
 
@@ -17,9 +17,10 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
         src/index.ejs      → dist/index.html     (draft taps)
         src/bottles.ejs    → dist/bottles/index.html  (bottles & cans, URL /bottles/; dist/bottles.html redirects there)
         src/store.ejs      → dist/store/index.html    (Beer Store, URL /store/, from API_ORIGIN/store/list; in the sitemap while STORE_PUBLIC=true)
+        src/drinks.ejs     → dist/drinks/index.html   (garden tea, coffee, soft drinks, spirits; from src/data/drinks.json, not the API)
         src/404.ejs        → dist/404.html        (custom error page, default locale only)
         src/beta.ejs       → dist/beta/index.html (design previews index; themes at /beta/<slug>/)
-        (index/bottles rendered once per locale: en → dist/, sr → dist/sr/)
+        (index/bottles/store/drinks rendered once per locale: en → dist/, sr → dist/sr/)
         src/partials/*     (shared snippets, head, nav, footer…)
         │
         ├─ dist/           (static assets: CSS, images, favicons)
@@ -38,7 +39,7 @@ API_ORIGIN/list  ─── fetch beer data (sectioned JSON)
 - **GitHub Actions** deploys to GitHub Pages on `workflow_dispatch`
 - **Google Analytics + Cloudflare Web Analytics** (production only, `src/partials/gtag.ejs` and `cftag.ejs`)
 - **Font Awesome 7** icons, inlined at build time as an SVG sprite (`src/icons.js`, from the `@fortawesome/*-svg-icons` packages; templates call `icon(name)`)
-- **`src/ld-json.js`** generates Schema.org `BarOrPub` + `Menu` structured data for the garden pages, and `LiquorStore` + `OfferCatalog` (no opening hours) for the store page
+- **`src/ld-json.js`** generates Schema.org `BarOrPub` + `Menu` structured data for the garden pages, and `LiquorStore` + `OfferCatalog` (no opening hours) for the store page (the drinks page: `BarOrPub` + a drinks `Menu`)
 
 ## Beer data schema (mapped from API)
 
@@ -84,6 +85,7 @@ Priority order in `src/partials/snippet.ejs`:
 
 - Prices sorted **small-to-large** by `volume_ml`, and only entries with `price > 0` — both done in `mapPrices()` (`build.js`), so the templates, JSON-LD and the `dist/api/v1/` mirror all get the same list.
 - If no valid prices remain, shows "Please ask the bartender for price details" — except on the store page, which shows the volumes (`sizes`) instead.
+- The drinks page has its own price list (`src/partials/drinks-list.ejs`), see below.
 - Old `price_small`/`price_big` fallback removed — all beers use `prices`.
 
 ## Beer Store page (`store.ejs`)
@@ -94,6 +96,16 @@ Priority order in `src/partials/snippet.ejs`:
 - **No tabs between venues:** the store is a separate venue, so its page has no On Tap / Bottles & Cans tabs and the garden nav has no store tab. The venues link to each other in the footer only.
 - **Design:** country sections with the jump-to-section nav; search (name/brewery/style, accent-insensitive) and style-group chips, both client-side, shown by the inline script (without JS everything is listed); footer and ld-json use the store's venue (`VENUES` in `build.js`: name + address key).
 - "Beer Store" is a name — never translated in any locale.
+
+## Drinks page (`drinks.ejs`)
+
+- **Data:** `src/data/drinks.json`, edited by hand from the printed garden "Piće menu" (no API, no images). `mapDrinkSections()` in `build.js` maps it per locale.
+- **Shape:** `sections: [{ id, serving?, items?, groups? }]`. `serving` (`"5cl"`, `"2.5cl"`) prints a "5 cl serving" line under the section title; `groups` (`[{ id, items }]`, used for the whisky regions) render as sub-headings. Items are `{ name, note?, prices: [{ volume?, price }] }`; `volume` (`"0.25L"`) is a bottle size, a price without one is per serving. Prices in RSD, sorted small-to-large by volume, `price > 0` only.
+- **Titles:** section and group titles come from i18n (`drinks.sections.<id>`, `drinks.groups.<id>`), so a new section or group needs a key in every locale. The Serbian whisky groups are copied verbatim from the printed menu (Latin script).
+- **Localized items:** `name_<code>` / `note_<code>` override the English. A present `note_<code>` wins even when empty: `note_sr: ""` hides the note on `/sr/` (the rakija notes only repeat the fruit already in the name).
+- **Structured data:** `ld-json.js` (`pageType` `'drinks'`) adds the garden `BarOrPub` with a drinks `Menu`: one `MenuSection` per section, whisky groups as nested `MenuSection`s. A price with a `volume` or a section `serving` is a `UnitPriceSpecification` for that quantity (liters); tea and coffee get a plain `price`. Item `@id`s are `#drinks-<section>-<n>` (positions, since `/sr/` names can be Cyrillic).
+- **Isolated:** an unreadable/invalid `drinks.json` or a render failure logs `Drinks: …` and skips the page (and its nav tab); the other pages still build. CI fails on any `Drinks:` warning and checks `drinks/index.html` + `sr/drinks/index.html`.
+- **Public:** indexable like the other pages of its locale, listed in `src/assets/sitemap.xml`. The garden nav shows a third tab (`nav.drinks`) whenever the page is built (`hasDrinks`); store and beta pages have no drinks tab, and beta themes don't render the drinks page.
 
 ## Beta design previews (`/beta/`)
 
@@ -115,7 +127,7 @@ The deploy workflow (`deploy.yml`):
 
 ## CI
 
-`ci.yml` runs on every pull request and push to `main`: `npm test`, then a production build from `test/fixtures/list.json` (`BEER_DATA`) and `test/fixtures/store.json` (`STORE_DATA`), failing if the store page is skipped or any page is missing. The fixtures are trimmed real API rows covering the template branches (on-tap badge, missing prices, non-alcoholic without ABV, several sizes, a nameless store row); keep them in sync when the API shape changes.
+`ci.yml` runs on every pull request and push to `main`: `npm test`, then a production build from `test/fixtures/list.json` (`BEER_DATA`) and `test/fixtures/store.json` (`STORE_DATA`), failing if the store or drinks page is skipped or any page is missing. The drinks page is built from the real `src/data/drinks.json` (no fixture). The fixtures are trimmed real API rows covering the template branches (on-tap badge, missing prices, non-alcoholic without ABV, several sizes, a nameless store row); keep them in sync when the API shape changes.
 
 ## Commands
 
@@ -151,7 +163,7 @@ Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixt
 - Desktop: default
 - 769px: larger images (120px), HD gets 200px
 - 768px: 100px images, HD gets 170px
-- 480px: compact layout
+- 480px: compact layout (garden tabs tighten so the three stay on one line; drinks list goes to one column)
 - 360px: minimum width
 - Print: small images, no backgrounds
 
@@ -161,8 +173,9 @@ Offline: `BEER_DATA="$(cat test/fixtures/list.json)" STORE_DATA="$(cat test/fixt
 |---|---|
 | `head.ejs` | `<meta>` tags, OG/Twitter cards, favicons, canonical URL |
 | `header.ejs` | `<h1>` + page nav + light/dark switcher |
-| `nav.ejs` | "On Tap" / "Bottles & Cans" tab links on the garden pages; the store page has no tabs |
-| `section-nav.ejs` | Jump-to-section links (bottles and store pages) |
+| `nav.ejs` | "On Tap" / "Bottles & Cans" / "Drinks" tab links on the garden pages (Drinks when `hasDrinks`); the store page has no tabs |
+| `section-nav.ejs` | Jump-to-section links (bottles, store and drinks pages; label is `section.title` when set, else `section.name`; anchors always from `section.name`) |
+| `drinks-list.ejs` | Text-only drinks price list (name, note, prices) used by `drinks.ejs` |
 | `snippet.ejs` | Single beer card (image, name, style, ABV, prices, rating) |
 | `ld-json.ejs` | Inlines the `<script type="application/ld+json">` block |
 | `scroll-top.ejs` | Fixed scroll-to-top button + CSS scroll-progress ring |
