@@ -2,14 +2,14 @@
     <div class="section-nav-links">
         <% sections.forEach(section => { %>
             <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
-            <a href="#<%= slug %>" class="section-nav-link"><%= section.name %></a>
+            <a href="#<%= slug %>" class="section-nav-link"><%= section.title || section.name %></a>
         <% }) %>
     </div>
     <select class="section-nav-select" aria-label="<%= t('bottles.jumpTo') %>" onchange="if(this.value) window.location.href=this.value">
         <option value=""><%= t('bottles.jumpToPlaceholder') %></option>
         <% sections.forEach(section => { %>
             <% var slug = section.name.replace(/[^a-zA-Z0-9]/g, '-').replace(/-+/g, '-').toLowerCase(); %>
-            <option value="#<%= slug %>"><%= section.name %></option>
+            <option value="#<%= slug %>"><%= section.title || section.name %></option>
         <% }) %>
     </select>
 </nav>

@@ -68,6 +68,55 @@ function storeLdJson(sections, t, base, localize) {
     return [store, webSite];
 }
 
+/**
+ * Garden drinks page: the bar with a Menu of the mapped drink sections (mapDrinkSections).
+ * Whisky regions are nested MenuSections. A price with a volume (bottled soft drinks) or a
+ * section serving size (spirits) gets a UnitPriceSpecification for that quantity; anything
+ * else (tea, coffee) is a plain per-serving price. Item @ids use the section and position, since
+ * names on /sr/ can be Cyrillic and would sanitize to nothing.
+ */
+function drinksMenu(sections, t) {
+    const menuItem = (item, idPrefix, servingMl) => {
+        const offers = { "@type": "Offer", "priceCurrency": "RSD" };
+        const quantified = item.prices.filter((p) => p.volume_ml || servingMl);
+        if (quantified.length > 0) {
+            offers.priceSpecification = item.prices.map(({ volume_ml, price }) => ({
+                "@type": "UnitPriceSpecification",
+                "price": price,
+                "priceCurrency": "RSD",
+                "referenceQuantity": { "@type": "QuantitativeValue", "value": (volume_ml || servingMl) / 1000, "unitCode": "LTR" }
+            }));
+        } else if (item.prices.length > 0) {
+            offers.price = item.prices[0].price;
+        }
+        const menuItem = { "@type": "MenuItem", "@id": idPrefix, "name": item.name, "offers": offers };
+        if (item.note) menuItem.description = item.note;
+        return menuItem;
+    };
+    return {
+        "@type": "Menu",
+        "@id": "#drinks-menu",
+        "name": t('ld.drinksMenuName'),
+        "description": t('ld.drinksMenuDesc'),
+        "hasMenuSection": sections.map((section) => {
+            const id = `#drinks-${section.name}`;
+            const menuSection = { "@type": "MenuSection", "@id": id, "name": section.title };
+            if (section.items.length > 0) {
+                menuSection.hasMenuItem = section.items.map((item, i) => menuItem(item, `${id}-${i + 1}`, section.serving_ml));
+            }
+            if (section.groups.length > 0) {
+                menuSection.hasMenuSection = section.groups.map((group, g) => ({
+                    "@type": "MenuSection",
+                    "@id": `${id}-group-${g + 1}`,
+                    "name": group.title,
+                    "hasMenuItem": group.items.map((item, i) => menuItem(item, `${id}-${g + 1}-${i + 1}`, section.serving_ml))
+                }));
+            }
+            return menuSection;
+        })
+    };
+}
+
 module.exports = function (data, pageType, t, base, localize) {
     if (pageType === 'store') return storeLdJson(data, t, base, localize);
 
@@ -140,7 +189,9 @@ module.exports = function (data, pageType, t, base, localize) {
         };
     }
 
-    if (pageType === 'bottles') {
+    if (pageType === 'drinks') {
+        if (data.length > 0) bar.hasMenu = drinksMenu(data, t);
+    } else if (pageType === 'bottles') {
         if (data.length > 0) {
             bar.servesCuisine = ["Beer"];
             bar.hasMenu = {

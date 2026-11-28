@@ -43,6 +43,30 @@
             "other": "Остало"
         }
     },
+    "drinks": {
+        "title": "Beersheep Garden – Кафа, чај и жестока пића",
+        "desc": "Чајеви, кафа, сокови, ракија, џин, вотка, виски и рум у Beersheep Garden-у, Београд.",
+        "h1": "Beersheep Garden – Пића",
+        "empty": "Мени пића тренутно није доступан.",
+        "sections": {
+            "tea": "Чајеви",
+            "coffee": "Кафа",
+            "soda": "Газирани сокови",
+            "water": "Вода",
+            "rakija": "Ракија",
+            "gin": "Џин",
+            "vodka": "Вотка",
+            "whisky": "Виски",
+            "rum": "Рум"
+        },
+        "groups": {
+            "islay": "Islay / dimljeni i tresetni",
+            "highlands": "Highlands / Islands",
+            "speyside": "Speyside",
+            "american": "Bourbon / American Whiskey"
+        },
+        "serving": "Порција {volume}"
+    },
     "notFound": {
         "title": "Beersheep Garden – Страница није пронађена",
         "h1": "Beersheep Garden – На точилицама",
@@ -56,7 +80,8 @@
         "taps": "Точилице",
         "bottles": "Флаше и лименке",
         "language": "Језик",
-        "darkMode": "Тамни режим"
+        "darkMode": "Тамни режим",
+        "drinks": "Пића"
     },
     "snippet": {
         "alsoOnTap": "има и на точилици",
@@ -85,7 +110,9 @@
         "bottleMenuName": "Флаше и лименке",
         "bottleMenuDesc": "Пива у флашама и лименкама",
         "storeDescription": "Продавница крафт пива у Београду — пива у флашама и лименкама домаћих и страних пивара.",
-        "storeCatalogName": "Флаше и лименке"
+        "storeCatalogName": "Флаше и лименке",
+        "drinksMenuName": "Пића",
+        "drinksMenuDesc": "Чајеви, кафа, сокови и жестока пића"
     },
     "countries": {
         "Australia": "Аустралија",

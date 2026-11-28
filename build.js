@@ -202,6 +202,47 @@ async function fetchStoreSections(apiOrigin) {
     }
 }
 
+// Garden drinks page (/drinks/): tea, coffee, soft drinks and spirits from a hand-kept file,
+// not the API. Public like the other garden pages (in src/assets/sitemap.xml); linked from the
+// garden nav whenever it builds.
+const DRINKS_FILE = path.join(__dirname, 'src/data/drinks.json');
+
+/**
+ * src/data/drinks.json → [{ name, title, serving_ml, items, groups: [{ title, items }] }] for a
+ * locale; items are [{ name, note, prices: [{ volume_ml, price }] }]. Titles come from i18n
+ * (drinks.sections.<id>, drinks.groups.<id>); `name_<code>` / `note_<code>` override the English
+ * (an empty `note_<code>` means no note in that locale).
+ * `serving` ("5cl") is the section's serving size; a price without a volume is per serving.
+ */
+function mapDrinkSections(data, code, t) {
+    if (!data || !Array.isArray(data.sections)) throw new Error('drinks: no sections array');
+    // A `<key>_<code>` that is present wins even when empty: `note_sr: ""` hides the note on /sr/
+    const pick = (obj, key) =>
+        code !== DEFAULT_LOCALE && obj[`${key}_${code}`] != null ? obj[`${key}_${code}`] : obj[key];
+    const mapItems = (items) =>
+        (items || [])
+            .filter((item) => item.name)
+            .map((item) => ({
+                name: pick(item, 'name'),
+                note: pick(item, 'note'),
+                prices: (item.prices || [])
+                    .filter((p) => p.price > 0)
+                    .map((p) => ({ volume_ml: p.volume ? parseVolumeMl(p.volume) : null, price: p.price }))
+                    .sort((a, b) => (a.volume_ml || 0) - (b.volume_ml || 0)),
+            }));
+    return data.sections
+        .map((section) => ({
+            name: section.id,
+            title: t(`drinks.sections.${section.id}`),
+            serving_ml: section.serving ? parseVolumeMl(section.serving) : null,
+            items: mapItems(section.items),
+            groups: (section.groups || [])
+                .map((group) => ({ title: t(`drinks.groups.${group.id}`), items: mapItems(group.items) }))
+                .filter((group) => group.items.length > 0),
+        }))
+        .filter((section) => section.items.length > 0 || section.groups.length > 0);
+}
+
 // Design previews at /beta/<slug>/ (English only): the same pages and data, plus an
 // override stylesheet (src/styles/beta/<slug>.css) and its Google Fonts. Never indexed:
 // noindex meta, Disallow in robots.txt, not in the sitemap, not linked from public pages.
@@ -415,6 +456,15 @@ async function build() {
         const bottlesTemplate = fs.readFileSync(path.join(__dirname, 'src/bottles.ejs'), 'utf8');
         const storeTemplate = fs.readFileSync(path.join(__dirname, 'src/store.ejs'), 'utf8');
         const notFoundTemplate = fs.readFileSync(path.join(__dirname, 'src/404.ejs'), 'utf8');
+        // Like the store, the drinks page must never break the garden pages: any failure skips it
+        let drinksTemplate = null;
+        let drinksData = null;
+        try {
+            drinksTemplate = fs.readFileSync(path.join(__dirname, 'src/drinks.ejs'), 'utf8');
+            drinksData = JSON.parse(fs.readFileSync(DRINKS_FILE, 'utf8'));
+        } catch (error) {
+            console.warn(`Drinks: ${error.message} — skipping the drinks page`);
+        }
 
         const render = async (template, data) => {
             // EJS reads options (filename: base path for include()) only from the third argument
@@ -479,9 +529,27 @@ async function build() {
 
             // Cards at the top of each page whose labels load eagerly with fetchpriority="high"
             const eagerImages = 3;
-            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, otherVenue: storeSections ? VENUES.store : null, theme: null, colorScheme: COLOR_SCHEME };
+            const common = { eagerImages, partials, icon: icons.icon, iconSprite: icons.sprite, t, localize, lang: code, base, locales, isPublic: locale.public, buildDate, environment, venue: VENUES.garden, otherVenue: storeSections ? VENUES.store : null, theme: null, colorScheme: COLOR_SCHEME, hasDrinks: !!drinksData };
 
             await writePages(outDir, common);
+
+            if (drinksData) {
+                try {
+                    const drinkSections = mapDrinkSections(drinksData, code, t);
+                    const drinksHtml = await render(drinksTemplate, {
+                        ...common,
+                        sections: drinkSections,
+                        ldJson: ldJson(drinkSections, 'drinks', t, base, localize),
+                        pageType: 'drinks',
+                        pagePath: '/drinks/',
+                        filename: 'src/drinks.ejs',
+                    });
+                    fs.mkdirSync(path.join(outDir, 'drinks'), { recursive: true });
+                    fs.writeFileSync(path.join(outDir, 'drinks', 'index.html'), drinksHtml);
+                } catch (error) {
+                    console.warn(`Drinks: rendering failed for "${code}" (${error.message}) — skipping`);
+                }
+            }
             // The page used to live at /bottles.html — keep old links and bookmarks working
             writeRedirect(path.join(outDir, 'bottles.html'), `${base}/bottles/`);
 
@@ -589,4 +657,5 @@ module.exports = {
     extractSections,
     lastModifiedIso,
     buildMeta,
+    mapDrinkSections,
 };

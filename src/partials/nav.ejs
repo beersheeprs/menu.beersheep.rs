@@ -3,6 +3,9 @@
 <nav class="page-nav" aria-label="<%= t('nav.label') %>">
     <a href="<%= base %>/" class="nav-link<%= pageType === 'taps' ? ' active' : '' %>"><%= t('nav.taps') %></a>
     <a href="<%= base %>/bottles/" class="nav-link<%= pageType === 'bottles' ? ' active' : '' %>"><%= t('nav.bottles') %></a>
+    <% if (typeof hasDrinks !== 'undefined' && hasDrinks) { %>
+    <a href="<%= base %>/drinks/" class="nav-link<%= pageType === 'drinks' ? ' active' : '' %>"><%= t('nav.drinks') %></a>
+    <% } %>
 </nav>
 <% } %>
 <nav class="lang-switch" aria-label="<%= t('nav.language') %>">
